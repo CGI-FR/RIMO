@@ -1,6 +1,6 @@
-module github.com/adrienaury/go-template
+module github.com/cgi-fr/rimo
 
-go 1.19
+go 1.20
 
 require (
 	github.com/gorilla/mux v1.8.0

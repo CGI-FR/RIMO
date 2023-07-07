@@ -1,5 +1,5 @@
 {
-    "name": "CHANGE IT",
+    "name": "RIMO",
     "dockerComposeFile": [
         "../docker-compose.yml"
     ],

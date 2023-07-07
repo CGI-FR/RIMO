@@ -4,7 +4,6 @@ name: run cli
 testcases:
   - name: no arguments
     steps:
-      - script: webserver
+      - script: rimo
         assertions:
-          - result.systemout ShouldContainSubstring Hello World!
           - result.code ShouldEqual 0
