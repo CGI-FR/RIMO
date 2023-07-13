@@ -8,7 +8,12 @@ require (
 )
 
 require (
+	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/hexops/valast v1.4.3 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
-	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
+	golang.org/x/mod v0.12.0 // indirect
+	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/tools v0.11.0 // indirect
+	mvdan.cc/gofumpt v0.5.0 // indirect
 )
