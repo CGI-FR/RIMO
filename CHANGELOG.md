@@ -14,18 +14,6 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## Unreleased (detailled)
-
-- `Added` rimo.yaml format 
-- `Changed` loading .jsonl with Numbers json type
-- `Changed` use empty slices of type [json.Numbers, string, bool] to load jsonl
-- `Changed` deal with null cases at first row of .jsonl
-
-## TODO / Notes
-
-- Venom test
-- neon test / compile / lint / test-int
-
 ## [0.1.0]
 
 - `Added` analyse.go : load .jsonl, process, output rimo.yaml

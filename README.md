@@ -1,11 +1,14 @@
 # rimo
+
 ## Description
+
 Rimo contains tools that helps creating a *masking.yaml* for [PIMO](https://github.com/CGI-FR/PIMO).
 It works as a 6 steps process :
 ![rimo steps](.github/img/rimo_steps.png "rimo steps")
+
 1. `gather` : orchestrate LINO to extract table of the database into a *.jsonl* file
 2. `analyse` : extract meaningful information on database from *.jsonl*
-3. `export` : dump data into an *Excel* file which serves as a configuration means 
+3. `export` : dump data into an *Excel* file which serves as a configuration means
 4. `import` : load, store and verify inputted data of the *Excel* file into a *.yaml* file
 5. `build` : create a *pimo_masking.yaml* from *.yaml*
 6. `script` : build a bash script to execute pipeline for PIMO
@@ -18,8 +21,9 @@ It works as a 6 steps process :
 ### `rimo analyser`
 
 ```console
-// to be defined 
+// to be defined
 ```
+
 - `input` : path to a directory or file containing to *jsonl* files
 - `output` : optional path to output. If none, same name and directory as input. If directory, same name as input.
 
@@ -32,6 +36,7 @@ It works as a 6 steps process :
 ```console
 // to be defined
 ```
+
 - `input` : path to a *yaml* file
 - `output` : optional path to output. If none, same name and directory as input. If directory, same name as input.
 
@@ -47,7 +52,7 @@ To implement : Venom tests
 
 In active development
 
-## Contributing 
+## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 `testcase_data.jsonl` in *tests/data* is generated using Faker and does contain any real information.
