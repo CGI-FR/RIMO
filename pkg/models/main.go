@@ -7,11 +7,11 @@ type Column struct {
 	Constraint   []string `yaml:"constraint"`
 	Confidential bool     `yaml:"confidential"`
 
-	MainMetric GenericMetric `yaml:"main_metric"`
+	MainMetric GenericMetric `yaml:"mainMetric"`
 
-	StringMetric  StringMetric  `yaml:"string_metric,omitempty"`
-	NumericMetric NumericMetric `yaml:"numeric_metric,omitempty"`
-	BoolMetric    BoolMetric    `yaml:"bool_metric,omitempty"`
+	StringMetric  StringMetric  `yaml:"stringMetric,omitempty"`
+	NumericMetric NumericMetric `yaml:"numericMetric,omitempty"`
+	BoolMetric    BoolMetric    `yaml:"boolMetric,omitempty"`
 }
 
 type GenericMetric struct {
@@ -21,9 +21,9 @@ type GenericMetric struct {
 }
 
 type StringMetric struct {
-	MostFreqLen     map[int]float64 `yaml:"most_frequent_len"`
-	LeastFreqLen    map[int]float64 `yaml:"least_frequent_len"`
-	LeastFreqSample []string        `yaml:"least_frequent_sample"`
+	MostFreqLen     map[int]float64 `yaml:"mostFrequentLen"`
+	LeastFreqLen    map[int]float64 `yaml:"leastFrequentLen"`
+	LeastFreqSample []string        `yaml:"leastFrequentSample"`
 }
 
 type NumericMetric struct {
@@ -33,5 +33,5 @@ type NumericMetric struct {
 }
 
 type BoolMetric struct {
-	TrueRatio float64 `yaml:"true_ratio"`
+	TrueRatio float64 `yaml:"trueRatio"`
 }

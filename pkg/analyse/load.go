@@ -14,7 +14,7 @@ type dataCol struct {
 	values  []interface{}
 }
 
-// Load .jsonl and return DataMap
+// Load .jsonl and return DataMap.
 func load(inputPath string) dataMap {
 	// Open the file
 	CheckFile(inputPath)
@@ -24,13 +24,20 @@ func load(inputPath string) dataMap {
 	}
 	defer file.Close()
 
-	// Instantiate dataMap map[string]interface{}
-	data := dataMap{}
-	// Read each line of the file
 	scanner := bufio.NewScanner(file)
+	data := loadNewJSONStruct(scanner)
+
+	return data
+}
+
+// Reads JSON new structure.
+func loadNewJSONStruct(scanner *bufio.Scanner) dataMap {
+	// Instantiate dataMap map[string]dataCol
+	data := dataMap{}
+
 	for scanner.Scan() {
 		lineMap := make(map[string]interface{})
-		err = json.Unmarshal(scanner.Bytes(), &lineMap)
+		err := json.Unmarshal(scanner.Bytes(), &lineMap)
 		if err != nil {
 			panic(err)
 		}
@@ -47,7 +54,7 @@ func load(inputPath string) dataMap {
 		}
 	}
 
-	// Check for any errors during scanning
+	// Check for any errors during scanning.
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
@@ -55,7 +62,39 @@ func load(inputPath string) dataMap {
 	return data
 }
 
-// Build a map of column names to column types
+// Reads JSON structure.
+func loadJSONStruct(scanner *bufio.Scanner) dataMap {
+	// Instantiate dataMap map[string]dataCol
+	data := dataMap{}
+
+	for scanner.Scan() {
+		lineMap := make(map[string]interface{})
+		err := json.Unmarshal(scanner.Bytes(), &lineMap)
+		if err != nil {
+			panic(err)
+		}
+
+		for colName := range lineMap {
+			if _, ok := data[colName]; !ok {
+				data[colName] = dataCol{
+					colType: "unknown",
+					values:  lineMap[colName].([]interface{}),
+				}
+			} else {
+				log.Fatalf("2 columns with same name: %s", colName)
+			}
+		}
+	}
+
+	// Check for any errors during scanning.
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+
+	return data
+}
+
+// Build a map of column names to column types.
 func buildColType(data dataMap) dataMap {
 	for colName, colData := range data {
 		// Iterate till colType is not unknown
@@ -66,6 +105,7 @@ func buildColType(data dataMap) dataMap {
 			}
 		}
 	}
+
 	return data
 }
 
@@ -82,7 +122,6 @@ func typeOf(v interface{}) string {
 	case bool:
 		return "bool"
 	default:
-		// return string(reflect.TypeOf(row_value))
 		return "unknown"
 	}
 }
