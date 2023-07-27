@@ -8,6 +8,7 @@ import (
 
 func CheckFile(path string) {
 	fileInfo, err := os.Stat(path)
+
 	absPath, _ := filepath.Abs(path)
 	// Check if the file exists
 	if os.IsNotExist(err) {

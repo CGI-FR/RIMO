@@ -1,3 +1,4 @@
+//nolint:forcetypeassert
 package analyse
 
 import (
@@ -7,17 +8,21 @@ import (
 	"os"
 )
 
-type dataMap map[string]dataCol
+// Define which format of JSON is used.
+var jsonFormatFunc = LoadNewJSONStruct //nolint:gochecknoglobals
 
-type dataCol struct {
-	colType string
-	values  []interface{}
+type DataMap map[string]DataCol
+
+type DataCol struct {
+	ColType string
+	Values  []interface{}
 }
 
 // Load .jsonl and return DataMap.
-func load(inputPath string) dataMap {
+func Load(inputPath string) DataMap {
 	// Open the file
 	CheckFile(inputPath)
+
 	file, err := os.Open(inputPath)
 	if err != nil {
 		panic(err)
@@ -25,32 +30,35 @@ func load(inputPath string) dataMap {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	data := loadNewJSONStruct(scanner)
+	data := jsonFormatFunc(scanner)
 
 	return data
 }
 
 // Reads JSON new structure.
-func loadNewJSONStruct(scanner *bufio.Scanner) dataMap {
+// { "col_name" : [value1, value2, ...] }
+func LoadNewJSONStruct(scanner *bufio.Scanner) DataMap {
 	// Instantiate dataMap map[string]dataCol
-	data := dataMap{}
+	data := DataMap{}
 
 	for scanner.Scan() {
 		lineMap := make(map[string]interface{})
+
 		err := json.Unmarshal(scanner.Bytes(), &lineMap)
 		if err != nil {
 			panic(err)
 		}
 
 		for colName := range lineMap {
-			if _, ok := data[colName]; !ok {
-				data[colName] = dataCol{
-					colType: "unknown",
-					values:  lineMap[colName].([]interface{}),
-				}
-			} else {
-				log.Fatalf("2 columns with same name: %s", colName)
+			if _, ok := data[colName]; ok {
+				log.Fatalf("column was found twice: %s", colName)
 			}
+
+			dataCol := DataCol{
+				ColType: "unknown",
+				Values:  lineMap[colName].([]interface{}),
+			}
+			data[colName] = dataCol
 		}
 	}
 
@@ -63,9 +71,10 @@ func loadNewJSONStruct(scanner *bufio.Scanner) dataMap {
 }
 
 // Reads JSON structure.
-func loadJSONStruct(scanner *bufio.Scanner) dataMap {
+// { "col_name" : value, "col_name2" : value2, ... }
+func LoadJSONStruct(scanner *bufio.Scanner) DataMap {
 	// Instantiate dataMap map[string]dataCol
-	data := dataMap{}
+	data := DataMap{}
 
 	for scanner.Scan() {
 		lineMap := make(map[string]interface{})
@@ -76,9 +85,9 @@ func loadJSONStruct(scanner *bufio.Scanner) dataMap {
 
 		for colName := range lineMap {
 			if _, ok := data[colName]; !ok {
-				data[colName] = dataCol{
-					colType: "unknown",
-					values:  lineMap[colName].([]interface{}),
+				data[colName] = DataCol{
+					ColType: "unknown",
+					Values:  lineMap[colName].([]interface{}),
 				}
 			} else {
 				log.Fatalf("2 columns with same name: %s", colName)
@@ -95,13 +104,13 @@ func loadJSONStruct(scanner *bufio.Scanner) dataMap {
 }
 
 // Build a map of column names to column types.
-func buildColType(data dataMap) dataMap {
+func BuildColType(data DataMap) DataMap {
 	for colName, colData := range data {
 		// Iterate till colType is not unknown
-		for i := 0; i < len(colData.values) && data[colName].colType == "unknown"; i++ {
-			data[colName] = dataCol{
-				colType: typeOf(colData.values[i]),
-				values:  colData.values,
+		for i := 0; i < len(colData.Values) && data[colName].ColType == "unknown"; i++ {
+			data[colName] = DataCol{
+				ColType: TypeOf(colData.Values[i]),
+				Values:  colData.Values,
 			}
 		}
 	}
@@ -109,18 +118,18 @@ func buildColType(data dataMap) dataMap {
 	return data
 }
 
-func typeOf(v interface{}) string {
+func TypeOf(v interface{}) string {
 	switch v.(type) {
 	case int:
-		return "int"
+		return "numeric"
 	case float64:
-		return "float64"
+		return "numeric"
 	case json.Number:
 		return "json.Number"
 	case string:
 		return "string"
 	case bool:
-		return "bool"
+		return "boolean"
 	default:
 		return "unknown"
 	}
