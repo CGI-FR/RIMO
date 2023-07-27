@@ -1,0 +1,9 @@
+name: first run rimo
+testcases:
+  - name: test command rimo
+    steps:
+      - script: |-
+          rimo analyse
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldContainSubstring Hello World!
