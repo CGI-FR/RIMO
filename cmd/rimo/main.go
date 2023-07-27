@@ -26,14 +26,13 @@ func main() {
 
 	rootCmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "rimo",
-		Short: "Command line to ...",
+		Short: "Tools to help generate PIMO masking",
 		Version: fmt.Sprintf(`%v (commit=%v date=%v by=%v)
-		Copyright (C) 2021 CGI France
-		License GPLv3: GNU GPL version 3 <https://gnu.org/licenses/gpl.html>.
-		This is free software: you are free to change and redistribute it.
+		// Copyright (C) 2021 CGI France
+		// License GPLv3: GNU GPL version 3 <https://gnu.org/licenses/gpl.html>.
+		// This is free software: you are free to change and redistribute it.
 		There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDate, builtBy),
 		Run: func(cmd *cobra.Command, args []string) {
-			helloWorld()
 		},
 	}
 
