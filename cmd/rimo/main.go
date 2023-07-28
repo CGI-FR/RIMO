@@ -51,6 +51,6 @@ func main() {
 }
 
 func helloWorld() {
-	fmt.Println("Hello world !")
-	log.Print("Hello world !")
+	fmt.Println("Hello World!")
+	log.Print("Hello World!")
 }

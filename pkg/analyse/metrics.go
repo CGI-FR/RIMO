@@ -11,9 +11,9 @@ const (
 )
 
 func ComputeMetric(dataCol DataCol, colName string) models.Column {
-	var confidential *bool = nil
+	var confidential *bool = nil //nolint
 
-	col := models.Column{
+	col := models.Column{ //nolint:exhaustruct
 		Name:         colName,
 		Type:         dataCol.ColType,
 		Concept:      "",
@@ -26,7 +26,7 @@ func ComputeMetric(dataCol DataCol, colName string) models.Column {
 	sample := make([]interface{}, sampleSize)
 
 	for i := 0; i < 5; i++ {
-		sample[i] = dataCol.Values[rand.Intn(len(dataCol.Values))]
+		sample[i] = dataCol.Values[rand.Intn(len(dataCol.Values))] //nolint:gosec
 	}
 
 	col.MainMetric.Sample = sample
