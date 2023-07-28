@@ -10,7 +10,7 @@ const (
 	sampleSize = 5
 )
 
-func computeMetric(dataCol DataCol, colName string) models.Column {
+func ComputeMetric(dataCol DataCol, colName string) models.Column {
 	var confidential *bool = nil
 
 	col := models.Column{
@@ -24,9 +24,11 @@ func computeMetric(dataCol DataCol, colName string) models.Column {
 	col.MainMetric.Count = int64(len(dataCol.Values))
 	col.MainMetric.Unique = int64(len(dataCol.Values))
 	sample := make([]interface{}, sampleSize)
+
 	for i := 0; i < 5; i++ {
 		sample[i] = dataCol.Values[rand.Intn(len(dataCol.Values))]
 	}
+
 	col.MainMetric.Sample = sample
 
 	// Type specific metric
@@ -34,6 +36,7 @@ func computeMetric(dataCol DataCol, colName string) models.Column {
 	case "string":
 		// Create a counter for each string length
 		lengthCounter := make(map[int]int)
+
 		for _, value := range dataCol.Values {
 			if str, ok := value.(string); ok {
 				length := len(str)
@@ -42,8 +45,10 @@ func computeMetric(dataCol DataCol, colName string) models.Column {
 		}
 	case "numeric":
 		// Compute numeric metric
+		break
 	case "bool":
 		// Compute bool metric
+		break
 	}
 
 	return col

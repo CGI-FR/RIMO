@@ -8,6 +8,12 @@ import (
 	"os"
 )
 
+const (
+	Numeric = "numeric"
+	String  = "string"
+	Boolean = "boolean"
+)
+
 // Define which format of JSON is used.
 var jsonFormatFunc = LoadNewJSONStruct //nolint:gochecknoglobals
 
@@ -36,7 +42,7 @@ func Load(inputPath string) DataMap {
 }
 
 // Reads JSON new structure.
-// { "col_name" : [value1, value2, ...] }
+// { "col_name" : [value1, value2, ...] }.
 func LoadNewJSONStruct(scanner *bufio.Scanner) DataMap {
 	// Instantiate dataMap map[string]dataCol
 	data := DataMap{}
@@ -71,13 +77,14 @@ func LoadNewJSONStruct(scanner *bufio.Scanner) DataMap {
 }
 
 // Reads JSON structure.
-// { "col_name" : value, "col_name2" : value2, ... }
+// { "col_name" : value, "col_name2" : value2, ... }.
 func LoadJSONStruct(scanner *bufio.Scanner) DataMap {
 	// Instantiate dataMap map[string]dataCol
 	data := DataMap{}
 
 	for scanner.Scan() {
 		lineMap := make(map[string]interface{})
+
 		err := json.Unmarshal(scanner.Bytes(), &lineMap)
 		if err != nil {
 			panic(err)
@@ -121,15 +128,15 @@ func BuildColType(data DataMap) DataMap {
 func TypeOf(v interface{}) string {
 	switch v.(type) {
 	case int:
-		return "numeric"
+		return Numeric
 	case float64:
-		return "numeric"
+		return Numeric
 	case json.Number:
-		return "json.Number"
+		return Numeric
 	case string:
-		return "string"
+		return String
 	case bool:
-		return "boolean"
+		return Boolean
 	default:
 		return "unknown"
 	}
