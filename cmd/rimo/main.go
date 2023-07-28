@@ -43,6 +43,11 @@ func main() {
 			helloWorld()
 		},
 	})
+
+	if err := rootCmd.Execute(); err != nil {
+		log.Err(err).Msg("Error when executing command")
+		os.Exit(1)
+	}
 }
 
 func helloWorld() {
