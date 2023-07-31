@@ -19,9 +19,6 @@ var jsonFormatFunc = LoadNewJSONStruct //nolint:gochecknoglobals
 
 // Load .jsonl and return DataMap.
 func Load(inputPath string) []DataCol {
-	// Open the file
-	CheckFile(inputPath)
-
 	file, err := os.Open(inputPath)
 	if err != nil {
 		panic(err)

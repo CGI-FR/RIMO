@@ -40,7 +40,6 @@ func main() {
 		Use:   "analyse [input_path] [output_path]",
 		Short: "Analyse a jsonl file and output a yaml file",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Hello World!")
 			inputPath := args[0]
 			outputPath := args[1]
 			// Check if the input path is a directory
