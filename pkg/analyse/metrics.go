@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"math/rand"
 
-	"github.com/cgi-fr/rimo/pkg/models"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 const (
 	sampleSize = 5
 )
 
-func ComputeMetric(dataCol DataCol) models.Column {
+func ComputeMetric(dataCol DataCol) model.Column {
 	var confidential *bool = nil //nolint
 
-	col := models.Column{ //nolint:exhaustruct
+	col := model.Column{ //nolint:exhaustruct
 		Name:         dataCol.ColName,
 		Type:         dataCol.ColType,
 		Concept:      "",
