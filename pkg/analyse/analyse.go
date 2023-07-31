@@ -9,11 +9,8 @@ import (
 )
 
 type DataCol struct {
-	BaseName  string
-	TableName string
-	ColName   string
-	ColType   string
-	Values    []interface{}
+	ColName string
+	Values  []interface{}
 }
 
 // Handle execution pipeline of analyse pkg.
@@ -34,8 +31,8 @@ func Analyse(inputList []string, outputPath string) {
 		// Analyse
 		for dataCol := range data {
 			// Append each column to Base structure.
-			dataTable := ComputeMetric(dataCol)
-			base[baseName][tableName] = dataTable
+			column := ComputeMetric(dataCol)
+			base[baseName][tableName] = column
 		}
 	}
 
