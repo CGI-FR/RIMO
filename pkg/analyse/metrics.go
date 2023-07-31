@@ -1,6 +1,7 @@
 package analyse
 
 import (
+	"encoding/json"
 	"math/rand"
 
 	"github.com/cgi-fr/rimo/pkg/models"
@@ -10,11 +11,11 @@ const (
 	sampleSize = 5
 )
 
-func ComputeMetric(dataCol DataCol, colName string) models.Column {
+func ComputeMetric(dataCol DataCol) models.Column {
 	var confidential *bool = nil //nolint
 
 	col := models.Column{ //nolint:exhaustruct
-		Name:         colName,
+		Name:         dataCol.ColName,
 		Type:         dataCol.ColType,
 		Concept:      "",
 		Constraint:   []string{},
@@ -52,4 +53,36 @@ func ComputeMetric(dataCol DataCol, colName string) models.Column {
 	}
 
 	return col
+}
+
+// Build a map of column names to column types.
+func BuildColType(data DataMap) DataMap {
+	for colName, colData := range data {
+		// Iterate till colType is not unknown
+		for i := 0; i < len(colData.Values) && data[colName].ColType == "unknown"; i++ {
+			data[colName] = DataCol{
+				ColType: TypeOf(colData.Values[i]),
+				Values:  colData.Values,
+			}
+		}
+	}
+
+	return data
+}
+
+func TypeOf(v interface{}) string {
+	switch v.(type) {
+	case int:
+		return Numeric
+	case float64:
+		return Numeric
+	case json.Number:
+		return Numeric
+	case string:
+		return String
+	case bool:
+		return Boolean
+	default:
+		return "unknown"
+	}
 }

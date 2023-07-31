@@ -17,15 +17,8 @@ const (
 // Define which format of JSON is used.
 var jsonFormatFunc = LoadNewJSONStruct //nolint:gochecknoglobals
 
-type DataMap map[string]DataCol
-
-type DataCol struct {
-	ColType string
-	Values  []interface{}
-}
-
 // Load .jsonl and return DataMap.
-func Load(inputPath string) DataMap {
+func Load(inputPath string) []DataCol {
 	// Open the file
 	CheckFile(inputPath)
 
@@ -43,7 +36,7 @@ func Load(inputPath string) DataMap {
 
 // Reads JSON new structure.
 // { "col_name" : [value1, value2, ...] }.
-func LoadNewJSONStruct(scanner *bufio.Scanner) DataMap {
+func LoadNewJSONStruct(scanner *bufio.Scanner) []DataCol {
 	// Instantiate dataMap map[string]dataCol
 	data := DataMap{}
 
@@ -78,7 +71,7 @@ func LoadNewJSONStruct(scanner *bufio.Scanner) DataMap {
 
 // Reads JSON structure.
 // { "col_name" : value, "col_name2" : value2, ... }.
-func LoadJSONStruct(scanner *bufio.Scanner) DataMap {
+func LoadJSONStruct(scanner *bufio.Scanner) []DataCol {
 	// Instantiate dataMap map[string]dataCol
 	data := DataMap{}
 
@@ -108,36 +101,4 @@ func LoadJSONStruct(scanner *bufio.Scanner) DataMap {
 	}
 
 	return data
-}
-
-// Build a map of column names to column types.
-func BuildColType(data DataMap) DataMap {
-	for colName, colData := range data {
-		// Iterate till colType is not unknown
-		for i := 0; i < len(colData.Values) && data[colName].ColType == "unknown"; i++ {
-			data[colName] = DataCol{
-				ColType: TypeOf(colData.Values[i]),
-				Values:  colData.Values,
-			}
-		}
-	}
-
-	return data
-}
-
-func TypeOf(v interface{}) string {
-	switch v.(type) {
-	case int:
-		return Numeric
-	case float64:
-		return Numeric
-	case json.Number:
-		return Numeric
-	case string:
-		return String
-	case bool:
-		return Boolean
-	default:
-		return "unknown"
-	}
 }
