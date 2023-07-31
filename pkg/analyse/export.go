@@ -1,9 +1,9 @@
 package analyse
 
 import (
-	"github.com/cgi-fr/rimo/pkg/models"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
-func Export(base models.Base, outputPath string) {
+func Export(base model.Base, outputPath string) {
 	// Export base to outputPath in YAML format.
 }
