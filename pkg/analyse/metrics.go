@@ -11,39 +11,61 @@ const (
 	sampleSize = 5
 )
 
+// For a given dataCol return a model.Column with metrics.
 func ComputeMetric(dataCol DataCol) model.Column {
+	// Main metric
+	name := dataCol.ColName
+	colType := ColType(dataCol.Values)
+	concept := ""
 	var confidential *bool = nil //nolint
 
-	col := model.Column{ //nolint:exhaustruct
-		Name:         dataCol.ColName,
-		Type:         dataCol.ColType,
-		Concept:      "",
-		Constraint:   []string{},
-		Confidential: *confidential,
-	}
-	// Main metric
-	col.MainMetric.Count = int64(len(dataCol.Values))
-	col.MainMetric.Unique = int64(len(dataCol.Values))
-	sample := make([]interface{}, sampleSize)
+	// Generic metric
+	count := int64(len(dataCol.Values))
+	unique := int64(len(dataCol.Values))
+	sample := Sample(dataCol.Values, sampleSize)
 
-	for i := 0; i < 5; i++ {
-		sample[i] = dataCol.Values[rand.Intn(len(dataCol.Values))] //nolint:gosec
+	genericMetric := model.GenericMetric{
+		Count:  count,
+		Unique: unique,
+		Sample: sample,
 	}
 
-	col.MainMetric.Sample = sample
+	stringMetric := model.StringMetric{}
+	numericMetric := model.NumericMetric{}
+	boolMetric := model.BoolMetric{}
 
 	// Type specific metric
-	switch dataCol.ColType {
+	switch colType {
 	case "string":
-		// Create a counter for each string length
-		lengthCounter := make(map[int]int)
+		// Length frequency.
+		lenCount := LenCounter(dataCol.Values)
 
-		for _, value := range dataCol.Values {
-			if str, ok := value.(string); ok {
-				length := len(str)
-				lengthCounter[length]++
+		// MostFreq and LeastFreq
+		mostFreqLen := 0
+		mostFreqLenCount := 0
+		// LeastFreqLen
+		leastFreqLen := len(dataCol.Values) + 1
+		leastFreqLenCount := 0
+
+		for len, count := range lenCount {
+			if count > mostFreqLenCount {
+				mostFreqLen = len
+				mostFreqLenCount = count
+			}
+			if count < leastFreqLenCount {
+				leastFreqLen = len
+				leastFreqLenCount = count
 			}
 		}
+
+		mostFreqLenFrequency := GetFrequency(mostFreqLenCount, count)
+		leastFreqLenFrequency := GetFrequency(leastFreqLenCount, count)
+
+		// Add metrics to stringMetric
+		stringMetric.MostFreqLen = map[int]float64{mostFreqLen: mostFreqLenFrequency}    // TODO: get 5 most frequent length
+		stringMetric.LeastFreqLen = map[int]float64{leastFreqLen: leastFreqLenFrequency} // TODO: get 5 least frequent length
+		stringMetric.LeastFreqSample = []string{"undefined"}                             // TODO
+
 	case "numeric":
 		// Compute numeric metric
 		break
@@ -52,26 +74,35 @@ func ComputeMetric(dataCol DataCol) model.Column {
 		break
 	}
 
+	// Create the column
+	col := model.Column{ //nolint:exhaustruct
+		Name:         name,
+		Type:         colType,
+		Concept:      concept,
+		Constraint:   []string{},
+		Confidential: *confidential,
+
+		MainMetric: genericMetric,
+
+		StringMetric:  stringMetric,
+		NumericMetric: numericMetric,
+		BoolMetric:    boolMetric,
+	}
+
 	return col
 }
 
-// Build a map of column names to column types.
-func BuildColType(data DataMap) DataMap {
-	for colName, colData := range data {
-		// Iterate till colType is not unknown
-		for i := 0; i < len(colData.Values) && data[colName].ColType == "unknown"; i++ {
-			data[colName] = DataCol{
-				ColType: TypeOf(colData.Values[i]),
-				Values:  colData.Values,
-			}
-		}
+func ColType(values []interface{}) string {
+	colType := "unknown"
+	for i := 0; i < len(values) && colType == "unknown"; i++ {
+		colType = ValueType(values[i])
 	}
 
-	return data
+	return colType
 }
 
-func TypeOf(v interface{}) string {
-	switch v.(type) {
+func ValueType(value interface{}) string {
+	switch value.(type) {
 	case int:
 		return Numeric
 	case float64:
@@ -85,4 +116,32 @@ func TypeOf(v interface{}) string {
 	default:
 		return "unknown"
 	}
+}
+
+func Sample(values []interface{}, sampleSize int) []interface{} {
+	sample := make([]interface{}, sampleSize)
+	for i := 0; i < sampleSize; i++ {
+		sample[i] = values[rand.Intn(len(values))]
+	}
+
+	return sample
+}
+
+// StringSpecificMetric
+
+func LenCounter(values []interface{}) map[int]int {
+	lengthCounter := make(map[int]int)
+
+	for _, value := range values {
+		if str, ok := value.(string); ok {
+			length := len(str)
+			lengthCounter[length]++
+		}
+	}
+
+	return lengthCounter
+}
+
+func GetFrequency(occurence int, count int64) float64 {
+	return float64(occurence) / float64(count)
 }
