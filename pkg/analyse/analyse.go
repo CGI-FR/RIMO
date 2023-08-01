@@ -29,7 +29,7 @@ func Analyse(inputList []string, outputPath string) {
 		data := Load(inputPath)
 
 		// Analyse
-		for dataCol := range data {
+		for _, dataCol := range data {
 			// Append each column to Base structure.
 			column := ComputeMetric(dataCol)
 			base[baseName][tableName] = column
