@@ -12,17 +12,17 @@ const (
 )
 
 // For a given dataCol return a model.Column with metrics.
-func ComputeMetric(dataCol DataCol) model.Column {
+func ComputeMetric(colName string, values []interface{}) model.Column {
 	// Main metric
-	name := dataCol.ColName
-	colType := ColType(dataCol.Values)
+	name := colName
+	colType := ColType(values)
 	concept := ""
 	var confidential *bool = nil //nolint
 
 	// Generic metric
-	count := int64(len(dataCol.Values))
-	unique := int64(len(dataCol.Values))
-	sample := Sample(dataCol.Values, sampleSize)
+	count := int64(len(values))
+	unique := int64(len(values))
+	sample := Sample(values, sampleSize)
 
 	genericMetric := model.GenericMetric{
 		Count:  count,
@@ -38,13 +38,13 @@ func ComputeMetric(dataCol DataCol) model.Column {
 	switch colType {
 	case "string":
 		// Length frequency.
-		lenCount := LenCounter(dataCol.Values)
+		lenCount := LenCounter(values)
 
 		// MostFreq and LeastFreq
 		mostFreqLen := 0
 		mostFreqLenCount := 0
 		// LeastFreqLen
-		leastFreqLen := len(dataCol.Values) + 1
+		leastFreqLen := len(values) + 1
 		leastFreqLenCount := 0
 
 		for len, count := range lenCount {

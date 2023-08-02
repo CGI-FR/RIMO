@@ -4,7 +4,7 @@ package analyse
 import (
 	"bufio"
 	"encoding/json"
-	"log"
+	"fmt"
 	"os"
 )
 
@@ -14,11 +14,17 @@ const (
 	Boolean = "boolean"
 )
 
-// Define which format of JSON is used.
-var jsonFormatFunc = LoadNewJSONStruct //nolint:gochecknoglobals
+var jsonFormatFunc = LoadNewJSONStruct
 
 // Load .jsonl and return DataMap.
-func Load(inputPath string) []DataCol {
+func Load(inputPath string, format string) DataMap {
+	if format == "old" {
+		jsonFormatFunc = LoadOldJSONStruct
+	} else if format == "new" {
+		jsonFormatFunc = LoadNewJSONStruct
+	} else {
+		panic("Format not supported")
+	}
 	file, err := os.Open(inputPath)
 	if err != nil {
 		panic(err)
@@ -31,9 +37,11 @@ func Load(inputPath string) []DataCol {
 	return data
 }
 
+type DataMap map[string][]interface{}
+
 // Reads JSON new structure.
 // { "col_name" : [value1, value2, ...] }.
-func LoadNewJSONStruct(scanner *bufio.Scanner) []DataCol {
+func LoadNewJSONStruct(scanner *bufio.Scanner) DataMap {
 	// Instantiate dataMap map[string]dataCol
 	data := DataMap{}
 
@@ -46,15 +54,21 @@ func LoadNewJSONStruct(scanner *bufio.Scanner) []DataCol {
 		}
 
 		for colName := range lineMap {
+			// Check if colName is already in dataMap.
 			if _, ok := data[colName]; ok {
-				log.Fatalf("column was found twice: %s", colName)
+				// Column already exist in dataMap.
+				// Raise error
+				panic("Column already exist in dataMap")
+			} else {
+				// Column does not exist in dataMap.
+				// Assert linemap[colName] is []interface{}
+				if _, ok := lineMap[colName].([]interface{}); !ok {
+					// print lineMap[colName]
+					fmt.Println(lineMap[colName])
+					panic("Column is not []interface{}")
+				}
+				data[colName] = lineMap[colName].([]interface{})
 			}
-
-			dataCol := DataCol{
-				ColType: "unknown",
-				Values:  lineMap[colName].([]interface{}),
-			}
-			data[colName] = dataCol
 		}
 	}
 
@@ -66,10 +80,10 @@ func LoadNewJSONStruct(scanner *bufio.Scanner) []DataCol {
 	return data
 }
 
-// Reads JSON structure.
+// Reads previous JSON structure.
 // { "col_name" : value, "col_name2" : value2, ... }.
-func LoadJSONStruct(scanner *bufio.Scanner) []DataCol {
-	// Instantiate dataMap map[string]dataCol
+func LoadOldJSONStruct(scanner *bufio.Scanner) DataMap {
+	// Instantiate dataMap map[string][]interface{}
 	data := DataMap{}
 
 	for scanner.Scan() {
@@ -82,12 +96,11 @@ func LoadJSONStruct(scanner *bufio.Scanner) []DataCol {
 
 		for colName := range lineMap {
 			if _, ok := data[colName]; !ok {
-				data[colName] = DataCol{
-					ColType: "unknown",
-					Values:  lineMap[colName].([]interface{}),
-				}
+				// data[colName] does not exist, instantiate it
+				data[colName] = []interface{}{lineMap[colName]}
 			} else {
-				log.Fatalf("2 columns with same name: %s", colName)
+				// Add values to data[colName]
+				data[colName] = append(data[colName], lineMap[colName])
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import (
 )
 
 func TestColType(t *testing.T) {
+	t.Helper()
 	t.Parallel()
 
 	var slice1 []interface{} = []interface{}{1, 2, 3}
@@ -47,9 +48,10 @@ func TestColType(t *testing.T) {
 }
 
 func SampleTest(t *testing.T) {
+	t.Helper()
 	t.Parallel()
 
-	var slice1 []interface{} = []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	slice1 := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}
 	sample1 := analyse.Sample(slice1, 5)
 	sample2 := analyse.Sample(slice1, 5)
 
@@ -65,7 +67,7 @@ func SampleTest(t *testing.T) {
 	}
 
 	if sameOrder == len(sample1) {
-		t.Errorf("2 analyse.Sample(%v, 5) have same order; most likely expected different", slice1, sample1, 5)
+		t.Errorf("2 analyse.Sample(%v, 5) have same order; most likely expected different", slice1)
 	}
 
 	sample3 := analyse.Sample(slice1, 15)
@@ -73,7 +75,7 @@ func SampleTest(t *testing.T) {
 		t.Errorf("analyse.Sample(%v, 15) = %v; expected %v", slice1, sample3, 15)
 	}
 
-	var slice2 []interface{} = []interface{}{"Hello", 2, true}
+	slice2 := []interface{}{"Hello", 2, true}
 	sample4 := analyse.Sample(slice2, 5)
 	if len(sample4) != 3 {
 		t.Errorf("analyse.Sample(%v, 5) = %v; expected sample from different type of element", slice2, sample4)

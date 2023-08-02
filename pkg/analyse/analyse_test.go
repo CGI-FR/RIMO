@@ -13,18 +13,12 @@ const (
 	jsonlOldFormatInputPath = "../../test/data/testcase_data.jsonl"
 )
 
-func TestLoadNewFormat(t *testing.T) {
-	t.Helper()
+func TestPipeline(t *testing.T) {
 	t.Parallel()
 
-	data := analyse.Load(jsonlNewFormatInputPath, "new")
+	data := analyse.Load(jsonlNewFormatInputPath)
 	fmt.Println(valast.String(data))
-}
 
-func TestLoadOldFormat(t *testing.T) {
-	t.Helper()
-	t.Parallel()
-
-	data := analyse.Load(jsonlOldFormatInputPath, "old")
-	fmt.Println(valast.String(data))
+	// dataMap := analyse.ColType(data)
+	// fmt.Println(valast.String(dataMap))
 }

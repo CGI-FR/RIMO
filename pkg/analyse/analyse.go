@@ -8,11 +8,6 @@ import (
 	"github.com/cgi-fr/rimo/pkg/model"
 )
 
-type DataCol struct {
-	ColName string
-	Values  []interface{}
-}
-
 // Handle execution pipeline of analyse pkg.
 func Analyse(inputList []string, outputPath string) {
 	base := make(model.Base)
@@ -26,12 +21,12 @@ func Analyse(inputList []string, outputPath string) {
 		tableName := filepath.Base(inputPath)
 
 		// Load inputFilePath.
-		data := Load(inputPath)
+		data := Load(inputPath, "new")
 
 		// Analyse
-		for _, dataCol := range data {
+		for colName, values := range data {
 			// Append each column to Base structure.
-			column := ComputeMetric(dataCol)
+			column := ComputeMetric(colName, values)
 			base[baseName][tableName] = column
 		}
 	}
