@@ -12,8 +12,7 @@ import (
 func Analyse(inputList []string, outputPath string) {
 	base := make(model.Base)
 
-	// Iterate over inputList and outputList.
-	// Load, Analyse and Export.
+	// Iterate over inputList.
 	for i := range inputList {
 		inputPath := inputList[i]
 		// Extract Base and Table name from inputFilePath.
