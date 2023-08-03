@@ -4,53 +4,78 @@ import (
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestColType(t *testing.T) {
-	t.Helper()
+func TestColType(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
-	slice1 := []interface{}{1, 2, 3}
-	expected1 := "numeric"
+	t.Run("numeric", func(t *testing.T) {
+		t.Helper()
+		t.Parallel()
 
-	if actual1 := analyse.ColType(slice1); actual1 != expected1 {
-		t.Errorf("ColType(%v) = %s; expected %s", slice1, actual1, expected1)
-	}
+		slice := []interface{}{1, 2, 3}
+		expected := "numeric"
 
-	slice2 := []interface{}{nil, 2, 3}
-	expected2 := "numeric"
+		actual := analyse.ColType(slice)
+		require.Equal(t, expected, actual)
+	})
 
-	if actual2 := analyse.ColType(slice2); actual2 != expected2 {
-		t.Errorf("ColType(%v) = %s; expected %s", slice2, actual2, expected2)
-	}
+	t.Run("numeric with nil", func(t *testing.T) {
+		t.Helper()
+		t.Parallel()
 
-	slice3 := []interface{}{nil, "text", nil}
-	expected3 := "string"
+		slice := []interface{}{nil, 2, 3}
+		expected := "numeric"
 
-	if actual3 := analyse.ColType(slice3); actual3 != expected3 {
-		t.Errorf("analyse.ColType(%v) = %s; expected %s", slice3, actual3, expected3)
-	}
+		actual := analyse.ColType(slice)
+		require.Equal(t, expected, actual)
+	})
 
-	slice4 := []interface{}{nil, true, false}
-	expected4 := "boolean"
+	t.Run("string", func(t *testing.T) {
+		t.Helper()
+		t.Parallel()
 
-	if actual4 := analyse.ColType(slice4); actual4 != expected4 {
-		t.Errorf("analyse.ColType(%v) = %s; expected %s", slice4, actual4, expected4)
-	}
+		slice := []interface{}{nil, "text", nil}
+		expected := "string"
 
-	slice5 := []interface{}{"text", 2, false}
-	expected5 := "string"
+		actual := analyse.ColType(slice)
+		require.Equal(t, expected, actual)
+	})
 
-	if actual5 := analyse.ColType(slice5); actual5 != expected5 {
-		t.Errorf("analyse.ColType(%v) = %s; expected %s", slice5, actual5, expected5)
-	}
+	t.Run("boolean", func(t *testing.T) {
+		t.Helper()
+		t.Parallel()
 
-	slice6 := []interface{}{nil, nil, nil}
-	expected6 := "unknown"
+		slice := []interface{}{nil, true, false}
+		expected := "boolean"
 
-	if actual6 := analyse.ColType(slice6); actual6 != expected6 {
-		t.Errorf("analyse.ColType(%v) = %s; expected %s", slice6, actual6, expected6)
-	}
+		actual := analyse.ColType(slice)
+		require.Equal(t, expected, actual)
+	})
+
+	t.Run("mixed", func(t *testing.T) {
+		t.Helper()
+		t.Parallel()
+
+		slice := []interface{}{"text", 2, false}
+		expected := "string"
+
+		actual := analyse.ColType(slice)
+		require.Equal(t, expected, actual)
+	})
+
+	t.Run("unknown", func(t *testing.T) {
+		t.Helper()
+		t.Parallel()
+
+		slice := []interface{}{nil, nil, nil}
+		expected := "unknown"
+
+		actual := analyse.ColType(slice)
+		require.Equal(t, expected, actual)
+	})
 }
 
 func TestSample(t *testing.T) {
@@ -61,31 +86,62 @@ func TestSample(t *testing.T) {
 	sample1 := analyse.Sample(slice1, 5)
 	sample2 := analyse.Sample(slice1, 5)
 
-	if len(sample1) != 5 {
-		t.Errorf("analyse.Sample(%v, 5) = %v; expected %v", slice1, sample1, 5)
-	}
+	t.Run("Sample len", func(t *testing.T) {
+		t.Parallel()
 
-	sameOrder := 0
-
-	for i := 0; i < len(sample1); i++ {
-		if sample1[i] == sample2[i] {
-			sameOrder++
+		if len(sample1) != 5 {
+			t.Errorf("analyse.Sample(%v, 5) = %v; expected %v", slice1, sample1, 5)
 		}
-	}
+	})
 
-	if sameOrder == len(sample1) {
-		t.Errorf("2 analyse.Sample(%v, 5) have same order; most likely expected different", slice1)
-	}
+	t.Run("Sample is random", func(t *testing.T) {
+		t.Parallel()
 
-	sample3 := analyse.Sample(slice1, 15)
-	if len(sample3) != 15 {
-		t.Errorf("analyse.Sample(%v, 15) = %v; expected %v", slice1, sample3, 15)
-	}
+		sameOrder := 0
 
-	slice2 := []interface{}{"Hello", 2, true}
-	sample4 := analyse.Sample(slice2, 5)
+		for i := 0; i < len(sample1); i++ {
+			if sample1[i] == sample2[i] {
+				sameOrder++
+			}
+		}
 
-	if len(sample4) != 5 {
-		t.Errorf("analyse.Sample(%v, 5) = %v; expected sample from different type of element", slice2, sample4)
-	}
+		if sameOrder == len(sample1) {
+			t.Errorf("2 analyse.Sample(%v, 5) have same order; most likely expected different", slice1)
+		}
+	})
+
+	t.Run("Sample len greater than input len", func(t *testing.T) {
+		t.Parallel()
+
+		sample3 := analyse.Sample(slice1, 15)
+		if len(sample3) != 15 {
+			t.Errorf("analyse.Sample(%v, 15) = %v; expected %v", slice1, sample3, 15)
+		}
+	})
+}
+
+func TestLenCouter(t *testing.T) {
+	t.Parallel()
+
+	t.Run("valid input", func(t *testing.T) {
+		t.Helper()
+		t.Parallel()
+
+		slice := []interface{}{"Hello", "Hello", "Hi", ""}
+		expected := map[int]int{5: 2, 2: 1, 0: 1}
+
+		actual, err := analyse.LenCounter(slice)
+		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
+
+	t.Run("invalid input", func(t *testing.T) {
+		t.Helper()
+		t.Parallel()
+
+		slice := []interface{}{"Hello", 2, true}
+
+		_, err := analyse.LenCounter(slice)
+		assert.ErrorIs(t, err, analyse.ErrNonString)
+	})
 }

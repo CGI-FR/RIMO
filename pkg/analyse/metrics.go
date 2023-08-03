@@ -2,6 +2,8 @@ package analyse
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"math/rand"
 
 	"github.com/cgi-fr/rimo/pkg/model"
@@ -38,7 +40,11 @@ func ComputeMetric(colName string, values []interface{}) model.Column {
 	switch colType {
 	case "string":
 		// Length frequency.
-		lenCount := LenCounter(values)
+		lenCount, err := LenCounter(values)
+		if err != nil {
+			// Handle the error here, e.g. log it or return it to the caller
+			log.Printf("Error counting lengths: %v", err)
+		}
 
 		// MostFreq and LeastFreq
 		mostFreqLen := 0
@@ -52,6 +58,7 @@ func ComputeMetric(colName string, values []interface{}) model.Column {
 				mostFreqLen = len
 				mostFreqLenCount = count
 			}
+
 			if count < leastFreqLenCount {
 				leastFreqLen = len
 				leastFreqLenCount = count
@@ -62,9 +69,12 @@ func ComputeMetric(colName string, values []interface{}) model.Column {
 		leastFreqLenFrequency := GetFrequency(leastFreqLenCount, count)
 
 		// Add metrics to stringMetric
-		stringMetric.MostFreqLen = map[int]float64{mostFreqLen: mostFreqLenFrequency}    // TODO: get 5 most frequent length
-		stringMetric.LeastFreqLen = map[int]float64{leastFreqLen: leastFreqLenFrequency} // TODO: get 5 least frequent length
-		stringMetric.LeastFreqSample = []string{"undefined"}                             // TODO
+		// TO DO: get 5 most frequent length
+		stringMetric.MostFreqLen = map[int]float64{mostFreqLen: mostFreqLenFrequency}
+		// TO DO: get 5 least frequent length
+		stringMetric.LeastFreqLen = map[int]float64{leastFreqLen: leastFreqLenFrequency}
+		// TO DO
+		stringMetric.LeastFreqSample = []string{"undefined"}
 
 	case "numeric":
 		// Compute numeric metric
@@ -75,7 +85,7 @@ func ComputeMetric(colName string, values []interface{}) model.Column {
 	}
 
 	// Create the column
-	col := model.Column{ //nolint:exhaustruct
+	col := model.Column{
 		Name:         name,
 		Type:         colType,
 		Concept:      concept,
@@ -129,19 +139,24 @@ func Sample(values []interface{}, sampleSize int) []interface{} {
 
 // StringSpecificMetric
 
-func LenCounter(values []interface{}) map[int]int {
+var ErrNonString = fmt.Errorf("non-string value found")
+
+// LenCounter return a map of length and their occurrence.
+func LenCounter(values []interface{}) (map[int]int, error) {
 	lengthCounter := make(map[int]int)
 
 	for _, value := range values {
 		if str, ok := value.(string); ok {
 			length := len(str)
 			lengthCounter[length]++
+		} else {
+			return nil, ErrNonString
 		}
 	}
 
-	return lengthCounter
+	return lengthCounter, nil
 }
 
-func GetFrequency(occurence int, count int64) float64 {
-	return float64(occurence) / float64(count)
+func GetFrequency(occurrence int, count int64) float64 {
+	return float64(occurrence) / float64(count)
 }
