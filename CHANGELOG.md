@@ -16,4 +16,4 @@ Types of changes
 
 ## [0.1.0]
 
-- `Added` analyse.go : load .jsonl, process, output rimo.yaml
+- `Added` rimo analyse command
