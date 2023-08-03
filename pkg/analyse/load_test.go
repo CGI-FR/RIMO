@@ -2,6 +2,7 @@ package analyse_test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
@@ -22,4 +23,16 @@ func TestLoadOldFormat(t *testing.T) {
 
 	data := analyse.Load(jsonlOldFormatInputPath, "old")
 	fmt.Println(valast.String(data))
+}
+
+func TestEqualityFormat(t *testing.T) {
+	t.Helper()
+	t.Parallel()
+
+	dataNew := analyse.Load(jsonlNewFormatInputPath, "new")
+	dataOld := analyse.Load(jsonlOldFormatInputPath, "old")
+
+	if !reflect.DeepEqual(dataNew, dataOld) {
+		t.Errorf("Data mismatch: %v != %v", dataNew, dataOld)
+	}
 }
