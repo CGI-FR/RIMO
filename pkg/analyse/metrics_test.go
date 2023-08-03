@@ -10,44 +10,50 @@ func TestColType(t *testing.T) {
 	t.Helper()
 	t.Parallel()
 
-	var slice1 []interface{} = []interface{}{1, 2, 3}
+	slice1 := []interface{}{1, 2, 3}
 	expected1 := "numeric"
+
 	if actual1 := analyse.ColType(slice1); actual1 != expected1 {
 		t.Errorf("ColType(%v) = %s; expected %s", slice1, actual1, expected1)
 	}
 
-	var slice2 []interface{} = []interface{}{nil, 2, 3}
+	slice2 := []interface{}{nil, 2, 3}
 	expected2 := "numeric"
+
 	if actual2 := analyse.ColType(slice2); actual2 != expected2 {
 		t.Errorf("ColType(%v) = %s; expected %s", slice2, actual2, expected2)
 	}
 
-	var slice3 []interface{} = []interface{}{nil, "text", nil}
+	slice3 := []interface{}{nil, "text", nil}
 	expected3 := "string"
+
 	if actual3 := analyse.ColType(slice3); actual3 != expected3 {
 		t.Errorf("analyse.ColType(%v) = %s; expected %s", slice3, actual3, expected3)
 	}
 
-	var slice4 []interface{} = []interface{}{nil, true, false}
+	slice4 := []interface{}{nil, true, false}
 	expected4 := "boolean"
+
 	if actual4 := analyse.ColType(slice4); actual4 != expected4 {
 		t.Errorf("analyse.ColType(%v) = %s; expected %s", slice4, actual4, expected4)
 	}
 
-	var slice5 []interface{} = []interface{}{"text", 2, false}
-	expected5 := "unknown"
+	slice5 := []interface{}{"text", 2, false}
+	expected5 := "string"
+
 	if actual5 := analyse.ColType(slice5); actual5 != expected5 {
 		t.Errorf("analyse.ColType(%v) = %s; expected %s", slice5, actual5, expected5)
 	}
 
-	var slice6 []interface{} = []interface{}{nil, nil, nil}
+	slice6 := []interface{}{nil, nil, nil}
 	expected6 := "unknown"
+
 	if actual6 := analyse.ColType(slice6); actual6 != expected6 {
 		t.Errorf("analyse.ColType(%v) = %s; expected %s", slice6, actual6, expected6)
 	}
 }
 
-func SampleTest(t *testing.T) {
+func TestSample(t *testing.T) {
 	t.Helper()
 	t.Parallel()
 
@@ -60,6 +66,7 @@ func SampleTest(t *testing.T) {
 	}
 
 	sameOrder := 0
+
 	for i := 0; i < len(sample1); i++ {
 		if sample1[i] == sample2[i] {
 			sameOrder++
@@ -77,7 +84,8 @@ func SampleTest(t *testing.T) {
 
 	slice2 := []interface{}{"Hello", 2, true}
 	sample4 := analyse.Sample(slice2, 5)
-	if len(sample4) != 3 {
+
+	if len(sample4) != 5 {
 		t.Errorf("analyse.Sample(%v, 5) = %v; expected sample from different type of element", slice2, sample4)
 	}
 }

@@ -8,11 +8,6 @@ import (
 	"github.com/hexops/valast"
 )
 
-const (
-	jsonlNewFormatInputPath = "../../test/data/testcase_newstruct.jsonl"
-	jsonlOldFormatInputPath = "../../test/data/testcase_data.jsonl"
-)
-
 func TestLoadNewFormat(t *testing.T) {
 	t.Helper()
 	t.Parallel()

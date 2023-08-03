@@ -16,7 +16,7 @@ const (
 func TestPipeline(t *testing.T) {
 	t.Parallel()
 
-	data := analyse.Load(jsonlNewFormatInputPath)
+	data := analyse.Load(jsonlNewFormatInputPath, "new")
 	fmt.Println(valast.String(data))
 
 	// dataMap := analyse.ColType(data)
