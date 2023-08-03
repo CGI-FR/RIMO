@@ -2,8 +2,13 @@ package model
 
 // RIMO YAML structure.
 type (
-	Base   map[string]Table
-	Table  map[string]Column
+	Base struct {
+		Name   string `yaml:"database"`
+		Tables []struct {
+			Name    string   `yaml:"name"`
+			Columns []Column `yaml:"columns"`
+		} `yaml:"tables"`
+	}
 	Column struct {
 		Name         string   `yaml:"name"`
 		Type         string   `yaml:"type"`
@@ -19,7 +24,7 @@ type (
 	}
 )
 
-// RIMO YAML metric.
+// RIMO YAML metrics.
 type (
 	GenericMetric struct {
 		Count  int64         `yaml:"count"`
