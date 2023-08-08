@@ -2,3 +2,4 @@
 bin
 .cache
 ROADMAP.md
+test/data/outputTest/

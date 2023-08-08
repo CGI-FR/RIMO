@@ -3,18 +3,19 @@ package model
 // RIMO YAML structure.
 type (
 	Base struct {
-		Name   string `yaml:"database"`
-		Tables []struct {
-			Name    string   `yaml:"name"`
-			Columns []Column `yaml:"columns"`
-		} `yaml:"tables"`
+		Name   string  `yaml:"database"`
+		Tables []Table `yaml:"tables"`
+	}
+	Table struct {
+		Name    string   `yaml:"name"`
+		Columns []Column `yaml:"columns"`
 	}
 	Column struct {
 		Name         string   `yaml:"name"`
 		Type         string   `yaml:"type"`
 		Concept      string   `yaml:"concept"`
 		Constraint   []string `yaml:"constraint"`
-		Confidential bool     `yaml:"confidential"`
+		Confidential *bool    `yaml:"confidential"`
 
 		MainMetric GenericMetric `yaml:"mainMetric"`
 

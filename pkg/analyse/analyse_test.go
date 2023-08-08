@@ -1,17 +1,25 @@
 package analyse_test
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/hexops/valast"
+	"gopkg.in/yaml.v3"
 )
 
 const (
 	jsonlNewFormatInputPath = "../../test/data/testcase_newstruct.jsonl"
 	jsonlOldFormatInputPath = "../../test/data/testcase_data.jsonl"
-	yamlData                = `
+	outputDir               = "../../test/data/outputTest"
+	outputFileNameAnalyse   = "testcase_newstruct.jsonl"
+
+	yamlData = `
 	database: ""
 	tables:
 	  - name: testcase_data
@@ -157,12 +165,82 @@ const (
 `
 )
 
-func TestPipeline(t *testing.T) {
+func TestAnalyse(t *testing.T) {
 	t.Parallel()
 
-	data := analyse.Load(jsonlNewFormatInputPath, "new")
-	fmt.Println(valast.String(data))
+	inputList := []string{jsonlNewFormatInputPath}
+	outputPath := filepath.Join(outputDir, outputFileNameAnalyse)
+	analyse.Analyse(inputList, outputPath)
 
-	// dataMap := analyse.ColType(data)
-	// fmt.Println(valast.String(dataMap))
+	// Read output file
+	file, err := os.Open(outputPath)
+	if err != nil {
+		t.Errorf("Error opening output file: %v", err)
+	}
+	defer file.Close()
+
+	// Decode the YAML data into a model.Base object
+	var baseData model.Base
+
+	decoder := yaml.NewDecoder(file)
+	err = decoder.Decode(&baseData)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// Print the base data
+	fmt.Println(valast.String(baseData))
+}
+
+func TestGetBaseName(t *testing.T) {
+	t.Helper()
+	t.Parallel()
+
+	path := "path/to/dir/basename_tablename.jsonl"
+	expected := "basename"
+
+	if baseName, err := analyse.GetBaseName(path); baseName != expected || err != nil {
+		t.Errorf("GetBaseName(%q) = (%q, %v), expected (%q, %v)", path, baseName, err, expected, nil)
+	}
+
+	path2 := "basename_tablename.jsonl"
+	expected2 := "basename"
+
+	if baseName, err := analyse.GetBaseName(path2); baseName != expected2 || err != nil {
+		t.Errorf("GetBaseName(%q) = (%q, %v), expected (%q, %v)", path2, baseName, err, expected2, nil)
+	}
+
+	invalidPath := ""
+
+	_, err := analyse.GetBaseName(invalidPath)
+	if !errors.Is(err, analyse.ErrNonExtractibleValue) {
+		t.Errorf("expected error %v, but got %v", analyse.ErrNonExtractibleValue, err)
+	}
+}
+
+func TestGetTableName(t *testing.T) {
+	t.Helper()
+	t.Parallel()
+
+	path := "path/to/dir/basename_tablename.jsonl"
+	expected := "tablename"
+
+	if tableName, err := analyse.GetTableName(path); tableName != expected || err != nil {
+		t.Errorf("GetTableName(%q) = (%q, %v), expected (%q, %v)", path, tableName, err, expected, nil)
+	}
+
+	path2 := "basename_tablename.jsonl"
+	expected2 := "tablename"
+
+	if tableName, err := analyse.GetTableName(path2); tableName != expected2 || err != nil {
+		t.Errorf("GetTableName(%q) = (%q, %v), expected (%q, %v)", path2, tableName, err, expected2, nil)
+	}
+
+	invalidPath := ""
+
+	_, err := analyse.GetTableName(invalidPath)
+	if !errors.Is(err, analyse.ErrNonExtractibleValue) {
+		t.Errorf("expected error %v, but got %v", analyse.ErrNonExtractibleValue, err)
+	}
 }

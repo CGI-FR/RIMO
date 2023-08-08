@@ -90,7 +90,7 @@ func ComputeMetric(colName string, values []interface{}) model.Column {
 		Type:         colType,
 		Concept:      concept,
 		Constraint:   []string{},
-		Confidential: *confidential,
+		Confidential: confidential,
 
 		MainMetric: genericMetric,
 
