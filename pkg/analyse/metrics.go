@@ -2,6 +2,7 @@ package analyse
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math/rand"
@@ -14,93 +15,64 @@ const (
 )
 
 // For a given dataCol return a model.Column with metrics.
-func ComputeMetric(colName string, values []interface{}) model.Column {
+func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 	// Main metric
 	name := colName
 	colType := ColType(values)
 	concept := ""
 	var confidential *bool = nil //nolint
 
-	// Generic metric
-	count := int64(len(values))
-	unique := int64(len(values))
-	sample := Sample(values, sampleSize)
-
-	genericMetric := model.GenericMetric{
-		Count:  count,
-		Unique: unique,
-		Sample: sample,
-	}
-
-	stringMetric := model.StringMetric{}
-	numericMetric := model.NumericMetric{}
-	boolMetric := model.BoolMetric{}
-
-	// Type specific metric
-	switch colType {
-	case "string":
-		// Length frequency.
-		lenCount, err := LenCounter(values)
-		if err != nil {
-			// Handle the error here, e.g. log it or return it to the caller
-			log.Printf("Error counting lengths: %v", err)
-		}
-
-		// MostFreq and LeastFreq
-		mostFreqLen := 0
-		mostFreqLenCount := 0
-		// LeastFreqLen
-		leastFreqLen := len(values) + 1
-		leastFreqLenCount := 0
-
-		for len, count := range lenCount {
-			if count > mostFreqLenCount {
-				mostFreqLen = len
-				mostFreqLenCount = count
-			}
-
-			if count < leastFreqLenCount {
-				leastFreqLen = len
-				leastFreqLenCount = count
-			}
-		}
-
-		mostFreqLenFrequency := GetFrequency(mostFreqLenCount, count)
-		leastFreqLenFrequency := GetFrequency(leastFreqLenCount, count)
-
-		// Add metrics to stringMetric
-		// TO DO: get 5 most frequent length
-		stringMetric.MostFreqLen = map[int]float64{mostFreqLen: mostFreqLenFrequency}
-		// TO DO: get 5 least frequent length
-		stringMetric.LeastFreqLen = map[int]float64{leastFreqLen: leastFreqLenFrequency}
-		// TO DO
-		stringMetric.LeastFreqSample = []string{"undefined"}
-
-	case "numeric":
-		// Compute numeric metric
-		break
-	case "bool":
-		// Compute bool metric
-		break
-	}
-
-	// Create the column
-	col := model.Column{
+	// Create the column.
+	col := model.Column{ //nolint:exhaustruct
 		Name:         name,
 		Type:         colType,
 		Concept:      concept,
 		Constraint:   []string{},
 		Confidential: confidential,
-
-		MainMetric: genericMetric,
-
-		StringMetric:  stringMetric,
-		NumericMetric: numericMetric,
-		BoolMetric:    boolMetric,
 	}
 
-	return col
+	// Generic metric
+
+	genericMetric := model.GenericMetric{
+		Count:  int64(len(values)),
+		Unique: int64(len(values)),
+		Sample: Sample(values, sampleSize),
+	}
+
+	col.MainMetric = genericMetric
+
+	// Type specific metric
+
+	switch colType {
+	case "string":
+		metric, err := StringMetric(values)
+		if err != nil {
+			return model.Column{}, fmt.Errorf("error computing string metric in column %v : %v", name, err)
+		}
+
+		col.StringMetric = metric
+
+	case "numeric":
+		metric, err := NumericMetric(values)
+		if err != nil {
+			return model.Column{}, fmt.Errorf("error computing numeric metric in column %v : %w", name, err)
+		}
+
+		col.NumericMetric = metric
+
+	case "bool":
+		metric, err := BoolMetric(values)
+		if err != nil {
+			return model.Column{}, err
+		}
+
+		col.BoolMetric = metric
+	}
+
+	return col, nil
 }
+
+// Generic metrics.
 
 func ColType(values []interface{}) string {
 	colType := "unknown"
@@ -137,9 +109,120 @@ func Sample(values []interface{}, sampleSize int) []interface{} {
 	return sample
 }
 
-// StringSpecificMetric
+// Specific type metric.
 
-var ErrNonString = fmt.Errorf("non-string value found")
+var ErrValueType = errors.New("value type error")
+
+// String metric : MostFreqLen, LeastFreqLen, LeastFreqSample
+
+func StringMetric(values []interface{}) (model.StringMetric, error) {
+	// Length frequency.
+	lenCount, err := LenCounter(values)
+	if err != nil {
+		// Handle the error here, e.g. log it or return it to the caller
+		log.Printf("Error counting lengths of strings : %v", err)
+	}
+
+	// MostFreq and LeastFreq
+	mostFreqLen := 0
+	mostFreqLenCount := 0
+	// LeastFreqLen
+	leastFreqLen := len(values) + 1
+	leastFreqLenCount := 0
+
+	for len, count := range lenCount {
+		if count > mostFreqLenCount {
+			mostFreqLen = len
+			mostFreqLenCount = count
+		}
+
+		if count < leastFreqLenCount {
+			leastFreqLen = len
+			leastFreqLenCount = count
+		}
+	}
+
+	mostFreqLenFrequency := GetFrequency(mostFreqLenCount, int64(len(values)))
+	leastFreqLenFrequency := GetFrequency(leastFreqLenCount, int64(len(values)))
+
+	// Add metrics to stringMetric
+	stringMetric := model.StringMetric{
+		MostFreqLen:     []model.LenFreq{{Length: mostFreqLen, Freq: mostFreqLenFrequency}},
+		LeastFreqLen:    []model.LenFreq{{Length: leastFreqLen, Freq: leastFreqLenFrequency}},
+		LeastFreqSample: []string{"undefined"},
+	}
+
+	return stringMetric, nil
+}
+
+// Numeric metric : Min, Max, Mean.
+
+func NumericMetric(values []interface{}) (model.NumericMetric, error) {
+	totalCount := len(values)
+
+	value, ok := values[0].(float64)
+	if !ok {
+		return model.NumericMetric{}, fmt.Errorf("%w : expected numeric found %T: %v", ErrValueType, values[0], values[0])
+	}
+
+	min := value
+	max := value
+	sum := 0.0
+
+	for _, value := range values {
+		valueFloat, ok := value.(float64)
+		if !ok {
+			return model.NumericMetric{}, fmt.Errorf("%w : expected numeric found %T: %v", ErrValueType, value, value)
+		}
+
+		sum += valueFloat
+
+		if valueFloat > max {
+			max = valueFloat
+		}
+
+		if valueFloat < min {
+			min = valueFloat
+		}
+	}
+
+	mean := sum / float64(totalCount)
+
+	numericMetric := model.NumericMetric{
+		Min:  min,
+		Max:  max,
+		Mean: mean,
+	}
+
+	return numericMetric, nil
+}
+
+// Bool metric : TrueRatio.
+func BoolMetric(values []interface{}) (model.BoolMetric, error) {
+	totalCount := len(values)
+	trueCount := 0
+
+	for _, value := range values {
+		switch valueBool := value.(type) {
+		case bool:
+			if valueBool {
+				trueCount++
+			}
+		default:
+			return model.BoolMetric{}, fmt.Errorf("%w : expected boolean found %T: %v", ErrValueType, value, value)
+		}
+	}
+
+	trueRatio := GetFrequency(trueCount, int64(totalCount))
+
+	boolMetric := model.BoolMetric{
+		TrueRatio: trueRatio,
+	}
+
+	return boolMetric, nil
+}
+
+// Utils functions.
 
 // LenCounter return a map of length and their occurrence.
 func LenCounter(values []interface{}) (map[int]int, error) {
@@ -150,7 +233,7 @@ func LenCounter(values []interface{}) (map[int]int, error) {
 			length := len(str)
 			lengthCounter[length]++
 		} else {
-			return nil, ErrNonString
+			return nil, fmt.Errorf("%w : expected string found %T: %v", ErrValueType, value, value)
 		}
 	}
 

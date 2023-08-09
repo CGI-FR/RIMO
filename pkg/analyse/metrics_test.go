@@ -4,9 +4,13 @@ import (
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/cgi-fr/rimo/pkg/model"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// Main metrics tests.
 
 func TestColType(t *testing.T) { //nolint:funlen
 	t.Parallel()
@@ -120,8 +124,60 @@ func TestSample(t *testing.T) {
 	})
 }
 
+// Metrics tests.
+
+func TestNumericMetric(t *testing.T) {
+	t.Parallel()
+
+	t.Run("numeric metric", func(t *testing.T) {
+		t.Parallel()
+
+		numeric := []interface{}{1, 2, 3}
+		expectedMetric := model.NumericMetric{
+			Min:  1,
+			Max:  3,
+			Mean: 2,
+		}
+
+		actualMetric, err := analyse.NumericMetric(numeric)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		assert.Equal(t, expectedMetric, actualMetric)
+	})
+}
+
+func TestStringMetric(t *testing.T) {
+	t.Parallel()
+
+	text := []interface{}{"1", "1", "1", "22", "22", "333", "333"}
+	expectedMetric := model.StringMetric{ //nolint:exhaustruct
+		MostFreqLen:  []model.LenFreq{{Length: 1, Freq: 3}, {Length: 2, Freq: 2}, {Length: 3, Freq: 2}},
+		LeastFreqLen: []model.LenFreq{{Length: 3, Freq: 2}, {Length: 2, Freq: 2}, {Length: 1, Freq: 3}},
+	}
+
+	stringMetric, _ := analyse.StringMetric(text)
+	assert.Equal(t, expectedMetric.MostFreqLen, stringMetric.MostFreqLen)
+	assert.Equal(t, expectedMetric.LeastFreqLen, stringMetric.LeastFreqLen)
+}
+
+func TestBooleanMetric(t *testing.T) {
+	t.Parallel()
+
+	boolean := []interface{}{true, true, false}
+	expectedMetric := model.BoolMetric{
+		TrueRatio: float64(2) / float64(3),
+	}
+
+	boolMetric, _ := analyse.BoolMetric(boolean)
+	assert.Equal(t, expectedMetric, boolMetric)
+}
+
+// Utils tests.
+
 func TestLenCouter(t *testing.T) {
 	t.Parallel()
+	t.Helper()
 
 	t.Run("valid input", func(t *testing.T) {
 		t.Helper()
@@ -142,6 +198,6 @@ func TestLenCouter(t *testing.T) {
 		slice := []interface{}{"Hello", 2, true}
 
 		_, err := analyse.LenCounter(slice)
-		assert.ErrorIs(t, err, analyse.ErrNonString)
+		assert.ErrorIs(t, err, analyse.ErrValueType)
 	})
 }

@@ -48,7 +48,11 @@ func Analyse(inputList []string, outputPath string) {
 		var cols []model.Column
 
 		for colName, values := range data {
-			column := ComputeMetric(colName, values)
+			column, err := ComputeMetric(colName, values)
+			if err != nil {
+				log.Fatalf("failed to compute metric: %v", err)
+			}
+
 			cols = append(cols, column)
 		}
 

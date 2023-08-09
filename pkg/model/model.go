@@ -33,9 +33,14 @@ type (
 		Sample []interface{} `yaml:"sample"`
 	}
 	StringMetric struct {
-		MostFreqLen     map[int]float64 `yaml:"mostFrequentLen"`
-		LeastFreqLen    map[int]float64 `yaml:"leastFrequentLen"`
-		LeastFreqSample []string        `yaml:"leastFrequentSample"`
+		MostFreqLen     []LenFreq `yaml:"mostFrequentLen"`
+		LeastFreqLen    []LenFreq `yaml:"leastFrequentLen"`
+		LeastFreqSample []string  `yaml:"leastFrequentSample"`
+	}
+
+	LenFreq struct {
+		Length int
+		Freq   float64
 	}
 	NumericMetric struct {
 		Min  float64 `yaml:"min"`
