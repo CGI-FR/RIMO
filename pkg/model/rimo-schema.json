@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/Base",
+  "$defs": {
+    "Base": {
+      "properties": {
+        "database": {
+          "type": "string"
+        },
+        "tables": {
+          "items": {
+            "$ref": "#/$defs/Table"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "database",
+        "tables"
+      ]
+    },
+    "BoolMetric": {
+      "properties": {
+        "trueRatio": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "trueRatio"
+      ]
+    },
+    "Column": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "concept": {
+          "type": "string"
+        },
+        "constraint": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "confidential": {
+          "type": "boolean"
+        },
+        "mainMetric": {
+          "$ref": "#/$defs/GenericMetric"
+        },
+        "stringMetric": {
+          "$ref": "#/$defs/StringMetric"
+        },
+        "numericMetric": {
+          "$ref": "#/$defs/NumericMetric"
+        },
+        "boolMetric": {
+          "$ref": "#/$defs/BoolMetric"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "type",
+        "concept",
+        "constraint",
+        "confidential",
+        "mainMetric"
+      ]
+    },
+    "GenericMetric": {
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "unique": {
+          "type": "integer"
+        },
+        "sample": {
+          "items": true,
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "count",
+        "unique",
+        "sample"
+      ]
+    },
+    "LenFreq": {
+      "properties": {
+        "length": {
+          "type": "integer"
+        },
+        "freq": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "length",
+        "freq"
+      ]
+    },
+    "NumericMetric": {
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "mean": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "min",
+        "max",
+        "mean"
+      ]
+    },
+    "StringMetric": {
+      "properties": {
+        "mostFrequentLen": {
+          "items": {
+            "$ref": "#/$defs/LenFreq"
+          },
+          "type": "array"
+        },
+        "leastFrequentLen": {
+          "items": {
+            "$ref": "#/$defs/LenFreq"
+          },
+          "type": "array"
+        },
+        "leastFrequentSample": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "mostFrequentLen",
+        "leastFrequentLen",
+        "leastFrequentSample"
+      ]
+    },
+    "Table": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/Column"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "columns"
+      ]
+    }
+  }
+}
