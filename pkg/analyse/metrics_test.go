@@ -132,7 +132,7 @@ func TestNumericMetric(t *testing.T) {
 	t.Run("numeric metric", func(t *testing.T) {
 		t.Parallel()
 
-		numeric := []interface{}{1, 2, 3}
+		numeric := []interface{}{1.0, 2.0, 3.0}
 		expectedMetric := model.NumericMetric{
 			Min:  1,
 			Max:  3,
