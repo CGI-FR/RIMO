@@ -5,7 +5,6 @@ import (
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
 	"github.com/cgi-fr/rimo/pkg/model"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -156,9 +155,13 @@ func TestStringMetric(t *testing.T) {
 		LeastFreqLen: []model.LenFreq{{Length: 3, Freq: 2}, {Length: 2, Freq: 2}, {Length: 1, Freq: 3}},
 	}
 
-	stringMetric, _ := analyse.StringMetric(text)
-	assert.Equal(t, expectedMetric.MostFreqLen, stringMetric.MostFreqLen)
-	assert.Equal(t, expectedMetric.LeastFreqLen, stringMetric.LeastFreqLen)
+	actualMetric, err := analyse.StringMetric2(text, &testing.T{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	assert.Equal(t, expectedMetric.MostFreqLen, actualMetric.MostFreqLen)
+	assert.Equal(t, expectedMetric.LeastFreqLen, actualMetric.LeastFreqLen)
 }
 
 func TestBooleanMetric(t *testing.T) {

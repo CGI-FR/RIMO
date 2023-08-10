@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"sort"
+	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/model"
 )
@@ -114,6 +116,70 @@ func Sample(values []interface{}, sampleSize int) []interface{} {
 var ErrValueType = errors.New("value type error")
 
 // String metric : MostFreqLen, LeastFreqLen, LeastFreqSample
+
+func StringMetric2(values []interface{}, t *testing.T) (model.StringMetric, error) {
+	// Initialize the StringMetric struct
+	metric := model.StringMetric{} //nolint:exhaustruct
+
+	// Convert the input values to a slice of strings
+	strings := make([]string, len(values))
+	// Count the frequency of each string length
+	lenCounter := make(map[int]int)
+
+	for i, v := range values { //nolint:varnamelen
+		s, ok := v.(string)
+		if !ok {
+			return metric, fmt.Errorf("%w : expected numeric found %T: %v", ErrValueType, v, v)
+		}
+
+		strings[i] = s
+		lenCounter[len(s)]++
+	}
+
+	// Sort the string lengths by frequency
+	sorted := make([]int, 0, len(lenCounter))
+	for l := range lenCounter {
+		sorted = append(sorted, l)
+	}
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return lenCounter[sorted[i]] > lenCounter[sorted[j]]
+	})
+
+	t.Logf("lenCounter: %v", lenCounter)
+	t.Logf("sorted: %v", sorted)
+
+	// Find the 5th most and least frequent length
+	for i := 0; i < sampleSize || i < len(sorted); i++ {
+		t.Logf("i: %v", i)
+		metric.MostFreqLen = append(metric.MostFreqLen, model.LenFreq{
+			Length: sorted[i],
+			Freq:   GetFrequency(lenCounter[sorted[i]], int64(len(strings))),
+		})
+
+		metric.LeastFreqLen = append(metric.LeastFreqLen, model.LenFreq{
+			Length: sorted[len(sorted)-i],
+			Freq:   GetFrequency(lenCounter[sorted[len(sorted)-i-1]], int64(len(strings))),
+		})
+	}
+
+	// Find 5 samples of the least frequent length
+	leastFreqLen := sorted[len(sorted)-1]
+	leastFreqSamples := make([]string, 0, sampleSize)
+
+	for _, s := range strings {
+		if len(s) == leastFreqLen {
+			leastFreqSamples = append(leastFreqSamples, s)
+			if len(leastFreqSamples) == sampleSize {
+				break
+			}
+		}
+	}
+
+	metric.LeastFreqSample = leastFreqSamples
+
+	return metric, nil
+}
 
 func StringMetric(values []interface{}) (model.StringMetric, error) {
 	// Length frequency.
