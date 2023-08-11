@@ -7,7 +7,6 @@ import (
 	"log"
 	"math/rand"
 	"sort"
-	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/model"
 )
@@ -117,7 +116,7 @@ var ErrValueType = errors.New("value type error")
 
 // String metric : MostFreqLen, LeastFreqLen, LeastFreqSample
 
-func StringMetric2(values []interface{}, t *testing.T) (model.StringMetric, error) {
+func StringMetric2(values []interface{}) (model.StringMetric, error) {
 	// Initialize the StringMetric struct
 	metric := model.StringMetric{} //nolint:exhaustruct
 
@@ -136,7 +135,7 @@ func StringMetric2(values []interface{}, t *testing.T) (model.StringMetric, erro
 		lenCounter[len(s)]++
 	}
 
-	// Sort the string lengths by frequency
+	// Sort the string lengths by descending count
 	sorted := make([]int, 0, len(lenCounter))
 	for l := range lenCounter {
 		sorted = append(sorted, l)
@@ -146,33 +145,49 @@ func StringMetric2(values []interface{}, t *testing.T) (model.StringMetric, erro
 		return lenCounter[sorted[i]] > lenCounter[sorted[j]]
 	})
 
-	t.Logf("lenCounter: %v", lenCounter)
-	t.Logf("sorted: %v", sorted)
+	totalCount := int64(len(strings))
 
 	// Find the 5th most and least frequent length
-	for i := 0; i < sampleSize || i < len(sorted); i++ {
-		t.Logf("i: %v", i)
+	for i := 0; i < sampleSize && i < len(sorted); i++ {
 		metric.MostFreqLen = append(metric.MostFreqLen, model.LenFreq{
 			Length: sorted[i],
-			Freq:   GetFrequency(lenCounter[sorted[i]], int64(len(strings))),
+			Freq:   GetFrequency(lenCounter[sorted[i]], totalCount),
 		})
 
+		length := sorted[len(sorted)-i-1]
+
 		metric.LeastFreqLen = append(metric.LeastFreqLen, model.LenFreq{
-			Length: sorted[len(sorted)-i],
-			Freq:   GetFrequency(lenCounter[sorted[len(sorted)-i-1]], int64(len(strings))),
+			Length: length,
+			Freq:   GetFrequency(lenCounter[length], totalCount),
 		})
 	}
 
-	// Find 5 samples of the least frequent length
-	leastFreqLen := sorted[len(sorted)-1]
+	// Find 5 samples of least frequent length, if 5 samples are not found uses 2nd least frequent.
+	// Loop through lenCounter till sampleSize samples are known.
+	knownSample := 0
+	lenSample := []int{}
+
+	for i := len(sorted) - 1; i >= 0 && knownSample < sampleSize; i-- {
+		knownSample += lenCounter[sorted[i]]
+		lenSample = append(lenSample, sorted[i])
+	}
+
 	leastFreqSamples := make([]string, 0, sampleSize)
 
-	for _, s := range strings {
-		if len(s) == leastFreqLen {
-			leastFreqSamples = append(leastFreqSamples, s)
-			if len(leastFreqSamples) == sampleSize {
-				break
-			}
+	// Create a map of the lengths in lenSample
+	lenMap := make(map[int]bool)
+	for _, l := range lenSample {
+		lenMap[l] = true
+	}
+
+	for _, string := range strings {
+		if len(leastFreqSamples) == sampleSize {
+			break
+		}
+
+		// Check if the length of the string is in the lenMap.
+		if lenMap[len(string)] {
+			leastFreqSamples = append(leastFreqSamples, string)
 		}
 	}
 

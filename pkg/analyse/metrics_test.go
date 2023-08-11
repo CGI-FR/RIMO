@@ -5,6 +5,7 @@ import (
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
 	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/hexops/valast"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -149,19 +150,26 @@ func TestNumericMetric(t *testing.T) {
 func TestStringMetric(t *testing.T) {
 	t.Parallel()
 
-	text := []interface{}{"1", "1", "1", "22", "22", "333", "333"}
+	text := []interface{}{"1", "1", "1", "1", "1", "22", "22", "22", "331", "332"}
 	expectedMetric := model.StringMetric{ //nolint:exhaustruct
-		MostFreqLen:  []model.LenFreq{{Length: 1, Freq: 3}, {Length: 2, Freq: 2}, {Length: 3, Freq: 2}},
-		LeastFreqLen: []model.LenFreq{{Length: 3, Freq: 2}, {Length: 2, Freq: 2}, {Length: 1, Freq: 3}},
+		MostFreqLen:  []model.LenFreq{{Length: 1, Freq: 0.5}, {Length: 2, Freq: 0.3}, {Length: 3, Freq: 0.2}},
+		LeastFreqLen: []model.LenFreq{{Length: 3, Freq: 0.2}, {Length: 2, Freq: 0.3}, {Length: 1, Freq: 0.5}},
 	}
 
-	actualMetric, err := analyse.StringMetric2(text, &testing.T{})
+	actualMetric, err := analyse.StringMetric2(text)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	t.Logf(valast.String(actualMetric))
+
 	assert.Equal(t, expectedMetric.MostFreqLen, actualMetric.MostFreqLen)
 	assert.Equal(t, expectedMetric.LeastFreqLen, actualMetric.LeastFreqLen)
+	for _, sample := range actualMetric.LeastFreqSample {
+		if sample != "331" && sample != "332" && sample != "22" {
+			t.Errorf("actualMetric.LeastFreqSample contains unexpected sample: %v", sample)
+		}
+	}
 }
 
 func TestBooleanMetric(t *testing.T) {
