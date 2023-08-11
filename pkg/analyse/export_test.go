@@ -25,7 +25,7 @@ func TestExport(t *testing.T) {
 	}
 
 	// Create a temporary directory for the test
-	tempDir, err := os.MkdirTemp("", "export_test")
+	tempDir, err := os.MkdirTemp(TestDir, "export_test")
 	assert.NoError(t, err)
 
 	defer os.RemoveAll(tempDir)
