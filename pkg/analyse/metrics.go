@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"math/rand"
 	"sort"
 
@@ -109,7 +108,7 @@ var ErrValueType = errors.New("value type error")
 
 // String metric : MostFreqLen, LeastFreqLen, LeastFreqSample
 
-func StringMetric2(values []interface{}) (model.StringMetric, error) {
+func StringMetric(values []interface{}) (model.StringMetric, error) {
 	// Initialize the StringMetric struct
 	metric := model.StringMetric{} //nolint:exhaustruct
 
@@ -187,46 +186,6 @@ func StringMetric2(values []interface{}) (model.StringMetric, error) {
 	metric.LeastFreqSample = leastFreqSamples
 
 	return metric, nil
-}
-
-func StringMetric(values []interface{}) (model.StringMetric, error) {
-	// Length frequency.
-	lenCount, err := LenCounter(values)
-	if err != nil {
-		// Handle the error here, e.g. log it or return it to the caller
-		log.Printf("Error counting lengths of strings : %v", err)
-	}
-
-	// MostFreq and LeastFreq
-	mostFreqLen := 0
-	mostFreqLenCount := 0
-	// LeastFreqLen
-	leastFreqLen := len(values) + 1
-	leastFreqLenCount := 0
-
-	for len, count := range lenCount {
-		if count > mostFreqLenCount {
-			mostFreqLen = len
-			mostFreqLenCount = count
-		}
-
-		if count < leastFreqLenCount {
-			leastFreqLen = len
-			leastFreqLenCount = count
-		}
-	}
-
-	mostFreqLenFrequency := GetFrequency(mostFreqLenCount, int64(len(values)))
-	leastFreqLenFrequency := GetFrequency(leastFreqLenCount, int64(len(values)))
-
-	// Add metrics to stringMetric
-	stringMetric := model.StringMetric{
-		MostFreqLen:     []model.LenFreq{{Length: mostFreqLen, Freq: mostFreqLenFrequency}},
-		LeastFreqLen:    []model.LenFreq{{Length: leastFreqLen, Freq: leastFreqLenFrequency}},
-		LeastFreqSample: []string{"undefined"},
-	}
-
-	return stringMetric, nil
 }
 
 // Numeric metric : Min, Max, Mean.

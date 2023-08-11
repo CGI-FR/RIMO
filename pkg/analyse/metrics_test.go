@@ -159,7 +159,7 @@ func TestStringMetric(t *testing.T) {
 		LeastFreqLen: []model.LenFreq{{Length: 3, Freq: 0.2}, {Length: 2, Freq: 0.3}, {Length: 1, Freq: 0.5}},
 	}
 
-	actualMetric, err := analyse.StringMetric2(text)
+	actualMetric, err := analyse.StringMetric(text)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
