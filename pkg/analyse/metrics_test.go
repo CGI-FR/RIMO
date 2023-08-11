@@ -16,7 +16,6 @@ func TestColType(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
 	t.Run("numeric", func(t *testing.T) {
-		t.Helper()
 		t.Parallel()
 
 		slice := []interface{}{1, 2, 3}
@@ -27,7 +26,6 @@ func TestColType(t *testing.T) { //nolint:funlen
 	})
 
 	t.Run("numeric with nil", func(t *testing.T) {
-		t.Helper()
 		t.Parallel()
 
 		slice := []interface{}{nil, 2, 3}
@@ -38,7 +36,6 @@ func TestColType(t *testing.T) { //nolint:funlen
 	})
 
 	t.Run("string", func(t *testing.T) {
-		t.Helper()
 		t.Parallel()
 
 		slice := []interface{}{nil, "text", nil}
@@ -49,7 +46,6 @@ func TestColType(t *testing.T) { //nolint:funlen
 	})
 
 	t.Run("boolean", func(t *testing.T) {
-		t.Helper()
 		t.Parallel()
 
 		slice := []interface{}{nil, true, false}
@@ -60,7 +56,6 @@ func TestColType(t *testing.T) { //nolint:funlen
 	})
 
 	t.Run("mixed", func(t *testing.T) {
-		t.Helper()
 		t.Parallel()
 
 		slice := []interface{}{"text", 2, false}
@@ -71,7 +66,6 @@ func TestColType(t *testing.T) { //nolint:funlen
 	})
 
 	t.Run("unknown", func(t *testing.T) {
-		t.Helper()
 		t.Parallel()
 
 		slice := []interface{}{nil, nil, nil}
@@ -83,7 +77,6 @@ func TestColType(t *testing.T) { //nolint:funlen
 }
 
 func TestSample(t *testing.T) {
-	t.Helper()
 	t.Parallel()
 
 	slice1 := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -122,6 +115,16 @@ func TestSample(t *testing.T) {
 			t.Errorf("analyse.Sample(%v, 15) = %v; expected %v", slice1, sample3, 15)
 		}
 	})
+}
+
+func TestUnique(t *testing.T) {
+	t.Parallel()
+
+	sample := []interface{}{1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+	expected := int64(9)
+	actual := analyse.Unique(sample)
+
+	assert.Equal(t, expected, actual)
 }
 
 // Metrics tests.
@@ -188,10 +191,8 @@ func TestBooleanMetric(t *testing.T) {
 
 func TestLenCouter(t *testing.T) {
 	t.Parallel()
-	t.Helper()
 
 	t.Run("valid input", func(t *testing.T) {
-		t.Helper()
 		t.Parallel()
 
 		slice := []interface{}{"Hello", "Hello", "Hi", ""}
@@ -203,7 +204,6 @@ func TestLenCouter(t *testing.T) {
 	})
 
 	t.Run("invalid input", func(t *testing.T) {
-		t.Helper()
 		t.Parallel()
 
 		slice := []interface{}{"Hello", 2, true}

@@ -84,23 +84,6 @@ func ColType(values []interface{}) string {
 	return colType
 }
 
-func ValueType(value interface{}) string {
-	switch value.(type) {
-	case int:
-		return Numeric
-	case float64:
-		return Numeric
-	case json.Number:
-		return Numeric
-	case string:
-		return String
-	case bool:
-		return Boolean
-	default:
-		return "unknown"
-	}
-}
-
 func Sample(values []interface{}, sampleSize int) []interface{} {
 	sample := make([]interface{}, sampleSize)
 	for i := 0; i < sampleSize; i++ {
@@ -108,6 +91,16 @@ func Sample(values []interface{}, sampleSize int) []interface{} {
 	}
 
 	return sample
+}
+
+func Unique(values []interface{}) int64 {
+	unique := make(map[interface{}]bool)
+
+	for _, value := range values {
+		unique[value] = true
+	}
+
+	return int64(len(unique))
 }
 
 // Specific type metric.
@@ -323,4 +316,21 @@ func LenCounter(values []interface{}) (map[int]int, error) {
 
 func GetFrequency(occurrence int, count int64) float64 {
 	return float64(occurrence) / float64(count)
+}
+
+func ValueType(value interface{}) string {
+	switch value.(type) {
+	case int:
+		return Numeric
+	case float64:
+		return Numeric
+	case json.Number:
+		return Numeric
+	case string:
+		return String
+	case bool:
+		return Boolean
+	default:
+		return "unknown"
+	}
 }
