@@ -10,10 +10,6 @@ import (
 	"github.com/cgi-fr/rimo/pkg/model"
 )
 
-const (
-	sampleSize = 5
-)
-
 // For a given dataCol return a model.Column with metrics.
 func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 	// Main metric
@@ -36,7 +32,7 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 	genericMetric := model.GenericMetric{
 		Count:  int64(len(values)),
 		Unique: int64(len(values)),
-		Sample: Sample(values, sampleSize),
+		Sample: Sample(values, model.SampleSize),
 	}
 
 	col.MainMetric = genericMetric
@@ -127,26 +123,30 @@ func StringMetric(values []interface{}) (model.StringMetric, error) {
 		lenCounter[len(s)]++
 	}
 
-	// Sort the string lengths by descending count
-	sorted := make([]int, 0, len(lenCounter))
+	// Create a list of unique lengths
+	uniqueLengthSorted := make([]int, 0, len(lenCounter))
 	for l := range lenCounter {
-		sorted = append(sorted, l)
+		uniqueLengthSorted = append(uniqueLengthSorted, l)
 	}
 
-	sort.Slice(sorted, func(i, j int) bool {
-		return lenCounter[sorted[i]] > lenCounter[sorted[j]]
+	// Sort the string lengths by descending count of occurrence, breaks ties with ascending length
+	sort.Slice(uniqueLengthSorted, func(i, j int) bool {
+		if lenCounter[uniqueLengthSorted[i]] == lenCounter[uniqueLengthSorted[j]] {
+			return uniqueLengthSorted[i] < uniqueLengthSorted[j]
+		}
+		return lenCounter[uniqueLengthSorted[i]] > lenCounter[uniqueLengthSorted[j]]
 	})
 
 	totalCount := int64(len(strings))
 
-	// Find the 5th most and least frequent length
-	for i := 0; i < sampleSize && i < len(sorted); i++ {
+	// Find the n_th most and least frequent length
+	for i := 0; i < model.SampleSize && i < len(uniqueLengthSorted); i++ {
 		metric.MostFreqLen = append(metric.MostFreqLen, model.LenFreq{
-			Length: sorted[i],
-			Freq:   GetFrequency(lenCounter[sorted[i]], totalCount),
+			Length: uniqueLengthSorted[i],
+			Freq:   GetFrequency(lenCounter[uniqueLengthSorted[i]], totalCount),
 		})
 
-		length := sorted[len(sorted)-i-1]
+		length := uniqueLengthSorted[len(uniqueLengthSorted)-i-1]
 
 		metric.LeastFreqLen = append(metric.LeastFreqLen, model.LenFreq{
 			Length: length,
@@ -154,17 +154,24 @@ func StringMetric(values []interface{}) (model.StringMetric, error) {
 		})
 	}
 
-	// Find 5 samples of least frequent length, if 5 samples are not found uses 2nd least frequent.
-	// Loop through lenCounter till sampleSize samples are known.
+	// Find n samples of least frequent length.
+	// Strategy :
+	// 	1. build a pool of length to take sample from :
+	//		if lenCounter[leastFrequentLength] does not provide enough sample :
+	// 			select n-i least frequent length till n samples are found.
+	//  2. once length pool provide at least n samples,
+	// 		iterate over values []interface{} and add to sample if length match length pool.
+	// Note : 1. this strategy isn't random 2. is subject to over representation of n-i least frequent length.
+
 	knownSample := 0
 	lenSample := []int{}
 
-	for i := len(sorted) - 1; i >= 0 && knownSample < sampleSize; i-- {
-		knownSample += lenCounter[sorted[i]]
-		lenSample = append(lenSample, sorted[i])
+	for i := len(uniqueLengthSorted) - 1; i >= 0 && knownSample < model.SampleSize; i-- {
+		knownSample += lenCounter[uniqueLengthSorted[i]]
+		lenSample = append(lenSample, uniqueLengthSorted[i])
 	}
 
-	leastFreqSamples := make([]string, 0, sampleSize)
+	leastFreqSamples := make([]string, 0, model.SampleSize)
 
 	// Create a map of the lengths in lenSample
 	lenMap := make(map[int]bool)
@@ -173,7 +180,7 @@ func StringMetric(values []interface{}) (model.StringMetric, error) {
 	}
 
 	for _, string := range strings {
-		if len(leastFreqSamples) == sampleSize {
+		if len(leastFreqSamples) == model.SampleSize {
 			break
 		}
 
@@ -256,22 +263,6 @@ func BoolMetric(values []interface{}) (model.BoolMetric, error) {
 }
 
 // Utils functions.
-
-// LenCounter return a map of length and their occurrence.
-func LenCounter(values []interface{}) (map[int]int, error) {
-	lengthCounter := make(map[int]int)
-
-	for _, value := range values {
-		if str, ok := value.(string); ok {
-			length := len(str)
-			lengthCounter[length]++
-		} else {
-			return nil, fmt.Errorf("%w : expected string found %T: %v", ErrValueType, value, value)
-		}
-	}
-
-	return lengthCounter, nil
-}
 
 func GetFrequency(occurrence int, count int64) float64 {
 	return float64(occurrence) / float64(count)

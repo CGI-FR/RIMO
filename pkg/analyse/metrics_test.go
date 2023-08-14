@@ -150,13 +150,26 @@ func TestNumericMetric(t *testing.T) {
 	})
 }
 
+// Ensure 2 things :
+// 1. correctness : frequency are correct
+// 2. order/consistency : frequency of length ties are break using ascending order of length
 func TestStringMetric(t *testing.T) {
 	t.Parallel()
 
-	text := []interface{}{"1", "1", "1", "1", "1", "22", "22", "22", "331", "332"}
+	text := []interface{}{"1", "1", "1", "22", "22", "22", "331", "332", "4441", "4442"}
 	expectedMetric := model.StringMetric{ //nolint:exhaustruct
-		MostFreqLen:  []model.LenFreq{{Length: 1, Freq: 0.5}, {Length: 2, Freq: 0.3}, {Length: 3, Freq: 0.2}},
-		LeastFreqLen: []model.LenFreq{{Length: 3, Freq: 0.2}, {Length: 2, Freq: 0.3}, {Length: 1, Freq: 0.5}},
+		MostFreqLen: []model.LenFreq{
+			{Length: 1, Freq: 0.3},
+			{Length: 2, Freq: 0.3},
+			{Length: 3, Freq: 0.2},
+			{Length: 4, Freq: 0.2},
+		},
+		LeastFreqLen: []model.LenFreq{
+			{Length: 4, Freq: 0.2},
+			{Length: 3, Freq: 0.2},
+			{Length: 2, Freq: 0.3},
+			{Length: 1, Freq: 0.3},
+		},
 	}
 
 	actualMetric, err := analyse.StringMetric(text)
@@ -168,6 +181,7 @@ func TestStringMetric(t *testing.T) {
 
 	assert.Equal(t, expectedMetric.MostFreqLen, actualMetric.MostFreqLen)
 	assert.Equal(t, expectedMetric.LeastFreqLen, actualMetric.LeastFreqLen)
+
 	for _, sample := range actualMetric.LeastFreqSample {
 		if sample != "331" && sample != "332" && sample != "22" {
 			t.Errorf("actualMetric.LeastFreqSample contains unexpected sample: %v", sample)
@@ -185,30 +199,4 @@ func TestBooleanMetric(t *testing.T) {
 
 	boolMetric, _ := analyse.BoolMetric(boolean)
 	assert.Equal(t, expectedMetric, boolMetric)
-}
-
-// Utils tests.
-
-func TestLenCouter(t *testing.T) {
-	t.Parallel()
-
-	t.Run("valid input", func(t *testing.T) {
-		t.Parallel()
-
-		slice := []interface{}{"Hello", "Hello", "Hi", ""}
-		expected := map[int]int{5: 2, 2: 1, 0: 1}
-
-		actual, err := analyse.LenCounter(slice)
-		require.NoError(t, err)
-		assert.Equal(t, expected, actual)
-	})
-
-	t.Run("invalid input", func(t *testing.T) {
-		t.Parallel()
-
-		slice := []interface{}{"Hello", 2, true}
-
-		_, err := analyse.LenCounter(slice)
-		assert.ErrorIs(t, err, analyse.ErrValueType)
-	})
 }
