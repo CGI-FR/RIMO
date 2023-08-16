@@ -37,11 +37,20 @@ func main() {
 	}
 
 	analyseCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "analyse [input_path] [output_path]",
-		Short: "Analyse a jsonl file and output a yaml file",
+		Use:   "rimo analyse [input_path] [output_path]",
+		Short: "Generate a rimo.yaml from a directory of .jsonl files",
+		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			inputPath := args[0]
 			outputPath := args[1]
+
+			// Print current working directory
+			cwd, err := os.Getwd()
+			if err != nil {
+				log.Fatal().Msgf("error getting current working directory: %v", err)
+			}
+			log.Info().Msgf("current working directory: %s", cwd)
+
 			// Check if the input path is a directory
 			if err := CheckDir(inputPath); err != nil {
 				log.Fatal().Msgf("error checking input path: %v", err)
