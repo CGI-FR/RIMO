@@ -4,3 +4,4 @@ bin
 ROADMAP.md
 test/data/outputTest/
 test/analyseTest/output/rimo_output.yaml
+venom.log

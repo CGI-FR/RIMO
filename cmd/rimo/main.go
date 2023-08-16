@@ -5,10 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cgi-fr/rimo/pkg/analyse"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/cobra"
+	"github.com/cgi-fr/rimo/pkg/analyse" //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/model"   //nolint:depguard
+	"github.com/rs/zerolog"              //nolint:depguard
+	"github.com/rs/zerolog/log"          //nolint:depguard
+	"github.com/spf13/cobra"             //nolint:depguard
 )
 
 // Provisioned by ldflags.
@@ -20,9 +21,8 @@ var (
 	builtBy   string //nolint: gochecknoglobals
 )
 
-func main() {
-	//nolint: exhaustruct
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+func main() { //nolint:funlen
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) //nolint: exhaustruct
 
 	log.Info().Msgf("%v %v (commit=%v date=%v by=%v)", name, version, commit, buildDate, builtBy)
 
@@ -36,14 +36,11 @@ func main() {
 		There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDate, builtBy),
 	}
 
-	analyseCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "rimo analyse [input_path] [output_path]",
-		Short: "Generate a rimo.yaml from a directory of .jsonl files",
-		Args:  cobra.ExactArgs(2),
+	rimoSchemaCmd := &cobra.Command{ //nolint:exhaustruct
+		Use:   "rimo schema",
+		Short: "Export rimo json schema",
+		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			inputPath := args[0]
-			outputPath := args[1]
-
 			// Print current working directory
 			cwd, err := os.Getwd()
 			if err != nil {
@@ -51,15 +48,23 @@ func main() {
 			}
 			log.Info().Msgf("current working directory: %s", cwd)
 
-			// Check if the input path is a directory
-			if err := CheckDir(inputPath); err != nil {
-				log.Fatal().Msgf("error checking input path: %v", err)
+			err = model.ExportSchema()
+			if err != nil {
+				log.Fatal().Msgf("error generating rimo schema: %v", err)
 			}
+		},
+	}
 
-			// Check if the output path is a regular file
-			if err := CheckFile(outputPath); err != nil {
-				log.Fatal().Msgf("error checking output path: %v", err)
-			}
+	rimoAnalyseCmd := &cobra.Command{ //nolint:exhaustruct
+		Use:   "rimo analyse [input_path] [output_path]",
+		Short: "Generate a rimo.yaml from a directory of .jsonl files",
+		Args:  cobra.ExactArgs(2), //nolint:gomnd
+		Run: func(cmd *cobra.Command, args []string) {
+			inputPath := args[0]
+			CheckDir(inputPath)
+
+			outputPath := args[1]
+			CheckFile(outputPath)
 
 			// List of .jsonl files in input directory
 			inputList, err := FilesList(inputPath, ".jsonl")
@@ -74,7 +79,8 @@ func main() {
 		},
 	}
 
-	rootCmd.AddCommand(analyseCmd)
+	rootCmd.AddCommand(rimoAnalyseCmd)
+	rootCmd.AddCommand(rimoSchemaCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
@@ -82,7 +88,7 @@ func main() {
 	}
 }
 
-func CheckFile(path string) error {
+func CheckFile(path string) {
 	fileInfo, err := os.Stat(path)
 
 	absPath, _ := filepath.Abs(path)
@@ -94,10 +100,9 @@ func CheckFile(path string) error {
 	if !fileInfo.Mode().IsRegular() {
 		log.Fatal().Msgf("not a regular file: %s", absPath)
 	}
-	return nil
 }
 
-func CheckDir(path string) error {
+func CheckDir(path string) {
 	fileInfo, err := os.Stat(path)
 
 	absPath, _ := filepath.Abs(path)
@@ -109,16 +114,15 @@ func CheckDir(path string) error {
 	if !fileInfo.Mode().IsDir() {
 		log.Fatal().Msgf("not a directory: %s", absPath)
 	}
-	return nil
 }
 
 func FilesList(path string, extension string) ([]string, error) {
-	var inputList []string
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if filepath.Ext(path) == extension {
-			inputList = append(inputList, path)
-		}
-		return nil
-	})
-	return inputList, err
+	pattern := filepath.Join(path, "*"+extension)
+
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, fmt.Errorf("error listing files: %w", err)
+	}
+
+	return files, nil
 }

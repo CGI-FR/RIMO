@@ -3,11 +3,11 @@ package analyse_test
 import (
 	"testing"
 
-	"github.com/cgi-fr/rimo/pkg/analyse"
-	"github.com/cgi-fr/rimo/pkg/model"
-	"github.com/hexops/valast"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/cgi-fr/rimo/pkg/analyse"  //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/model"    //nolint:depguard
+	"github.com/hexops/valast"            //nolint:depguard
+	"github.com/stretchr/testify/assert"  //nolint:depguard
+	"github.com/stretchr/testify/require" //nolint:depguard
 )
 
 // Main metrics tests.
@@ -19,7 +19,7 @@ func TestColType(t *testing.T) { //nolint:funlen
 		t.Parallel()
 
 		slice := []interface{}{1, 2, 3}
-		expected := "numeric"
+		expected := model.ValueType.Numeric
 
 		actual := analyse.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -29,7 +29,7 @@ func TestColType(t *testing.T) { //nolint:funlen
 		t.Parallel()
 
 		slice := []interface{}{nil, 2, 3}
-		expected := "numeric"
+		expected := model.ValueType.Numeric
 
 		actual := analyse.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -39,7 +39,7 @@ func TestColType(t *testing.T) { //nolint:funlen
 		t.Parallel()
 
 		slice := []interface{}{nil, "text", nil}
-		expected := "string"
+		expected := model.ValueType.String
 
 		actual := analyse.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -49,7 +49,7 @@ func TestColType(t *testing.T) { //nolint:funlen
 		t.Parallel()
 
 		slice := []interface{}{nil, true, false}
-		expected := "boolean"
+		expected := model.ValueType.Bool
 
 		actual := analyse.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -59,7 +59,7 @@ func TestColType(t *testing.T) { //nolint:funlen
 		t.Parallel()
 
 		slice := []interface{}{"text", 2, false}
-		expected := "string"
+		expected := model.ValueType.String
 
 		actual := analyse.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -69,7 +69,7 @@ func TestColType(t *testing.T) { //nolint:funlen
 		t.Parallel()
 
 		slice := []interface{}{nil, nil, nil}
-		expected := "unknown"
+		expected := model.ValueType.Undefined
 
 		actual := analyse.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -152,7 +152,7 @@ func TestNumericMetric(t *testing.T) {
 
 // Ensure 2 things :
 // 1. correctness : frequency are correct
-// 2. order/consistency : frequency of length ties are break using ascending order of length
+// 2. order/consistency : frequency of length ties are break using ascending order of length.
 func TestStringMetric(t *testing.T) {
 	t.Parallel()
 

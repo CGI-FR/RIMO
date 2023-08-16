@@ -14,17 +14,19 @@ const (
 	Boolean = "boolean"
 )
 
-var jsonFormatFunc = LoadNewJSONStruct
-
 // Load .jsonl and return DataMap.
 func Load(inputPath string, format string) DataMap {
-	if format == "old" {
+	var jsonFormatFunc func(*bufio.Scanner) DataMap
+
+	switch format {
+	case "old":
 		jsonFormatFunc = LoadOldJSONStruct
-	} else if format == "new" {
+	case "new":
 		jsonFormatFunc = LoadNewJSONStruct
-	} else {
-		panic("Format not supported")
+	default:
+		jsonFormatFunc = LoadNewJSONStruct
 	}
+
 	file, err := os.Open(inputPath)
 	if err != nil {
 		panic(err)

@@ -5,76 +5,84 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/invopop/jsonschema"
+	"github.com/invopop/jsonschema" //nolint:depguard
 )
 
-const SampleSize int = 5
+type RIMOType string
+
+const (
+	SampleSize int = 5
+)
+
+var ValueType = struct { //nolint:gochecknoglobals
+	String    RIMOType
+	Numeric   RIMOType
+	Bool      RIMOType
+	Undefined RIMOType
+}{
+	String:    "string",
+	Numeric:   "numeric",
+	Bool:      "bool",
+	Undefined: "undefined",
+}
 
 // RIMO YAML structure.
 type (
 	Base struct {
-		Name   string  `yaml:"database" json:"database" jsonschema:"required"`
-		Tables []Table `yaml:"tables" json:"tables" jsonschema:"required"`
+		Name   string  `json:"database" jsonschema:"required" yaml:"database"`
+		Tables []Table `json:"tables"   jsonschema:"required" yaml:"tables"`
 	}
 
 	Table struct {
-		Name    string   `yaml:"name" json:"name" jsonschema:"required"`
-		Columns []Column `yaml:"columns" json:"columns" jsonschema:"required"`
+		Name    string   `json:"name"    jsonschema:"required" yaml:"name"`
+		Columns []Column `json:"columns" jsonschema:"required" yaml:"columns"`
 	}
 
 	Column struct {
-		Name         string        `yaml:"name" json:"name" jsonschema:"required"`
-		Type         string        `yaml:"type" json:"type" jsonschema:"required"`
-		Concept      string        `yaml:"concept" json:"concept" jsonschema:"required"`
-		Constraint   []string      `yaml:"constraint" json:"constraint" jsonschema:"required"`
-		Confidential *bool         `yaml:"confidential" json:"confidential" jsonschema:"required"`
-		MainMetric   GenericMetric `yaml:"mainMetric" json:"mainMetric" jsonschema:"required"`
+		Name         string        `json:"name"         jsonschema:"required" yaml:"name"`
+		Type         RIMOType      `json:"type"         jsonschema:"required" validate:"oneof=string numeric boolean" yaml:"type"` //nolint:lll
+		Concept      string        `json:"concept"      jsonschema:"required" yaml:"concept"`
+		Constraint   []string      `json:"constraint"   jsonschema:"required" yaml:"constraint"`
+		Confidential *bool         `json:"confidential" jsonschema:"required" yaml:"confidential"`
+		MainMetric   GenericMetric `json:"mainMetric"   jsonschema:"required" yaml:"mainMetric"`
 
-		StringMetric  StringMetric  `yaml:"stringMetric,omitempty" json:"stringMetric,omitempty"`
-		NumericMetric NumericMetric `yaml:"numericMetric,omitempty" json:"numericMetric,omitempty"`
-		BoolMetric    BoolMetric    `yaml:"boolMetric,omitempty" json:"boolMetric,omitempty"`
+		StringMetric  StringMetric  `json:"stringMetric,omitempty"  jsonschema:"required" yaml:"stringMetric,omitempty"`
+		NumericMetric NumericMetric `json:"numericMetric,omitempty" jsonschema:"required" yaml:"numericMetric,omitempty"`
+		BoolMetric    BoolMetric    `json:"boolMetric,omitempty"    jsonschema:"required" yaml:"boolMetric,omitempty"`
 	}
 )
 
 // RIMO YAML metrics.
 type (
 	GenericMetric struct {
-		Count  int64         `yaml:"count" json:"count" jsonschema:"required"`
-		Unique int64         `yaml:"unique" json:"unique" jsonschema:"required"`
-		Sample []interface{} `yaml:"sample" json:"sample" jsonschema:"required"`
+		Count  int64         `json:"count"  jsonschema:"required" yaml:"count"`
+		Unique int64         `json:"unique" jsonschema:"required" yaml:"unique"`
+		Sample []interface{} `json:"sample" jsonschema:"required" yaml:"sample"`
 	}
 	StringMetric struct {
-		MostFreqLen     []LenFreq `yaml:"mostFrequentLen" json:"mostFrequentLen" jsonschema:"required"`
-		LeastFreqLen    []LenFreq `yaml:"leastFrequentLen" json:"leastFrequentLen" jsonschema:"required"`
-		LeastFreqSample []string  `yaml:"leastFrequentSample" json:"leastFrequentSample" jsonschema:"required"`
+		MostFreqLen     []LenFreq `json:"mostFrequentLen"     jsonschema:"required" yaml:"mostFrequentLen"`
+		LeastFreqLen    []LenFreq `json:"leastFrequentLen"    jsonschema:"required" yaml:"leastFrequentLen"`
+		LeastFreqSample []string  `json:"leastFrequentSample" jsonschema:"required" yaml:"leastFrequentSample"`
 	}
 
 	LenFreq struct {
-		Length int     `json:"length" jsonschema:"required"`
-		Freq   float64 `json:"freq" jsonschema:"required"`
+		Length int     `json:"length" jsonschema:"required" yaml:"length"`
+		Freq   float64 `json:"freq"   jsonschema:"required" yaml:"freq"`
 	}
 
 	NumericMetric struct {
-		Min  float64 `yaml:"min" json:"min" jsonschema:"required"`
-		Max  float64 `yaml:"max" json:"max" jsonschema:"required"`
-		Mean float64 `yaml:"mean" json:"mean" jsonschema:"required"`
+		Min  float64 `json:"min"  jsonschema:"required" yaml:"min"`
+		Max  float64 `json:"max"  jsonschema:"required" yaml:"max"`
+		Mean float64 `json:"mean" jsonschema:"required" yaml:"mean"`
 	}
 
 	BoolMetric struct {
-		TrueRatio float64 `yaml:"trueRatio" json:"trueRatio" jsonschema:"required"`
+		TrueRatio float64 `json:"trueRatio" jsonschema:"required" yaml:"trueRatio"`
 	}
 )
 
-func main() {
-	err := ExportBaseSchema()
-	if err != nil {
-		fmt.Println("error:", err)
-		os.Exit(1)
-	}
-}
-
 // ExportBaseSchema exports the YAML schema for the Base struct to the current folder.
-func ExportBaseSchema() error {
+func ExportSchema() error {
 	// Marshal the struct into a JSON string
 	s := jsonschema.Reflect(&Base{}) //nolint:exhaustruct
 

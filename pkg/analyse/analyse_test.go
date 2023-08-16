@@ -12,10 +12,10 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/cgi-fr/rimo/pkg/analyse"
-	"github.com/cgi-fr/rimo/pkg/model"
-	"github.com/hexops/valast"
-	"github.com/stretchr/testify/assert"
+	"github.com/cgi-fr/rimo/pkg/analyse" //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/model"   //nolint:depguard
+	"github.com/hexops/valast"           //nolint:depguard
+	"github.com/stretchr/testify/assert" //nolint:depguard
 )
 
 const (
@@ -23,15 +23,15 @@ const (
 )
 
 var (
-	JsonlNewFormat  = filepath.Join(TestDir, "/input/testcase_newstruct.jsonl")
-	JsonlPrevFormat = filepath.Join(TestDir, "/input/testcase_prevstruct.jsonl")
+	jsonlNewFormat  = filepath.Join(TestDir, "/input/testcase_newstruct.jsonl")  //nolint:gochecknoglobals
+	jsonlPrevFormat = filepath.Join(TestDir, "/input/testcase_prevstruct.jsonl") //nolint:gochecknoglobals
 )
 
 // Compare output file with expected output file.
 func TestAnalyseFileComparison(t *testing.T) {
 	t.Parallel()
 
-	inputList := []string{JsonlNewFormat}
+	inputList := []string{jsonlNewFormat}
 	outputPath := filepath.Join(TestDir, "/output/rimo_output.yaml")
 	analyse.Analyse(inputList, outputPath)
 
@@ -78,7 +78,7 @@ func TestAnalyseFileComparison(t *testing.T) {
 func TestAnalyseObjectComparison(t *testing.T) {
 	t.Parallel()
 
-	inputList := []string{JsonlNewFormat}
+	inputList := []string{jsonlNewFormat}
 	outputPath := filepath.Join(TestDir, "/output/rimo_output.yaml")
 	analyse.Analyse(inputList, outputPath)
 
@@ -130,114 +130,24 @@ func TestAnalyseObjectComparison(t *testing.T) {
 // UTILS FUNCTIONS.
 
 // DeepEqual two model.Base.
-func EqualBase(base1, base2 model.Base) (equal bool, diff string) {
+func EqualBase(base1, base2 model.Base) (bool, string) {
 	if !reflect.DeepEqual(base1, base2) {
 		return false, fmt.Sprintf("base is different : %s \n \n %s", valast.String(base1), valast.String(base2))
-	} else {
-		return true, ""
-	}
-}
-
-// NOT IN USE : order of table and column in yaml is ensured by analyse.Load()
-func EqualBaseWithoutOrder(base1, base2 model.Base) (equal bool, diff string) {
-	if base1.Name != base2.Name {
-		return false, fmt.Sprintf("base name does not match : %s and %s", base1.Name, base2.Name)
-	}
-
-	// Use case : order of tables and columns are not ensured.
-	// We need to map table and column to their respective index to be able to compare them.
-	type (
-		tableLocator  map[string]int            // Index of table.
-		columnLocator map[string]map[string]int // Index of column.
-	)
-
-	// base1
-	tableLocator1 := make(tableLocator)
-	columnLocator1 := make(columnLocator)
-
-	for tableIndex, table := range base1.Tables {
-		tableLocator1[table.Name] = tableIndex
-
-		for columnIndex, column := range table.Columns {
-			if columnLocator1[table.Name] == nil {
-				columnLocator1[table.Name] = make(map[string]int)
-			}
-
-			columnLocator1[table.Name][column.Name] = columnIndex
-		}
-	}
-
-	// base2
-	tableLocator2 := make(tableLocator)
-	columnLocator2 := make(columnLocator)
-
-	for tableIndex, table := range base2.Tables {
-		tableLocator2[table.Name] = tableIndex
-
-		for columnIndex, column := range table.Columns {
-			if columnLocator2[table.Name] == nil {
-				columnLocator2[table.Name] = make(map[string]int)
-			}
-
-			columnLocator2[table.Name][column.Name] = columnIndex
-		}
-	}
-
-	// compare tables and columns of base1 and base2.
-	for tableName, columnLocator := range columnLocator1 {
-		if _, ok := columnLocator2[tableName]; !ok {
-			return false, fmt.Sprintf("table %s does not exist in Base", tableName)
-		}
-
-		for columnName := range columnLocator {
-			if _, ok := columnLocator2[tableName][columnName]; !ok {
-				return false, fmt.Sprintf("column %s does not exist in table %s", columnName, tableName)
-			}
-		}
-	}
-
-	// A second loop is required to check if all columns of base2 are present in base1.
-	for tableName, columnLocator := range columnLocator2 {
-		if _, ok := columnLocator1[tableName]; !ok {
-			return false, fmt.Sprintf("table %s does not exist in Base", tableName)
-		}
-
-		for columnName := range columnLocator {
-			if _, ok := columnLocator1[tableName][columnName]; !ok {
-				return false, fmt.Sprintf("column %s does not exist in table %s", columnName, tableName)
-			}
-		}
-	}
-
-	// DeepEqual columns of base1 and base2
-	for tableName, tableIndex := range tableLocator1 {
-		table1 := base1.Tables[tableIndex]
-		table2 := base2.Tables[tableLocator2[tableName]]
-
-		for columnName, columnIndex := range columnLocator1[tableName] {
-			column1 := table1.Columns[columnIndex]
-			column2 := table2.Columns[columnLocator2[tableName][columnName]]
-
-			if !reflect.DeepEqual(column1, column2) {
-				return false, fmt.Sprintf(
-					"column %s in table %s is different : %s \n %s",
-					columnName, tableName, valast.String(column1), valast.String(column2))
-			}
-		}
 	}
 
 	return true, ""
 }
 
 func removeSampleFromBase(base model.Base) model.Base {
-	for i, table := range base.Tables {
-		for j, column := range table.Columns {
+	for tableI, table := range base.Tables {
+		for columnJ, column := range table.Columns {
 			column.MainMetric.Sample = nil
 
-			if column.Type == "string" {
+			if column.Type == model.ValueType.String {
 				column.StringMetric.LeastFreqSample = nil
 			}
-			base.Tables[i].Columns[j] = column
+
+			base.Tables[tableI].Columns[columnJ] = column
 		}
 	}
 

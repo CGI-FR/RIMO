@@ -9,30 +9,17 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/model" //nolint:depguard
 )
 
 // Handle execution pipeline of analyse pkg.
 func Analyse(inputList []string, outputPath string) {
 	// Ensure all input files relate to same Base.
-	baseName, err := GetBaseName(inputList[0])
+	baseName, err := GetUniqueBaseName(inputList)
 	if err != nil {
 		log.Fatalf("failed to extract database name: %v", err)
 	}
-
-	for i := range inputList {
-		newBaseName, err := GetBaseName(inputList[i])
-		if err != nil {
-			log.Fatalf("failed to extract database name: %v", err)
-		}
-
-		if newBaseName != baseName {
-			log.Fatalf("input files do not relate to same Base: %s", baseName)
-		}
-	}
-
 	// Treatment of input file.
-
 	tables := make([]model.Table, 0, len(inputList))
 
 	for i := range inputList {
@@ -48,14 +35,7 @@ func Analyse(inputList []string, outputPath string) {
 		// Analyse
 		var cols []model.Column
 
-		for colName, values := range data {
-			column, err := ComputeMetric(colName, values)
-			if err != nil {
-				log.Fatalf("failed to compute metric: %v", err)
-			}
-
-			cols = append(cols, column)
-		}
+		cols = buildColumnMetric(data, cols)
 
 		// Sort cols by name.
 		sort.Slice(cols, func(i, j int) bool {
@@ -88,9 +68,42 @@ func Analyse(inputList []string, outputPath string) {
 	}
 }
 
+func buildColumnMetric(data DataMap, cols []model.Column) []model.Column {
+	for colName, values := range data {
+		column, err := ComputeMetric(colName, values)
+		if err != nil {
+			log.Fatalf("failed to compute metric: %v", err)
+		}
+
+		cols = append(cols, column)
+	}
+
+	return cols
+}
+
 // Error definitions.
 
 var ErrNonExtractibleValue = errors.New("couldn't extract base or table name from path")
+
+func GetUniqueBaseName(inputList []string) (string, error) {
+	baseName, err := GetBaseName(inputList[0])
+	if err != nil {
+		log.Fatalf("failed to extract database name: %v", err)
+	}
+
+	for i := range inputList {
+		newBaseName, err := GetBaseName(inputList[i])
+		if err != nil {
+			log.Fatalf("failed to extract database name: %v", err)
+		}
+
+		if newBaseName != baseName {
+			log.Fatalf("input files do not relate to same Base: %s", baseName)
+		}
+	}
+
+	return baseName, err
+}
 
 func GetBaseName(path string) (string, error) {
 	// path format : /path/to/jsonl/BASE_TABLE.jsonl
@@ -98,7 +111,7 @@ func GetBaseName(path string) (string, error) {
 	baseName = baseName[:len(baseName)-len(filepath.Ext(baseName))]
 	// Split at _ to get Base name.
 	parts := strings.Split(baseName, "_")
-	if len(parts) < 2 {
+	if len(parts) < 2 { //nolint:gomnd
 		return "", fmt.Errorf("%w : unable to extract base name from %s", ErrNonExtractibleValue, path)
 	}
 
@@ -116,7 +129,7 @@ func GetTableName(path string) (string, error) {
 	tableName = tableName[:len(tableName)-len(filepath.Ext(tableName))]
 	// Split at _ to get Table name.
 	parts := strings.Split(tableName, "_")
-	if len(parts) < 2 {
+	if len(parts) < 2 { //nolint:gomnd
 		return "", fmt.Errorf("%w : unable to extract table name from %s", ErrNonExtractibleValue, path)
 	}
 
