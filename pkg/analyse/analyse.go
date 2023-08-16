@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/cgi-fr/rimo/pkg/model"
@@ -56,6 +57,11 @@ func Analyse(inputList []string, outputPath string) {
 			cols = append(cols, column)
 		}
 
+		// Sort cols by name.
+		sort.Slice(cols, func(i, j int) bool {
+			return cols[i].Name < cols[j].Name
+		})
+
 		table := model.Table{
 			Name:    tableName,
 			Columns: cols,
@@ -64,6 +70,11 @@ func Analyse(inputList []string, outputPath string) {
 		// Append tables to Base structure.
 		tables = append(tables, table)
 	}
+
+	// Sort tables by name.
+	sort.Slice(tables, func(i, j int) bool {
+		return tables[i].Name < tables[j].Name
+	})
 
 	base := model.Base{
 		Name:   baseName,
