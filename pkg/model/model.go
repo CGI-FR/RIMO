@@ -8,6 +8,8 @@ import (
 	"github.com/invopop/jsonschema"
 )
 
+const SampleSize int = 5
+
 // RIMO YAML structure.
 type (
 	Base struct {

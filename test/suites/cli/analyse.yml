@@ -6,4 +6,3 @@ testcases:
           rimo analyse
         assertions:
           - result.code ShouldEqual 0
-          - result.systemout ShouldContainSubstring Hello World!

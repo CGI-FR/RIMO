@@ -3,3 +3,4 @@ bin
 .cache
 ROADMAP.md
 test/data/outputTest/
+test/analyseTest/output/rimo_output.yaml

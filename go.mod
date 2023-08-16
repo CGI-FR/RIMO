@@ -3,7 +3,7 @@ module github.com/cgi-fr/rimo
 go 1.20
 
 require (
-	github.com/hexops/valast v1.4.3
+	github.com/hexops/valast v1.4.4
 	github.com/rs/zerolog v1.28.0
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
