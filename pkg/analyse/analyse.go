@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cgi-fr/rimo/pkg/model" //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 // Handle execution pipeline of analyse pkg.

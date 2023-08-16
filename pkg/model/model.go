@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/invopop/jsonschema" //nolint:depguard
+	"github.com/invopop/jsonschema"
 )
 
 type RIMOType string

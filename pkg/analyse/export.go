@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cgi-fr/rimo/pkg/model" //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/model"
 	"gopkg.in/yaml.v3"
 )
 

@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cgi-fr/rimo/pkg/analyse" //nolint:depguard
-	"github.com/hexops/valast"           //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/hexops/valast"
 )
 
 func TestLoadNewFormat(t *testing.T) {

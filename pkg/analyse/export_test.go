@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/cgi-fr/rimo/pkg/analyse" //nolint:depguard
-	"github.com/cgi-fr/rimo/pkg/model"   //nolint:depguard
-	"github.com/stretchr/testify/assert" //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestExport(t *testing.T) {

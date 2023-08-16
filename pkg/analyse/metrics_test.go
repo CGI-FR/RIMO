@@ -3,11 +3,11 @@ package analyse_test
 import (
 	"testing"
 
-	"github.com/cgi-fr/rimo/pkg/analyse"  //nolint:depguard
-	"github.com/cgi-fr/rimo/pkg/model"    //nolint:depguard
-	"github.com/hexops/valast"            //nolint:depguard
-	"github.com/stretchr/testify/assert"  //nolint:depguard
-	"github.com/stretchr/testify/require" //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/hexops/valast"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // Main metrics tests.

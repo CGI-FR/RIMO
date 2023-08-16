@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cgi-fr/rimo/pkg/analyse" //nolint:depguard
-	"github.com/cgi-fr/rimo/pkg/model"   //nolint:depguard
-	"github.com/rs/zerolog"              //nolint:depguard
-	"github.com/rs/zerolog/log"          //nolint:depguard
-	"github.com/spf13/cobra"             //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
 )
 
 // Provisioned by ldflags.

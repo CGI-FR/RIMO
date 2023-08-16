@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"sort"
 
-	"github.com/cgi-fr/rimo/pkg/model" //nolint:depguard
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 // For a given dataCol return a model.Column with metrics.
