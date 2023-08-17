@@ -30,8 +30,10 @@ func Analyse(inputList []string, outputPath string) {
 			log.Fatalf("failed to extract table name: %v", err)
 		}
 		// Load inputFilePath.
-		data := Load(inputPath, "new")
-
+		data, err := Load(inputPath, "new")
+		if err != nil {
+			log.Fatalf("failed to load %s: %v", inputPath, err)
+		}
 		// Analyse
 		var cols []model.Column
 

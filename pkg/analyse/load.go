@@ -4,6 +4,7 @@ package analyse
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 )
@@ -14,9 +15,15 @@ const (
 	Boolean = "boolean"
 )
 
+var (
+	ErrNotInterface = errors.New("line is not an interface")
+	ErrScanJSON     = errors.New("couldn't scan JSON")
+	ErrSameColumn   = errors.New("column found twice in JSON")
+)
+
 // Load .jsonl and return DataMap.
-func Load(inputPath string, format string) DataMap {
-	var jsonFormatFunc func(*bufio.Scanner) DataMap
+func Load(inputPath string, format string) (DataMap, error) {
+	var jsonFormatFunc func(*bufio.Scanner) (DataMap, error)
 
 	switch format {
 	case "old":
@@ -29,21 +36,24 @@ func Load(inputPath string, format string) DataMap {
 
 	file, err := os.Open(inputPath)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("couldn't load %s : %w", inputPath, err)
 	}
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	data := jsonFormatFunc(scanner)
+	data, err := jsonFormatFunc(scanner)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't load %s : %w", inputPath, err)
+	}
 
-	return data
+	return data, nil
 }
 
 type DataMap map[string][]interface{}
 
 // Reads JSON new structure.
 // { "col_name" : [value1, value2, ...] }.
-func LoadNewJSONStruct(scanner *bufio.Scanner) DataMap {
+func LoadNewJSONStruct(scanner *bufio.Scanner) (DataMap, error) {
 	// Instantiate dataMap map[string]dataCol
 	data := DataMap{}
 
@@ -52,39 +62,35 @@ func LoadNewJSONStruct(scanner *bufio.Scanner) DataMap {
 
 		err := json.Unmarshal(scanner.Bytes(), &lineMap)
 		if err != nil {
-			panic(err)
+			return nil, ErrScanJSON
 		}
 
 		for colName := range lineMap {
 			// Check if colName is already in dataMap.
 			if _, ok := data[colName]; ok {
 				// Column already exist in dataMap.
-				// Raise error
-				panic("Column already exist in dataMap")
-			} else {
-				// Column does not exist in dataMap.
-				// Assert linemap[colName] is []interface{}
-				if _, ok := lineMap[colName].([]interface{}); !ok {
-					// print lineMap[colName]
-					fmt.Println(lineMap[colName])
-					panic("Column is not []interface{}")
-				}
-				data[colName] = lineMap[colName].([]interface{})
+				return nil, ErrSameColumn
 			}
+			// Column does not exist in dataMap.
+			if _, ok := lineMap[colName].([]interface{}); !ok {
+				return nil, fmt.Errorf("%w: %s of type %T", ErrNotInterface, colName, lineMap[colName])
+			}
+
+			data[colName] = lineMap[colName].([]interface{})
 		}
 	}
 
 	// Check for any errors during scanning.
 	if err := scanner.Err(); err != nil {
-		panic(err)
+		return nil, fmt.Errorf("couldn't scan JSON: %w", err)
 	}
 
-	return data
+	return data, nil
 }
 
 // Reads previous JSON structure.
 // { "col_name" : value, "col_name2" : value2, ... }.
-func LoadOldJSONStruct(scanner *bufio.Scanner) DataMap {
+func LoadOldJSONStruct(scanner *bufio.Scanner) (DataMap, error) {
 	// Instantiate dataMap map[string][]interface{}
 	data := DataMap{}
 
@@ -93,7 +99,7 @@ func LoadOldJSONStruct(scanner *bufio.Scanner) DataMap {
 
 		err := json.Unmarshal(scanner.Bytes(), &lineMap)
 		if err != nil {
-			panic(err)
+			return nil, fmt.Errorf("couldn't unmarshal JSON: %w", err)
 		}
 
 		for colName := range lineMap {
@@ -109,8 +115,8 @@ func LoadOldJSONStruct(scanner *bufio.Scanner) DataMap {
 
 	// Check for any errors during scanning.
 	if err := scanner.Err(); err != nil {
-		panic(err)
+		return nil, fmt.Errorf("couldn't scan JSON: %w", err)
 	}
 
-	return data
+	return data, nil
 }
