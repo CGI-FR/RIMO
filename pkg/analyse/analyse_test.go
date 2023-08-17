@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -18,13 +17,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	TestDir = "../../test/analyseTest/"
-)
-
 var (
-	jsonlNewFormat  = filepath.Join(TestDir, "/input/testcase_newstruct.jsonl")  //nolint:gochecknoglobals
-	jsonlPrevFormat = filepath.Join(TestDir, "/input/testcase_prevstruct.jsonl") //nolint:gochecknoglobals
+	jsonlNewFormat  = "./testdata/input/testcase_newstruct.jsonl"  //nolint:gochecknoglobals
+	jsonlPrevFormat = "./testdata/input/testcase_prevstruct.jsonl" //nolint:gochecknoglobals
 )
 
 // Compare output file with expected output file.
@@ -32,7 +27,7 @@ func TestAnalyseFileComparison(t *testing.T) {
 	t.Parallel()
 
 	inputList := []string{jsonlNewFormat}
-	outputPath := filepath.Join(TestDir, "/output/rimo_output.yaml")
+	outputPath := "./testdata/output/rimo_output.yaml"
 	analyse.Analyse(inputList, outputPath)
 
 	// Load output file
@@ -48,7 +43,7 @@ func TestAnalyseFileComparison(t *testing.T) {
 	actualOutput = buf.String()
 
 	// Load expected output file
-	testPath := filepath.Join(TestDir, "/expected/rimo_output.yaml")
+	testPath := "./testdata/expected/rimo_output.yaml"
 	expectedFile, err := os.Open(testPath)
 	assert.NoError(t, err)
 
@@ -79,7 +74,7 @@ func TestAnalyseObjectComparison(t *testing.T) {
 	t.Parallel()
 
 	inputList := []string{jsonlNewFormat}
-	outputPath := filepath.Join(TestDir, "/output/rimo_output.yaml")
+	outputPath := "./testdata/output/rimo_output.yaml"
 	analyse.Analyse(inputList, outputPath)
 
 	// Load output file
@@ -87,7 +82,7 @@ func TestAnalyseObjectComparison(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Load expected output file
-	testPath := filepath.Join(TestDir, "/expected/rimo_output.yaml")
+	testPath := "./testdata/expected/rimo_output.yaml"
 	expectedFile, err := os.Open(testPath)
 	assert.NoError(t, err)
 
