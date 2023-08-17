@@ -18,8 +18,8 @@ import (
 )
 
 var (
-	jsonlNewFormat  = "./testdata/input/testcase_newstruct.jsonl"  //nolint:gochecknoglobals
-	jsonlPrevFormat = "./testdata/input/testcase_prevstruct.jsonl" //nolint:gochecknoglobals
+	jsonlNewFormat  = "./testdata/input/newstruct/testcase_newstruct.jsonl"   //nolint:gochecknoglobals
+	jsonlPrevFormat = "./testdata/input/prevstruct/testcase_prevstruct.jsonl" //nolint:gochecknoglobals
 )
 
 // Compare output file with expected output file.
