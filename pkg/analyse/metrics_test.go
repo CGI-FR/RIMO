@@ -149,7 +149,8 @@ func TestNumericMetric(t *testing.T) {
 	})
 }
 
-// Ensure that frequency are correct, order goes from least to most frequent and frequency ties are break by length
+// Ensure that 1. frequency is correct, 2. order goes from least frequent and most frequent.
+// and 3. ties are break by length.
 func TestStringMetric(t *testing.T) {
 	t.Parallel()
 

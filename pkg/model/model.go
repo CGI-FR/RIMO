@@ -64,8 +64,8 @@ type (
 		Sample []interface{} `json:"sample" jsonschema:"required" yaml:"sample"`
 	}
 	StringMetric struct {
-		MostFreqLen  []LenFreq `json:"mostFrequentLen"     jsonschema:"required" yaml:"mostFrequentLen"`
-		LeastFreqLen []LenFreq `json:"leastFrequentLen"    jsonschema:"required" yaml:"leastFrequentLen"`
+		MostFreqLen  []LenFreq `json:"mostFrequentLen"  jsonschema:"required" yaml:"mostFrequentLen"`
+		LeastFreqLen []LenFreq `json:"leastFrequentLen" jsonschema:"required" yaml:"leastFrequentLen"`
 	}
 
 	LenFreq struct {

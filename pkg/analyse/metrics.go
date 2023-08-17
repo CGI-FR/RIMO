@@ -84,9 +84,12 @@ func ColType(values []interface{}) model.RIMOType {
 	return colType
 }
 
+var ErrEmptySlice = errors.New("slice is empty")
+
+// Return a sample of size sampleSize from values.
 func Sample[T any](values []T, sampleSize int) ([]T, error) {
 	if len(values) == 0 {
-		return nil, errors.New("values slice is empty")
+		return nil, ErrEmptySlice
 	}
 
 	if sampleSize >= len(values) {
