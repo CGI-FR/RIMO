@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cgi-fr/rimo/pkg/model/base",
   "$ref": "#/$defs/Base",
   "$defs": {
     "Base": {
@@ -105,13 +106,20 @@
         },
         "freq": {
           "type": "number"
+        },
+        "sample": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "length",
-        "freq"
+        "freq",
+        "sample"
       ]
     },
     "NumericMetric": {
@@ -147,20 +155,13 @@
             "$ref": "#/$defs/LenFreq"
           },
           "type": "array"
-        },
-        "leastFrequentSample": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "mostFrequentLen",
-        "leastFrequentLen",
-        "leastFrequentSample"
+        "leastFrequentLen"
       ]
     },
     "Table": {

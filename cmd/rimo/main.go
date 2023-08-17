@@ -37,7 +37,7 @@ func main() { //nolint:funlen
 	}
 
 	rimoSchemaCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "rimo schema",
+		Use:   "schema",
 		Short: "Export rimo json schema",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -56,7 +56,7 @@ func main() { //nolint:funlen
 	}
 
 	rimoAnalyseCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "rimo analyse [input_path] [output_path]",
+		Use:   "analyse [input_path] [output_path]",
 		Short: "Generate a rimo.yaml from a directory of .jsonl files",
 		Args:  cobra.ExactArgs(2), //nolint:gomnd
 		Run: func(cmd *cobra.Command, args []string) {
