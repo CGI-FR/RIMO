@@ -11,7 +11,11 @@ import (
 type RIMOType string
 
 const (
-	SampleSize int = 5
+	SampleSize              int = 5
+	MostFrequentLenSize     int = 5
+	MostFrequentSampleSize  int = 5
+	LeastFrequentLenSize    int = 5
+	LeastFrequentSampleSize int = 5
 )
 
 var ValueType = struct { //nolint:gochecknoglobals
@@ -60,14 +64,14 @@ type (
 		Sample []interface{} `json:"sample" jsonschema:"required" yaml:"sample"`
 	}
 	StringMetric struct {
-		MostFreqLen     []LenFreq `json:"mostFrequentLen"     jsonschema:"required" yaml:"mostFrequentLen"`
-		LeastFreqLen    []LenFreq `json:"leastFrequentLen"    jsonschema:"required" yaml:"leastFrequentLen"`
-		LeastFreqSample []string  `json:"leastFrequentSample" jsonschema:"required" yaml:"leastFrequentSample"`
+		MostFreqLen  []LenFreq `json:"mostFrequentLen"     jsonschema:"required" yaml:"mostFrequentLen"`
+		LeastFreqLen []LenFreq `json:"leastFrequentLen"    jsonschema:"required" yaml:"leastFrequentLen"`
 	}
 
 	LenFreq struct {
-		Length int     `json:"length" jsonschema:"required" yaml:"length"`
-		Freq   float64 `json:"freq"   jsonschema:"required" yaml:"freq"`
+		Length int      `json:"length" jsonschema:"required" yaml:"length"`
+		Freq   float64  `json:"freq"   jsonschema:"required" yaml:"freq"`
+		Sample []string `json:"sample" jsonschema:"required" yaml:"sample"`
 	}
 
 	NumericMetric struct {

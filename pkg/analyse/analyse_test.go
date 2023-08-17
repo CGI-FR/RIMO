@@ -144,7 +144,13 @@ func removeSampleFromBase(base model.Base) model.Base {
 			column.MainMetric.Sample = nil
 
 			if column.Type == model.ValueType.String {
-				column.StringMetric.LeastFreqSample = nil
+				for freqLen := range column.StringMetric.MostFreqLen {
+					column.StringMetric.MostFreqLen[freqLen].Sample = nil
+				}
+
+				for freqLen := range column.StringMetric.LeastFreqLen {
+					column.StringMetric.LeastFreqLen[freqLen].Sample = nil
+				}
 			}
 
 			base.Tables[tableI].Columns[columnJ] = column

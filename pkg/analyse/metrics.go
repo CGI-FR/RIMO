@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"math/rand"
 	"sort"
 
@@ -28,11 +29,15 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 	}
 
 	// Generic metric
+	sample, err := Sample(values, model.SampleSize)
+	if err != nil {
+		return model.Column{}, fmt.Errorf("error computing sample in column %v : %w", name, err)
+	}
 
 	genericMetric := model.GenericMetric{
 		Count:  int64(len(values)),
 		Unique: int64(len(values)),
-		Sample: Sample(values, model.SampleSize),
+		Sample: sample,
 	}
 
 	col.MainMetric = genericMetric
@@ -40,7 +45,7 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 	// Type specific metric
 
 	switch colType {
-	case "string":
+	case model.ValueType.String:
 		metric, err := StringMetric(values)
 		if err != nil {
 			return model.Column{}, fmt.Errorf("error computing string metric in column %v : %w", name, err)
@@ -48,7 +53,7 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 
 		col.StringMetric = metric
 
-	case "numeric":
+	case model.ValueType.Numeric:
 		metric, err := NumericMetric(values)
 		if err != nil {
 			return model.Column{}, fmt.Errorf("error computing numeric metric in column %v : %w", name, err)
@@ -56,7 +61,7 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 
 		col.NumericMetric = metric
 
-	case "bool":
+	case model.ValueType.Bool:
 		metric, err := BoolMetric(values)
 		if err != nil {
 			return model.Column{}, err
@@ -79,13 +84,21 @@ func ColType(values []interface{}) model.RIMOType {
 	return colType
 }
 
-func Sample(values []interface{}, sampleSize int) []interface{} {
-	sample := make([]interface{}, sampleSize)
-	for i := 0; i < sampleSize; i++ {
-		sample[i] = values[rand.Intn(len(values))] //nolint:gosec
+func Sample[T any](values []T, sampleSize int) ([]T, error) {
+	if len(values) == 0 {
+		return nil, errors.New("values slice is empty")
 	}
 
-	return sample
+	if sampleSize >= len(values) {
+		return values, nil
+	}
+
+	sample := make([]T, sampleSize)
+	for i := 0; i < sampleSize; i++ {
+		sample[i] = values[rand.Intn(len(values)-1)] //nolint:gosec
+	}
+
+	return sample, nil
 }
 
 func Unique(values []interface{}) int64 {
@@ -105,87 +118,88 @@ var ErrValueType = errors.New("value type error")
 // String metric : MostFreqLen, LeastFreqLen, LeastFreqSample
 
 func StringMetric(values []interface{}) (model.StringMetric, error) {
-	// Initialize the StringMetric struct
 	metric := model.StringMetric{} //nolint:exhaustruct
 
-	// Convert the input values to a slice of strings
-	strings := make([]string, len(values))
-	// Count the frequency of each string length
+	// Store strings by length.
+	lenMap := make(map[int][]string)
+	// Count length occurrence.
 	lenCounter := make(map[int]int)
+	totalCount := len(values)
 
-	for vIndex, value := range values {
+	for _, value := range values {
 		stringValue, ok := value.(string)
 		if !ok {
 			return metric, fmt.Errorf("%w : expected numeric found %T: %v", ErrValueType, value, value)
 		}
 
-		strings[vIndex] = stringValue
-		lenCounter[len(stringValue)]++
+		length := len(stringValue)
+		lenMap[length] = append(lenMap[length], stringValue)
+		lenCounter[length]++
 	}
 
-	// Create a list of unique lengths sorted by ascending frequency, break ties with ascending length
+	// Create a list of unique lengths sorted by descending frequency, break ties with ascending length
 	sortedLength := uniqueLengthSorted(lenCounter)
 
-	totalCount := int64(len(strings))
+	// Get size of MostFreqLen and LeastFreqLen
+	mostFrequentLenSize, leastFrequentLenSize := getFreqSize(len(sortedLength))
 
-	// Find the n_th most and least frequent length
-	for index := 0; index < model.SampleSize && index < len(sortedLength); index++ {
-		metric.MostFreqLen = append(metric.MostFreqLen, model.LenFreq{
-			Length: sortedLength[index],
-			Freq:   GetFrequency(lenCounter[sortedLength[index]], totalCount),
-		})
+	// Get ordered slice of least and most frequent length
+	lenMostFreqLen := sortedLength[0:leastFrequentLenSize]
 
-		length := sortedLength[len(sortedLength)-index-1]
+	lenLeastFreqLen := make([]int, mostFrequentLenSize)
 
-		metric.LeastFreqLen = append(metric.LeastFreqLen, model.LenFreq{
-			Length: length,
-			Freq:   GetFrequency(lenCounter[length], totalCount),
-		})
+	for i := 0; i < leastFrequentLenSize; i++ {
+		index := len(sortedLength) - 1 - i
+		lenLeastFreqLen[i] = sortedLength[index]
 	}
 
-	metric.LeastFreqSample = getLeastFrequentSample(sortedLength, lenCounter, strings)
+	leastFreqLen, err := buildFreqLen(lenLeastFreqLen, lenMap, lenCounter, totalCount)
+	if err != nil {
+		return metric, fmt.Errorf("error building least frequent length : %w", err)
+	}
+
+	metric.LeastFreqLen = leastFreqLen
+
+	mostFreqLen, err := buildFreqLen(lenMostFreqLen, lenMap, lenCounter, totalCount)
+	if err != nil {
+		return metric, fmt.Errorf("error building most frequent length : %w", err)
+	}
+
+	metric.MostFreqLen = mostFreqLen
 
 	return metric, nil
 }
 
-// Find n samples of least frequent length.
-func getLeastFrequentSample(sortedLength []int, lenCounter map[int]int, strings []string) []string {
-	// Strategy :
-	// 	1. build a pool of length to take sample from :
-	//		if lenCounter[leastFrequentLength] does not provide enough sample :
-	// 			select n-i least frequent length till n samples are found.
-	//  2. once length pool provide at least n samples,
-	// 		iterate over values []interface{} and add to sample if length match length pool.
-	// Note : 1. this strategy isn't random 2. is subject to over representation of n-i least frequent length.
-	// ---------
-	// Create a map of the lengths in lenSample
-	// Check if the length of the string is in the lenMap.
-	knownSample := 0
-	lenSample := []int{}
+func buildFreqLen(leastFreqLen []int, lenMap map[int][]string, lenCounter map[int]int, totalCount int) ([]model.LenFreq, error) { //nolint:lll
+	lenFreqs := make([]model.LenFreq, len(leastFreqLen))
 
-	for i := len(sortedLength) - 1; i >= 0 && knownSample < model.SampleSize; i-- {
-		knownSample += lenCounter[sortedLength[i]]
-		lenSample = append(lenSample, sortedLength[i])
-	}
-
-	leastFreqSamples := make([]string, 0, model.SampleSize)
-
-	lenMap := make(map[int]bool)
-	for _, l := range lenSample {
-		lenMap[l] = true
-	}
-
-	for _, string := range strings {
-		if len(leastFreqSamples) == model.SampleSize {
-			break
+	for index, len := range leastFreqLen {
+		sample, err := Sample(lenMap[len], model.LeastFrequentSampleSize)
+		if err != nil {
+			return lenFreqs, fmt.Errorf("error getting sample for length %v : %w", len, err)
 		}
 
-		if lenMap[len(string)] {
-			leastFreqSamples = append(leastFreqSamples, string)
+		lenFreqs[index] = model.LenFreq{
+			Length: len,
+			Freq:   GetFrequency(lenCounter[len], int64(totalCount)),
+			Sample: sample,
 		}
 	}
 
-	return leastFreqSamples
+	return lenFreqs, nil
+}
+
+func getFreqSize(nunique int) (int, int) {
+	mostFrequentLenSize := model.MostFrequentLenSize
+	leastFrequentLenSize := model.LeastFrequentLenSize
+
+	if nunique < model.MostFrequentLenSize+model.LeastFrequentLenSize {
+		// Modify MostFrequentLenSize and LeastFrequentLenSize to fit the number of unique length.
+		mostFrequentLenSize = int(math.Round(float64(nunique / 2)))  //nolint:gomnd
+		leastFrequentLenSize = int(math.Round(float64(nunique / 2))) //nolint:gomnd
+	}
+
+	return mostFrequentLenSize, leastFrequentLenSize
 }
 
 func uniqueLengthSorted(lenCounter map[int]int) []int {

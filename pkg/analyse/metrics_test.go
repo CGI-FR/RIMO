@@ -5,7 +5,6 @@ import (
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
 	"github.com/cgi-fr/rimo/pkg/model"
-	"github.com/hexops/valast"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -80,8 +79,8 @@ func TestSample(t *testing.T) {
 	t.Parallel()
 
 	slice1 := []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}
-	sample1 := analyse.Sample(slice1, 5)
-	sample2 := analyse.Sample(slice1, 5)
+	sample1, _ := analyse.Sample(slice1, 5)
+	sample2, _ := analyse.Sample(slice1, 5)
 
 	t.Run("Sample len", func(t *testing.T) {
 		t.Parallel()
@@ -110,7 +109,7 @@ func TestSample(t *testing.T) {
 	t.Run("Sample len greater than input len", func(t *testing.T) {
 		t.Parallel()
 
-		sample3 := analyse.Sample(slice1, 15)
+		sample3, _ := analyse.Sample(slice1, 15)
 		if len(sample3) != 15 {
 			t.Errorf("analyse.Sample(%v, 15) = %v; expected %v", slice1, sample3, 15)
 		}
@@ -150,25 +149,19 @@ func TestNumericMetric(t *testing.T) {
 	})
 }
 
-// Ensure 2 things :
-// 1. correctness : frequency are correct
-// 2. order/consistency : frequency of length ties are break using ascending order of length.
+// Ensure that frequency are correct, order goes from least to most frequent and frequency ties are break by length
 func TestStringMetric(t *testing.T) {
 	t.Parallel()
 
-	text := []interface{}{"1", "1", "1", "22", "22", "22", "331", "332", "4441", "4442"}
-	expectedMetric := model.StringMetric{ //nolint:exhaustruct
+	text := []interface{}{"1", "1", "1", "1", "22", "22", "22", "331", "332", "4441"}
+	expectedMetric := model.StringMetric{
 		MostFreqLen: []model.LenFreq{
-			{Length: 1, Freq: 0.3},
-			{Length: 2, Freq: 0.3},
-			{Length: 3, Freq: 0.2},
-			{Length: 4, Freq: 0.2},
+			{Length: 1, Freq: 0.4, Sample: []string{"1", "1", "1", "1"}},
+			{Length: 2, Freq: 0.3, Sample: []string{"22", "22", "22"}},
 		},
 		LeastFreqLen: []model.LenFreq{
-			{Length: 4, Freq: 0.2},
-			{Length: 3, Freq: 0.2},
-			{Length: 2, Freq: 0.3},
-			{Length: 1, Freq: 0.3},
+			{Length: 4, Freq: 0.1}, //nolint:exhaustruct
+			{Length: 3, Freq: 0.2}, //nolint:exhaustruct
 		},
 	}
 
@@ -177,15 +170,17 @@ func TestStringMetric(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	t.Logf(valast.String(actualMetric))
+	// t.Logf(valast.String(actualMetric))
 
-	assert.Equal(t, expectedMetric.MostFreqLen, actualMetric.MostFreqLen)
-	assert.Equal(t, expectedMetric.LeastFreqLen, actualMetric.LeastFreqLen)
+	for i := 0; i < len(expectedMetric.MostFreqLen); i++ {
+		assert.Equal(t, expectedMetric.MostFreqLen[i].Length, actualMetric.MostFreqLen[i].Length)
+		assert.Equal(t, expectedMetric.MostFreqLen[i].Freq, actualMetric.MostFreqLen[i].Freq)
+		assert.Equal(t, expectedMetric.MostFreqLen[i].Sample, actualMetric.MostFreqLen[i].Sample)
+	}
 
-	for _, sample := range actualMetric.LeastFreqSample {
-		if sample != "331" && sample != "332" && sample != "22" {
-			t.Errorf("actualMetric.LeastFreqSample contains unexpected sample: %v", sample)
-		}
+	for i := 0; i < len(expectedMetric.LeastFreqLen); i++ {
+		assert.Equal(t, expectedMetric.LeastFreqLen[i].Length, actualMetric.LeastFreqLen[i].Length)
+		assert.Equal(t, expectedMetric.LeastFreqLen[i].Freq, actualMetric.LeastFreqLen[i].Freq)
 	}
 }
 
