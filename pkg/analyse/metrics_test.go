@@ -110,8 +110,8 @@ func TestSample(t *testing.T) {
 		t.Parallel()
 
 		sample3, _ := analyse.Sample(slice1, 15)
-		if len(sample3) != 15 {
-			t.Errorf("analyse.Sample(%v, 15) = %v; expected %v", slice1, sample3, 15)
+		if len(sample3) != len(slice1) {
+			t.Errorf("analyse.Sample(%v, 15) = %v; expected len to be %v", slice1, sample3, len(slice1))
 		}
 	})
 }
