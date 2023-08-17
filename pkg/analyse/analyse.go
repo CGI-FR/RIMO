@@ -13,11 +13,11 @@ import (
 )
 
 // Handle execution pipeline of analyse pkg.
-func Analyse(inputList []string, outputPath string) {
+func Analyse(inputList []string, outputPath string) error {
 	// Ensure all input files relate to same Base.
 	baseName, err := GetUniqueBaseName(inputList)
 	if err != nil {
-		log.Fatalf("failed to extract database name: %v", err)
+		return fmt.Errorf("failed to extract database name: %w", err)
 	}
 	// Treatment of input file.
 	tables := make([]model.Table, 0, len(inputList))
@@ -27,12 +27,12 @@ func Analyse(inputList []string, outputPath string) {
 		// Extract Base and Table name from inputFilePath.
 		tableName, err := GetTableName(inputPath)
 		if err != nil {
-			log.Fatalf("failed to extract table name: %v", err)
+			return fmt.Errorf("failed to extract table name: %w", err)
 		}
 		// Load inputFilePath.
 		data, err := Load(inputPath, "new")
 		if err != nil {
-			log.Fatalf("failed to load %s: %v", inputPath, err)
+			return fmt.Errorf("failed to load %s: %w", inputPath, err)
 		}
 		// Analyse
 		var cols []model.Column
@@ -66,8 +66,10 @@ func Analyse(inputList []string, outputPath string) {
 	// Export
 	err = Export(base, outputPath)
 	if err != nil {
-		log.Fatalf("failed to export: %v", err)
+		return fmt.Errorf("failed to export: %w", err)
 	}
+
+	return nil
 }
 
 func buildColumnMetric(data DataMap, cols []model.Column) []model.Column {

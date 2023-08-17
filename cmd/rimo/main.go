@@ -82,7 +82,11 @@ func main() { //nolint:funlen
 			}
 			outputPath = filepath.Join(outputPath, basename+".yaml")
 
-			analyse.Analyse(inputList, outputPath)
+			err = analyse.Analyse(inputList, outputPath)
+			if err != nil {
+				log.Fatal().Msgf("error generating rimo.yaml: %v", err)
+			}
+
 			log.Info().Msgf("Successfully generated rimo.yaml at %s", outputPath)
 		},
 	}
