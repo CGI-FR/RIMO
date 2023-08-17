@@ -161,8 +161,8 @@ func TestStringMetric(t *testing.T) {
 			{Length: 2, Freq: 0.3, Sample: []string{"22", "22", "22"}},
 		},
 		LeastFreqLen: []model.LenFreq{
-			{Length: 4, Freq: 0.1}, //nolint:exhaustruct
-			{Length: 3, Freq: 0.2}, //nolint:exhaustruct
+			{Length: 4, Freq: 0.1, Sample: []string{"4441"}},
+			{Length: 3, Freq: 0.2, Sample: []string{"331", "332"}},
 		},
 	}
 
