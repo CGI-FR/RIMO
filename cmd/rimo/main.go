@@ -56,7 +56,7 @@ func main() { //nolint:funlen
 	}
 
 	rimoAnalyseCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "analyse [input_path] [output_path]",
+		Use:   "analyse [inputPath] [outputPath]",
 		Short: "Generate a rimo.yaml from a directory of .jsonl files",
 		Args:  cobra.ExactArgs(2), //nolint:gomnd
 		Run: func(cmd *cobra.Command, args []string) {
@@ -64,7 +64,7 @@ func main() { //nolint:funlen
 			CheckDir(inputPath)
 
 			outputPath := args[1]
-			CheckFile(outputPath)
+			CheckDir(outputPath)
 
 			// List of .jsonl files in input directory
 			inputList, err := FilesList(inputPath, ".jsonl")
@@ -75,7 +75,15 @@ func main() { //nolint:funlen
 				log.Fatal().Msgf("no .jsonl files found in %s", inputPath)
 			}
 
+			// Output path
+			basename, err := analyse.GetBaseName(inputList[0])
+			if err != nil {
+				log.Fatal().Msgf("error getting basename: %v", err)
+			}
+			outputPath = filepath.Join(outputPath, basename+".yaml")
+
 			analyse.Analyse(inputList, outputPath)
+			log.Info().Msgf("Successfully generated rimo.yaml at %s", outputPath)
 		},
 	}
 

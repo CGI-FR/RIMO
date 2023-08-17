@@ -41,6 +41,7 @@ func Load(inputPath string, format string) (DataMap, error) {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
+
 	data, err := jsonFormatFunc(scanner)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't load %s : %w", inputPath, err)
