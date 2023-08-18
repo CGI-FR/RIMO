@@ -8,26 +8,21 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Export base to outputPath in YAML format.
-const filePerm = 0o600
-
 func Export(base model.Base, outputPath string) error {
-	// Convert the base to YAML format
-	yamlData, err := yaml.Marshal(base)
+	// Create output file.
+	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("failed to marshal YAML data: %w", err)
+		return fmt.Errorf("failed to create output file: %w", err)
 	}
+	defer outputFile.Close()
 
-	// Write the YAML data to the output file
-	file, err := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, filePerm)
-	if err != nil {
-		return fmt.Errorf("failed to open file: %w", err)
-	}
-	defer file.Close()
+	// Encode Base to YAML.
+	encoder := yaml.NewEncoder(outputFile)
+	defer encoder.Close()
 
-	_, err = file.Write(yamlData)
+	err = encoder.Encode(base)
 	if err != nil {
-		return fmt.Errorf("failed to write YAML data to file: %w", err)
+		return fmt.Errorf("failed to encode Base to YAML: %w", err)
 	}
 
 	return nil
