@@ -3,6 +3,6 @@ testcases:
   - name: test command rimo
     steps:
       - script: |-
-          rimo analyse ./pkg/analyse/testdata/input/newstruct/ ./pkg/analyse/testdata/output/
+          rimo analyse ../../../pkg/analyse/testdata/input/newstruct/ ../../../pkg/analyse/testdata/output/
         assertions:
           - result.code ShouldEqual 0
