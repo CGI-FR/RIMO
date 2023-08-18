@@ -30,7 +30,7 @@ func Analyse(inputList []string, outputPath string) error {
 			return fmt.Errorf("failed to extract table name: %w", err)
 		}
 		// Load inputFilePath.
-		data, err := Load(inputPath, "new")
+		data, err := Load(inputPath)
 		if err != nil {
 			return fmt.Errorf("failed to load %s: %w", inputPath, err)
 		}

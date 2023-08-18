@@ -1,6 +1,6 @@
-database: testcase
+database: data
 tables:
-    - name: newstruct
+    - name: input
       columns:
         - name: address
           type: string
@@ -11,11 +11,11 @@ tables:
             count: 10
             unique: 10
             sample:
-                - 25545 Cole Court Newtonfurt, KY 13882
-                - 38432 Moreno Turnpike Garrettland, TN 72939
+                - 536 Robinson Estates Austinside, NV 69535
+                - PSC 4713, Box 9649 APO AA 43433
                 - 095 Jennifer Turnpike Castrobury, NY 98111
-                - 275 Stone Ridges Suite 885 East Aliciafurt, MH 15407
-                - 275 Stone Ridges Suite 885 East Aliciafurt, MH 15407
+                - 095 Jennifer Turnpike Castrobury, NY 98111
+                - 2035 Simmons Islands Heatherchester, IN 46152
           stringMetric:
             mostFrequentLen:
                 - length: 42
@@ -55,10 +55,10 @@ tables:
             count: 10
             unique: 10
             sample:
-                - 65
-                - 45
-                - 95
+                - 47
+                - 47
                 - 29
+                - 73
                 - 45
           numericMetric:
             min: 29
@@ -73,11 +73,11 @@ tables:
             count: 10
             unique: 10
             sample:
-                - "2011-07-13"
-                - "2014-09-09"
-                - "2011-07-13"
+                - "2013-06-11"
+                - "2013-06-11"
                 - "2005-05-10"
-                - "2011-07-13"
+                - "2005-05-10"
+                - "2014-09-09"
         - name: phone
           type: string
           concept: ""
@@ -88,10 +88,10 @@ tables:
             unique: 10
             sample:
                 - (517)819-3454
-                - 001-866-271-0116
-                - (517)819-3454
+                - 001-845-854-2110
                 - 260-587-0590
                 - +1-407-997-8293x68130
+                - "7795418893"
           stringMetric:
             mostFrequentLen:
                 - length: 16

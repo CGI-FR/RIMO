@@ -2,7 +2,6 @@ package analyse_test
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
@@ -10,37 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLoadNewFormat(t *testing.T) {
+func TestLoad(t *testing.T) {
 	t.Helper()
 	t.Parallel()
 
-	data, err := analyse.Load(jsonlNewFormat, "new")
+	data, err := analyse.Load(data1Path)
 	assert.NoError(t, err)
 
 	fmt.Println(valast.String(data))
-}
-
-func TestLoadOldFormat(t *testing.T) {
-	t.Helper()
-	t.Parallel()
-
-	data, err := analyse.Load(jsonlPrevFormat, "old")
-	assert.NoError(t, err)
-
-	fmt.Println(valast.String(data))
-}
-
-func TestEqualityFormat(t *testing.T) {
-	t.Helper()
-	t.Parallel()
-
-	dataNew, err := analyse.Load(jsonlNewFormat, "new")
-	assert.NoError(t, err)
-
-	dataOld, err := analyse.Load(jsonlPrevFormat, "old")
-	assert.NoError(t, err)
-
-	if !reflect.DeepEqual(dataNew, dataOld) {
-		t.Errorf("Data mismatch: %v != %v", dataNew, dataOld)
-	}
 }

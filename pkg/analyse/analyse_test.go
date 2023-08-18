@@ -17,111 +17,91 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	jsonlNewFormat  = "./testdata/input/newstruct/testcase_newstruct.jsonl"   //nolint:gochecknoglobals
-	jsonlPrevFormat = "./testdata/input/prevstruct/testcase_prevstruct.jsonl" //nolint:gochecknoglobals
-)
+var data1Path = "./testdata/data1/data_input.jsonl" //nolint:gochecknoglobals
 
-// Compare output file with expected output file.
+// Execute Analyse pipeline and compare with expected result.
 func TestAnalyseFileComparison(t *testing.T) {
 	t.Parallel()
 
-	inputList := []string{jsonlNewFormat}
-	outputPath := "./testdata/output/testcase.yaml"
+	inputList := []string{data1Path}
+	outputPath := "./testdata/data1/data_output.yaml"
+	testPath := "./testdata/data1/data_expected.yaml"
+
 	err := analyse.Analyse(inputList, outputPath)
 	assert.NoError(t, err)
 
+	// Compare output file with expected output file.
+	t.Run("output file comparison", func(t *testing.T) {
+		t.Parallel()
+
+		actualOutput := getText(t, outputPath)
+		expectedOutput := getText(t, testPath)
+
+		// Call removeSampleFromStrings
+		actualOutput = removeSampleFromStrings(actualOutput)
+		expectedOutput = removeSampleFromStrings(expectedOutput)
+
+		// Compare the expected output and actual output
+		assert.Equal(t, expectedOutput, actualOutput)
+	})
+
+	// Compare loaded output file with loaded expected output file.
+	// EqualBase() is used to compare two model.Base.
+	t.Run("loaded object comparison", func(t *testing.T) {
+		t.Parallel()
+
+		actualOutputBase := loadYAML(t, outputPath)
+		expectedOutputBase := loadYAML(t, testPath)
+
+		// Remove sample fields from both model.Base.
+		actualOutputBase = removeSampleFromBase(actualOutputBase)
+		expectedOutputBase = removeSampleFromBase(expectedOutputBase)
+
+		// Compare the expected output and actual output except all sample fields.
+		equal, diff := EqualBase(expectedOutputBase, actualOutputBase)
+		if !equal {
+			t.Errorf("base are not similar : %s", diff)
+		}
+	})
+}
+
+func loadYAML(t *testing.T, path string) model.Base {
+	t.Helper()
+
 	// Load output file
+	file, err := os.Open(path)
+	assert.NoError(t, err)
+
+	decoder := yaml.NewDecoder(file)
+
+	var base model.Base
+	err = decoder.Decode(&base)
+
+	if err != nil {
+		t.Errorf("error while decoding yaml file: %v", err)
+	}
+
+	file.Close()
+
+	return base
+}
+
+func getText(t *testing.T, outputPath string) string {
+	t.Helper()
+
 	file, err := os.Open(outputPath)
 	assert.NoError(t, err)
 
-	var actualOutput string
+	var output string
 
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(file)
 	assert.NoError(t, err)
+	file.Close()
 
-	actualOutput = buf.String()
+	output = buf.String()
 
-	// Load expected output file
-	testPath := "./testdata/expected/rimo_output.yaml"
-	expectedFile, err := os.Open(testPath)
-	assert.NoError(t, err)
-
-	t.Cleanup(func() {
-		file.Close()
-		expectedFile.Close()
-	})
-
-	var expectedOutput string
-
-	buf = new(bytes.Buffer)
-	_, err = buf.ReadFrom(expectedFile)
-	assert.NoError(t, err)
-
-	expectedOutput = buf.String()
-
-	// Call removeSampleFromStrings
-	actualOutput = removeSampleFromStrings(actualOutput)
-	expectedOutput = removeSampleFromStrings(expectedOutput)
-
-	// Compare the expected output and actual output
-	assert.Equal(t, expectedOutput, actualOutput)
-}
-
-// Compare loaded output file with loaded expected output file.
-// EqualBase() is used to compare two model.Base.
-func TestAnalyseObjectComparison(t *testing.T) {
-	t.Parallel()
-
-	inputList := []string{jsonlNewFormat}
-	outputPath := "./testdata/output/testcase.yaml"
-	err := analyse.Analyse(inputList, outputPath)
-	assert.NoError(t, err)
-
-	// Load output file
-	file, err := os.Open(outputPath)
-	assert.NoError(t, err)
-
-	// Load expected output file
-	testPath := "./testdata/expected/rimo_output.yaml"
-	expectedFile, err := os.Open(testPath)
-	assert.NoError(t, err)
-
-	t.Cleanup(func() {
-		file.Close()
-		expectedFile.Close()
-	})
-
-	// Load file in a model.Base.
-	decoder := yaml.NewDecoder(file)
-
-	var actualOutputBase model.Base
-	err = decoder.Decode(&actualOutputBase)
-
-	if err != nil {
-		t.Errorf("error while decoding yaml file: %v", err)
-	}
-
-	// Load expected file in a model.Base.
-	decoder = yaml.NewDecoder(expectedFile)
-
-	var expectedOutputBase model.Base
-	err = decoder.Decode(&expectedOutputBase)
-
-	if err != nil {
-		t.Errorf("error while decoding yaml file: %v", err)
-	}
-
-	// Remove sample fields from both model.Base.
-	actualOutputBase = removeSampleFromBase(actualOutputBase)
-	expectedOutputBase = removeSampleFromBase(expectedOutputBase)
-
-	// Compare the expected output and actual output except all sample fields.
-	equal, diff := EqualBase(expectedOutputBase, actualOutputBase)
-	if !equal {
-		t.Errorf("base are not similar : %s", diff)
-	}
+	return output
 }
 
 // UTILS FUNCTIONS.
