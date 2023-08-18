@@ -27,7 +27,7 @@ func TestAnalyseFileComparison(t *testing.T) {
 	t.Parallel()
 
 	inputList := []string{jsonlNewFormat}
-	outputPath := "./testdata/output/rimo_output.yaml"
+	outputPath := "./testdata/output/testcase.yaml"
 	err := analyse.Analyse(inputList, outputPath)
 	assert.NoError(t, err)
 
@@ -75,7 +75,7 @@ func TestAnalyseObjectComparison(t *testing.T) {
 	t.Parallel()
 
 	inputList := []string{jsonlNewFormat}
-	outputPath := "./testdata/output/rimo_output.yaml"
+	outputPath := "./testdata/output/testcase.yaml"
 	err := analyse.Analyse(inputList, outputPath)
 	assert.NoError(t, err)
 

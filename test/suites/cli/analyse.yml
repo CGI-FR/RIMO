@@ -1,8 +1,14 @@
 name: first run rimo
 testcases:
-  - name: test command rimo
+  - name: rimo analyse pipeline
     steps:
       - script: |-
-          rimo analyse ../../../pkg/analyse/testdata/input/newstruct/ ../../../pkg/analyse/testdata/output/
+          rimo analyse ../testdata/newstruct/ ../testdata/newstruct/
+        assertions:
+          - result.code ShouldEqual 0
+  - name: rimo schema
+    steps:
+      - script: |-
+          rimo schema
         assertions:
           - result.code ShouldEqual 0

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -46,12 +47,13 @@ func main() { //nolint:funlen
 			if err != nil {
 				log.Fatal().Msgf("error getting current working directory: %v", err)
 			}
-			log.Info().Msgf("current working directory: %s", cwd)
 
 			err = model.ExportSchema()
 			if err != nil {
 				log.Fatal().Msgf("error generating rimo schema: %v", err)
 			}
+
+			log.Info().Msgf("rimo schema successfully exported in %s", cwd)
 		},
 	}
 
@@ -61,12 +63,16 @@ func main() { //nolint:funlen
 		Args:  cobra.ExactArgs(2), //nolint:gomnd
 		Run: func(cmd *cobra.Command, args []string) {
 			inputPath := args[0]
-			CheckDir(inputPath)
+			if err := CheckDir(inputPath); err != nil {
+				log.Fatal().Msgf("error checking input directory: %v", err)
+			}
 
 			outputPath := args[1]
-			CheckDir(outputPath)
+			if err := CheckDir(outputPath); err != nil {
+				log.Fatal().Msgf("error checking output directory: %v", err)
+			}
 
-			// List of .jsonl files in input directory
+			// List .jsonl files in input directory
 			inputList, err := FilesList(inputPath, ".jsonl")
 			if err != nil {
 				log.Fatal().Msgf("error listing files: %v", err)
@@ -75,7 +81,7 @@ func main() { //nolint:funlen
 				log.Fatal().Msgf("no .jsonl files found in %s", inputPath)
 			}
 
-			// Output path
+			// Output path : outpathPath + basename + .yaml
 			basename, err := analyse.GetBaseName(inputList[0])
 			if err != nil {
 				log.Fatal().Msgf("error getting basename: %v", err)
@@ -100,32 +106,50 @@ func main() { //nolint:funlen
 	}
 }
 
-func CheckFile(path string) {
-	fileInfo, err := os.Stat(path)
+var (
+	ErrNotExist = errors.New("path does not exist")
+	ErrNotDir   = errors.New("path is not a directory")
+	ErrNotFile  = errors.New("path is not a file")
+)
 
-	absPath, _ := filepath.Abs(path)
+func CheckFile(path string) error {
+	// Get absPath
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return fmt.Errorf("error getting absolute path: %w", err)
+	}
+
+	fileInfo, err := os.Stat(path)
 	// Check if the file exists
 	if os.IsNotExist(err) {
-		log.Fatal().Msgf("file does not exist: %s", absPath)
+		return fmt.Errorf("%w: %s", ErrNotExist, path)
 	}
 	// Check if the file is a regular file
 	if !fileInfo.Mode().IsRegular() {
-		log.Fatal().Msgf("not a regular file: %s", absPath)
+		return fmt.Errorf("%w: %s", ErrNotFile, path)
 	}
+
+	return nil
 }
 
-func CheckDir(path string) {
-	fileInfo, err := os.Stat(path)
+func CheckDir(path string) error {
+	// Get absPath
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return fmt.Errorf("error getting absolute path: %w", err)
+	}
 
-	absPath, _ := filepath.Abs(path)
-	// Check if the file exists
+	fileInfo, err := os.Stat(path)
+	// Check if path exists
 	if os.IsNotExist(err) {
-		log.Fatal().Msgf("file does not exist: %s", absPath)
+		return fmt.Errorf("%w: %s", ErrNotExist, path)
 	}
-	// Check if the file is a directory
+	// Check if path is a directory
 	if !fileInfo.Mode().IsDir() {
-		log.Fatal().Msgf("not a directory: %s", absPath)
+		return fmt.Errorf("%w: %s", ErrNotDir, path)
 	}
+
+	return nil
 }
 
 func FilesList(path string, extension string) ([]string, error) {
