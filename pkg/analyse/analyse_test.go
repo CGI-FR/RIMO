@@ -169,10 +169,15 @@ func removeSampleFromStrings(rimoString string) string {
 	sampleSizeSkip := model.SampleSize + 1
 
 	for _, line := range lines {
+		// sample of stringMetric.MostFreqLen and stringMetric.LeastFreqLen may be of different length, skipping when nex
+		if skipLine > 0 && strings.Contains(line, "   - length:") || strings.Contains(line, "    - name:") {
+			skipLine = 0
+		}
+
 		switch {
 		case skipLine > 0:
 			skipLine--
-		case strings.Contains(line, "sample:") || strings.Contains(line, "leastFrequentSample:"):
+		case strings.Contains(line, "sample:"):
 			skipLine = sampleSizeSkip
 		default:
 			filteredLines = append(filteredLines, line)
