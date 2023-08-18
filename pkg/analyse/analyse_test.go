@@ -129,19 +129,6 @@ func createBenchFile(path string, lines int, jsonLine string) error {
 		}
 	}
 
-	if err := file.Sync(); err != nil {
-		return fmt.Errorf("error while syncing file: %w", err)
-	}
-
-	fileInfo, err := file.Stat()
-	if err != nil {
-		return fmt.Errorf("error while getting file info: %w", err)
-	}
-
-	if fileInfo.Size() != int64(lines*(len(jsonLine)+1)) {
-		return fmt.Errorf("file size does not match expected size")
-	}
-
 	return nil
 }
 
