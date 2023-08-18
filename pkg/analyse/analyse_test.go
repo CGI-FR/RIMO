@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -17,15 +20,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var data1Path = "./testdata/data1/data_input.jsonl" //nolint:gochecknoglobals
+var (
+	data1Path = "./testdata/data1/data_input.jsonl" //nolint:gochecknoglobals
+	data2Path = "./testdata/data2/data_input.jsonl" //nolint:gochecknoglobals
+)
 
 // Execute Analyse pipeline and compare with expected result.
-func TestAnalyseFileComparison(t *testing.T) {
+func TestAnalyse(t *testing.T) {
 	t.Parallel()
 
-	inputList := []string{data1Path}
-	outputPath := "./testdata/data1/data_output.yaml"
-	testPath := "./testdata/data1/data_expected.yaml"
+	inputList := []string{data2Path}
+	outputPath := "./testdata/data2/data_output.yaml"
+	testPath := "./testdata/data2/data_expected.yaml"
 
 	err := analyse.Analyse(inputList, outputPath)
 	assert.NoError(t, err)
@@ -63,6 +69,80 @@ func TestAnalyseFileComparison(t *testing.T) {
 			t.Errorf("base are not similar : %s", diff)
 		}
 	})
+}
+
+// Benchmark Analyse pipeline.
+
+func BenchmarkAnalyse(b *testing.B) {
+	jsonLine := `{"address": "PSC 4713, Box 9649 APO AA 43433", "age": 29, "major": false}`
+
+	for _, numLines := range []int{100, 1000, 10000, 100000} {
+		filepath := fmt.Sprintf("./testdata/benchmark/%d_input.jsonl", numLines)
+		outputPath := fmt.Sprintf("./testdata/benchmark/%d_output.yaml", numLines)
+
+		// Create a file with n lines.
+		err := createBenchFile(filepath, numLines, jsonLine)
+		assert.NoError(b, err)
+
+		inputList := []string{filepath}
+
+		b.Run(fmt.Sprintf("numLines=%d", numLines), func(b *testing.B) {
+			b.ResetTimer()
+
+			startTime := time.Now()
+
+			for n := 0; n < b.N; n++ {
+				err := analyse.Analyse(inputList, outputPath)
+				assert.NoError(b, err)
+			}
+
+			elapsed := time.Since(startTime)
+			linesPerSecond := float64(numLines*b.N) / elapsed.Seconds()
+			b.ReportMetric(linesPerSecond, "lines/s")
+		})
+	}
+}
+
+// Create a JSON Line for benchmark.
+func createBenchFile(path string, lines int, jsonLine string) error {
+	dir := filepath.Dir(path)
+
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return fmt.Errorf("error while creating directory: %w", err)
+	}
+
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+	if err != nil {
+		return fmt.Errorf("error while opening file: %w", err)
+	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("error while closing file: %v", err)
+		}
+	}()
+
+	for i := 0; i < lines; i++ {
+		_, err := file.WriteString(jsonLine + "\n")
+		if err != nil {
+			return fmt.Errorf("error while writing to file: %w", err)
+		}
+	}
+
+	if err := file.Sync(); err != nil {
+		return fmt.Errorf("error while syncing file: %w", err)
+	}
+
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return fmt.Errorf("error while getting file info: %w", err)
+	}
+
+	if fileInfo.Size() != int64(lines*(len(jsonLine)+1)) {
+		return fmt.Errorf("file size does not match expected size")
+	}
+
+	return nil
 }
 
 func loadYAML(t *testing.T, path string) model.Base {

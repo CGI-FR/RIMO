@@ -3,3 +3,4 @@ bin
 .cache
 *.log
 **/testcase.yaml
+pkg/analyse/testdata/benchmark/
