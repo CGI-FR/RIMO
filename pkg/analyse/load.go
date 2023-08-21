@@ -49,14 +49,11 @@ func LoadJSONLines(scanner *bufio.Scanner) (DataMap, error) {
 	for scanner.Scan() {
 		lineNumber++
 
+		bytes := scanner.Bytes()
 		lineMap := make(map[string]interface{})
 
-		// Check for BOM character at beginning of file.
-		bytes := scanner.Bytes()
-		if lineNumber == 1 && len(bytes) > 2 {
-			if scanner.Bytes()[0] == 0xEF && scanner.Bytes()[1] == 0xBB && scanner.Bytes()[2] == 0xBF {
-				bytes = scanner.Bytes()[3:]
-			}
+		if lineNumber == 1 {
+			bytes = stripBOM(bytes)
 		}
 
 		err := json.Unmarshal(bytes, &lineMap)
@@ -81,4 +78,12 @@ func LoadJSONLines(scanner *bufio.Scanner) (DataMap, error) {
 	}
 
 	return data, nil
+}
+
+func stripBOM(bytes []byte) []byte {
+	if len(bytes) > 2 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF {
+		return bytes[3:]
+	}
+
+	return bytes
 }
