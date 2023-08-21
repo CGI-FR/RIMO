@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -74,17 +72,11 @@ func TestAnalyse(t *testing.T) {
 // Benchmark Analyse pipeline.
 
 func BenchmarkAnalyse(b *testing.B) {
-	jsonLine := `{"address": "PSC 4713, Box 9649 APO AA 43433", "age": 29, "major": false}`
 
 	for _, numLines := range []int{100, 1000, 10000, 100000} {
-		filepath := fmt.Sprintf("./testdata/benchmark/%d_input.jsonl", numLines)
-		outputPath := fmt.Sprintf("./testdata/benchmark/%d_output.yaml", numLines)
-
-		// Create a file with n lines.
-		err := createBenchFile(filepath, numLines, jsonLine)
-		assert.NoError(b, err)
-
-		inputList := []string{filepath}
+		inputPath := fmt.Sprintf("./testdata/benchmark/mixed/%d_input.jsonl", numLines)
+		inputList := []string{inputPath}
+		outputPath := fmt.Sprintf("./testdata/benchmark/mixed/%d_output.yaml", numLines)
 
 		b.Run(fmt.Sprintf("numLines=%d", numLines), func(b *testing.B) {
 			b.ResetTimer()
@@ -103,33 +95,37 @@ func BenchmarkAnalyse(b *testing.B) {
 	}
 }
 
-// Create a JSON Line for benchmark.
-func createBenchFile(path string, lines int, jsonLine string) error {
-	dir := filepath.Dir(path)
+func BenchmarkMetric(b *testing.B) {
+	listNumValues := []int{100, 1000, 10000}
+	listType := []string{"numeric", "text", "bool"}
 
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return fmt.Errorf("error while creating directory: %w", err)
-	}
+	for _, dataType := range listType {
+		for _, numValues := range listNumValues {
 
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
-	if err != nil {
-		return fmt.Errorf("error while opening file: %w", err)
-	}
+			inputPath := fmt.Sprintf("./testdata/benchmark/%s/%d_input.jsonl", dataType, numValues)
+			// Load inputFilePath.
+			data, err := analyse.Load(inputPath)
+			if err != nil {
+				b.Fatalf("failed to load %s: %v", inputPath, err)
+			}
 
-	defer func() {
-		if err := file.Close(); err != nil {
-			log.Printf("error while closing file: %v", err)
+			var cols []model.Column
+
+			b.Run(fmt.Sprintf("type= %s, numValues=%d", dataType, numValues), func(b *testing.B) {
+				b.ResetTimer()
+				startTime := time.Now()
+
+				for n := 0; n < b.N; n++ {
+					cols = analyse.BuildColumnMetric(data, cols)
+					assert.NoError(b, err)
+				}
+
+				elapsed := time.Since(startTime)
+				valuesPerSecond := float64(numValues*b.N) / elapsed.Seconds()
+				b.ReportMetric(valuesPerSecond, "lines/s")
+			})
 		}
-	}()
-
-	for i := 0; i < lines; i++ {
-		_, err := file.WriteString(jsonLine + "\n")
-		if err != nil {
-			return fmt.Errorf("error while writing to file: %w", err)
-		}
 	}
-
-	return nil
 }
 
 func loadYAML(t *testing.T, path string) model.Base {

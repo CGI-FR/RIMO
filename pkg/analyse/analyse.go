@@ -37,7 +37,7 @@ func Analyse(inputList []string, outputPath string) error {
 		// Analyse
 		var cols []model.Column
 
-		cols = buildColumnMetric(data, cols)
+		cols = BuildColumnMetric(data, cols)
 
 		// Sort cols by name.
 		sort.Slice(cols, func(i, j int) bool {
@@ -72,7 +72,7 @@ func Analyse(inputList []string, outputPath string) error {
 	return nil
 }
 
-func buildColumnMetric(data DataMap, cols []model.Column) []model.Column {
+func BuildColumnMetric(data DataMap, cols []model.Column) []model.Column {
 	for colName, values := range data {
 		column, err := ComputeMetric(colName, values)
 		if err != nil {

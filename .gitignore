@@ -2,6 +2,7 @@
 bin
 .cache
 *.log
-**/testcase.yaml
-pkg/analyse/testdata/benchmark/
-pkg/analyse/testdata/data1/data_output.yaml
+.DS_Store
+
+pkg/analyse/testdata/data*/data_output.yaml
+pkg/analyse/testdata/benchmark/*
