@@ -43,13 +43,16 @@ type DataMap map[string][]interface{}
 // Reads JSON lines  structure: { "col_name1" : value1, "col_name2" : value1, ... }.
 func LoadJSONLines(scanner *bufio.Scanner) (DataMap, error) {
 	var data map[string][]interface{} = DataMap{}
+	lineNumber := 0
 
 	for scanner.Scan() {
+		lineNumber++
 		lineMap := make(map[string]interface{})
 
 		err := json.Unmarshal(scanner.Bytes(), &lineMap)
 		if err != nil {
-			return nil, fmt.Errorf("couldn't unmarshal JSON: %w", err)
+			line := scanner.Text()
+			return nil, fmt.Errorf("couldn't unmarshal JSON in %s : %w", line, err)
 		}
 
 		for colName := range lineMap {
