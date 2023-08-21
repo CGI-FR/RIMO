@@ -147,23 +147,23 @@ func StringMetric(values []interface{}) (model.StringMetric, error) {
 	mostFrequentLenSize, leastFrequentLenSize := getFreqSize(len(sortedLength))
 
 	// Get ordered slice of least and most frequent length
-	lenMostFreqLen := sortedLength[0:leastFrequentLenSize]
+	lenMostFreqLen := sortedLength[0:mostFrequentLenSize]
 
-	lenLeastFreqLen := make([]int, mostFrequentLenSize)
+	lenLeastFreqLen := make([]int, leastFrequentLenSize)
 
 	for i := 0; i < leastFrequentLenSize; i++ {
 		index := len(sortedLength) - 1 - i
 		lenLeastFreqLen[i] = sortedLength[index]
 	}
 
-	leastFreqLen, err := buildFreqLen(lenLeastFreqLen, lenMap, lenCounter, totalCount)
+	leastFreqLen, err := buildFreqLen(lenLeastFreqLen, lenMap, lenCounter, totalCount, model.LeastFrequentSampleSize)
 	if err != nil {
 		return metric, fmt.Errorf("error building least frequent length : %w", err)
 	}
 
 	metric.LeastFreqLen = leastFreqLen
 
-	mostFreqLen, err := buildFreqLen(lenMostFreqLen, lenMap, lenCounter, totalCount)
+	mostFreqLen, err := buildFreqLen(lenMostFreqLen, lenMap, lenCounter, totalCount, model.MostFrequentSampleSize)
 	if err != nil {
 		return metric, fmt.Errorf("error building most frequent length : %w", err)
 	}
@@ -173,11 +173,11 @@ func StringMetric(values []interface{}) (model.StringMetric, error) {
 	return metric, nil
 }
 
-func buildFreqLen(leastFreqLen []int, lenMap map[int][]string, lenCounter map[int]int, totalCount int) ([]model.LenFreq, error) { //nolint:lll
-	lenFreqs := make([]model.LenFreq, len(leastFreqLen))
+func buildFreqLen(freqLen []int, lenMap map[int][]string, lenCounter map[int]int, totalCount int, sampleLen int) ([]model.LenFreq, error) { //nolint:lll
+	lenFreqs := make([]model.LenFreq, len(freqLen))
 
-	for index, len := range leastFreqLen {
-		sample, err := Sample(lenMap[len], model.LeastFrequentSampleSize)
+	for index, len := range freqLen {
+		sample, err := Sample(lenMap[len], sampleLen)
 		if err != nil {
 			return lenFreqs, fmt.Errorf("error getting sample for length %v : %w", len, err)
 		}
@@ -198,8 +198,10 @@ func getFreqSize(nunique int) (int, int) {
 
 	if nunique < model.MostFrequentLenSize+model.LeastFrequentLenSize {
 		// Modify MostFrequentLenSize and LeastFrequentLenSize to fit the number of unique length.
-		mostFrequentLenSize = int(math.Round(float64(nunique / 2)))  //nolint:gomnd
-		leastFrequentLenSize = int(math.Round(float64(nunique / 2))) //nolint:gomnd
+		// Should keep ratio of MostFrequentLenSize and LeastFrequentLenSize.
+		ratio := float64(model.MostFrequentLenSize) / float64(model.MostFrequentLenSize+model.LeastFrequentLenSize)
+		mostFrequentLenSize = int(math.Round(float64(nunique) * ratio))
+		leastFrequentLenSize = nunique - mostFrequentLenSize
 	}
 
 	return mostFrequentLenSize, leastFrequentLenSize

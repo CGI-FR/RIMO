@@ -4,3 +4,4 @@ bin
 *.log
 **/testcase.yaml
 pkg/analyse/testdata/benchmark/
+pkg/analyse/testdata/data1/data_output.yaml
