@@ -43,16 +43,25 @@ type DataMap map[string][]interface{}
 // Reads JSON lines  structure: { "col_name1" : value1, "col_name2" : value1, ... }.
 func LoadJSONLines(scanner *bufio.Scanner) (DataMap, error) {
 	var data map[string][]interface{} = DataMap{}
+
 	lineNumber := 0
 
 	for scanner.Scan() {
 		lineNumber++
+
 		lineMap := make(map[string]interface{})
 
-		err := json.Unmarshal(scanner.Bytes(), &lineMap)
+		// Check for BOM character at beginning of file.
+		bytes := scanner.Bytes()
+		if lineNumber == 1 && len(bytes) > 2 {
+			if scanner.Bytes()[0] == 0xEF && scanner.Bytes()[1] == 0xBB && scanner.Bytes()[2] == 0xBF {
+				bytes = scanner.Bytes()[3:]
+			}
+		}
+
+		err := json.Unmarshal(bytes, &lineMap)
 		if err != nil {
-			line := scanner.Text()
-			return nil, fmt.Errorf("couldn't unmarshal JSON in %s : %w", line, err)
+			return nil, fmt.Errorf("couldn't unmarshal JSON in %s : %w", scanner.Text(), err)
 		}
 
 		for colName := range lineMap {
