@@ -1,8 +1,9 @@
 version: "1"
+seed: "1"
 masking:
   - selector:
       jsonpath: "bool_col"
     masks:
       - add: ""
       - regex: "(true)|(false)"
-      - fromjson:  "bool_col"
+      - fromjson: "bool_col"

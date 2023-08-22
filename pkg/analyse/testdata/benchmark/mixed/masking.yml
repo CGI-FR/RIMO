@@ -1,6 +1,6 @@
 version: "1"
+seed: "1"
 masking:
-
   - selector:
       jsonpath: "phone_fr"
     masks:
@@ -45,7 +45,7 @@ masking:
     masks:
       - add: ""
       - regex: "[(][0-9]{3}[)] [0-9]{3}-[0-9]{4}"
-  - selector: 
+  - selector:
       jsonpath: "numeric_col"
     masks:
       - add: ""
@@ -53,7 +53,7 @@ masking:
           min: 0
           max: 17.23
           precision: 2
-  - selector: 
+  - selector:
       jsonpath: "numeric_col1"
     masks:
       - add: ""
@@ -61,7 +61,7 @@ masking:
           min: 0
           max: 17.23
           precision: 2
-  - selector: 
+  - selector:
       jsonpath: "numeric_col2"
     masks:
       - add: ""
@@ -69,7 +69,7 @@ masking:
           min: 0
           max: 17.23
           precision: 2
-  - selector: 
+  - selector:
       jsonpath: "numeric_col3"
     masks:
       - add: ""
@@ -77,7 +77,7 @@ masking:
           min: 0
           max: 17.23
           precision: 2
-  - selector: 
+  - selector:
       jsonpath: "numeric_col4"
     masks:
       - add: ""
@@ -85,7 +85,7 @@ masking:
           min: 0
           max: 17.23
           precision: 2
-  - selector: 
+  - selector:
       jsonpath: "numeric_col5"
     masks:
       - add: ""
@@ -93,7 +93,7 @@ masking:
           min: 0
           max: 17.23
           precision: 2
-  - selector: 
+  - selector:
       jsonpath: "numeric_col6"
     masks:
       - add: ""
@@ -101,7 +101,7 @@ masking:
           min: 0
           max: 17.23
           precision: 2
-  - selector: 
+  - selector:
       jsonpath: "numeric_col7"
     masks:
       - add: ""
@@ -109,79 +109,79 @@ masking:
           min: 0
           max: 17.23
           precision: 2
-  - selector: 
+  - selector:
       jsonpath: "date_col"
     masks:
       - add: ""
       - randDate:
           dateMin: "1970-01-01T00:00:00Z"
           dateMax: "2020-01-01T00:00:00Z"
-  - selector: 
+  - selector:
       jsonpath: "date_col2"
     masks:
       - add: ""
       - randDate:
           dateMin: "1970-01-01T00:00:00Z"
           dateMax: "2020-01-01T00:00:00Z"
-  - selector: 
+  - selector:
       jsonpath: "date_col3"
     masks:
       - add: ""
       - randDate:
           dateMin: "1970-01-01T00:00:00Z"
           dateMax: "2020-01-01T00:00:00Z"
-  - selector: 
+  - selector:
       jsonpath: "date_col4"
     masks:
       - add: ""
       - randDate:
           dateMin: "1970-01-01T00:00:00Z"
           dateMax: "2020-01-01T00:00:00Z"
-  - selector: 
+  - selector:
       jsonpath: "date_col5"
     masks:
       - add: ""
       - randDate:
           dateMin: "1970-01-01T00:00:00Z"
           dateMax: "2020-01-01T00:00:00Z"
-  - selector: 
+  - selector:
       jsonpath: "date_col6"
     masks:
       - add: ""
       - randDate:
           dateMin: "1970-01-01T00:00:00Z"
           dateMax: "2020-01-01T00:00:00Z"
- 
+
   - selector:
       jsonpath: "bool_col"
     masks:
       - add: ""
       - regex: "(true)|(false)"
-      - fromjson:  "bool_col"
+      - fromjson: "bool_col"
 
   - selector:
-        jsonpath: "bool_col1"
+      jsonpath: "bool_col1"
     masks:
-        - add: ""
-        - regex: "(true)|(false)"
-        - fromjson:  "bool_col1"
+      - add: ""
+      - regex: "(true)|(false)"
+      - fromjson: "bool_col1"
 
   - selector:
-        jsonpath: "bool_col2"
+      jsonpath: "bool_col2"
     masks:
-        - add: ""
-        - regex: "(true)|(false)"
-        - fromjson:  "bool_col2"
+      - add: ""
+      - regex: "(true)|(false)"
+      - fromjson: "bool_col2"
   - selector:
-        jsonpath: "bool_col3"
+      jsonpath: "bool_col3"
     masks:
-        - add: ""
-        - regex: "(true)|(false)"
-        - fromjson:  "bool_col3"
+      - add: ""
+      - regex: "(true)|(false)"
+      - fromjson: "bool_col3"
 
   - selector:
-        jsonpath: "bool_col4"
+      jsonpath: "bool_col4"
     masks:
-        - add: ""
-        - regex: "(true)|(false)"
-        - fromjson:  "bool_col4"
+      - add: ""
+      - regex: "(true)|(false)"
+      - fromjson: "bool_col4"
