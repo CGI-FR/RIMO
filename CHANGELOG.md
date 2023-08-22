@@ -16,4 +16,4 @@ Types of changes
 
 ## [0.1.0]
 
-- `Added` First official version.
+- `Added` rimo analyse command

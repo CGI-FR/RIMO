@@ -1,0 +1,376 @@
+database: data
+tables:
+    - name: input
+      columns:
+        - name: '#'
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 721
+            sample:
+                - 601
+                - 25
+                - 345
+                - 110
+                - 654
+          numericMetric:
+            min: 1
+            max: 721
+            mean: 362.81375
+        - name: Attack
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 111
+            sample:
+                - 95
+                - 88
+                - 97
+                - 64
+                - 29
+          numericMetric:
+            min: 5
+            max: 190
+            mean: 79.00125
+        - name: Defense
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 103
+            sample:
+                - 110
+                - 56
+                - 160
+                - 53
+                - 38
+          numericMetric:
+            min: 5
+            max: 230
+            mean: 73.8425
+        - name: Generation
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 6
+            sample:
+                - 6
+                - 6
+                - 5
+                - 1
+                - 6
+          numericMetric:
+            min: 1
+            max: 6
+            mean: 3.32375
+        - name: HP
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 94
+            sample:
+                - 59
+                - 116
+                - 66
+                - 101
+                - 58
+          numericMetric:
+            min: 1
+            max: 255
+            mean: 69.25875
+        - name: Legendary
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 2
+            sample:
+                - "False"
+                - "True"
+          stringMetric:
+            mostFrequentLen:
+                - length: 5
+                  freq: 0.91875
+                  sample:
+                    - "False"
+            leastFrequentLen:
+                - length: 4
+                  freq: 0.08125
+                  sample:
+                    - "True"
+        - name: Name
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 800
+            sample:
+                - Simipour
+                - Marill
+                - Archeops
+                - Stantler
+                - Spinda
+          stringMetric:
+            mostFrequentLen:
+                - length: 7
+                  freq: 0.25375
+                  sample:
+                    - Pansage
+                    - Suicune
+                    - Ivysaur
+                    - Snorunt
+                    - Koffing
+                - length: 8
+                  freq: 0.20125
+                  sample:
+                    - Greninja
+                    - Cobalion
+                    - Mime Jr.
+                    - Slurpuff
+                    - Greninja
+                - length: 6
+                  freq: 0.1575
+                  sample:
+                    - Skrelp
+                    - Marill
+                    - Vulpix
+                    - Lairon
+                    - Golbat
+                - length: 9
+                  freq: 0.14
+                  sample:
+                    - Clawitzer
+                    - Alomomola
+                    - Diggersby
+                    - Azumarill
+                    - Mightyena
+                - length: 10
+                  freq: 0.06
+                  sample:
+                    - Chesnaught
+                    - Escavalier
+                    - Forretress
+                    - Lickilicky
+                    - Whirlipede
+            leastFrequentLen:
+                - length: 24
+                  freq: 0.00125
+                  sample:
+                    - ThundurusIncarnate Forme
+                - length: 22
+                  freq: 0.00125
+                  sample:
+                    - ThundurusTherian Forme
+                - length: 12
+                  freq: 0.00125
+                  sample:
+                    - MeowsticMale
+                - length: 11
+                  freq: 0.00125
+                  sample:
+                    - Fletchinder
+                - length: 3
+                  freq: 0.0025
+                  sample:
+                    - Muk
+                    - Mew
+        - name: Sp. Atk
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 105
+            sample:
+                - 10
+                - 165
+                - 122
+                - 74
+                - 129
+          numericMetric:
+            min: 10
+            max: 194
+            mean: 72.82
+        - name: Sp. Def
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 92
+            sample:
+                - 77
+                - 53
+                - 40
+                - 135
+                - 90
+          numericMetric:
+            min: 20
+            max: 230
+            mean: 71.9025
+        - name: Speed
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 108
+            sample:
+                - 62
+                - 72
+                - 92
+                - 35
+                - 145
+          numericMetric:
+            min: 5
+            max: 180
+            mean: 68.2775
+        - name: Total
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 200
+            sample:
+                - 515
+                - 302
+                - 236
+                - 555
+                - 385
+          numericMetric:
+            min: 180
+            max: 780
+            mean: 435.1025
+        - name: Type 1
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 18
+            sample:
+                - Dragon
+                - Steel
+                - Dragon
+                - Ice
+                - Grass
+          stringMetric:
+            mostFrequentLen:
+                - length: 5
+                  freq: 0.3225
+                  sample:
+                    - Fairy
+                    - Ghost
+                    - Steel
+                    - Grass
+                    - Water
+                - length: 6
+                  freq: 0.2425
+                  sample:
+                    - Normal
+                    - Poison
+                    - Ground
+                    - Dragon
+                    - Flying
+                - length: 4
+                  freq: 0.15875
+                  sample:
+                    - Fire
+                    - Rock
+                    - Dark
+            leastFrequentLen:
+                - length: 7
+                  freq: 0.07125
+                  sample:
+                    - Psychic
+                - length: 8
+                  freq: 0.08875
+                  sample:
+                    - Electric
+                    - Fighting
+                - length: 3
+                  freq: 0.11625
+                  sample:
+                    - Bug
+                    - Ice
+        - name: Type 2
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 800
+            unique: 19
+            sample:
+                - Bug
+                - Psychic
+                - Fire
+                - Fairy
+                - Psychic
+          stringMetric:
+            mostFrequentLen:
+                - length: 0
+                  freq: 0.4825
+                  sample:
+                    - ""
+                - length: 6
+                  freq: 0.235
+                  sample:
+                    - Poison
+                    - Flying
+                    - Dragon
+                    - Ground
+                    - Normal
+                - length: 5
+                  freq: 0.1225
+                  sample:
+                    - Fairy
+                    - Grass
+                    - Steel
+                    - Water
+                    - Ghost
+                - length: 4
+                  freq: 0.0575
+                  sample:
+                    - Rock
+                    - Dark
+                    - Fire
+            leastFrequentLen:
+                - length: 3
+                  freq: 0.02125
+                  sample:
+                    - Ice
+                    - Bug
+                - length: 8
+                  freq: 0.04
+                  sample:
+                    - Electric
+                    - Fighting
+                - length: 7
+                  freq: 0.04125
+                  sample:
+                    - Psychic

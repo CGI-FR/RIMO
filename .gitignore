@@ -1,3 +1,10 @@
 .env
 bin
 .cache
+*.log
+.DS_Store
+
+pkg/analyse/testdata/data*/data_output.yaml
+pkg/analyse/testdata/benchmark/**/*.jsonl
+pkg/analyse/testdata/benchmark/**/*.yaml
+pkg/analyse/testdata/data2/data_output.yaml

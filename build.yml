@@ -51,6 +51,7 @@ properties:
       "ifshort",
       "nosnakecase",
       "exhaustivestruct",
+      "depguard",
     ]
   snapshot: false # If true, do not upload release when publish target is used
   dockerfiles: # List of Dockerfiles to build, defined by a map of {key=Dockerfile name ; value=path to build context}, the image name will be determined by the extension of the Dockerfile
@@ -226,9 +227,15 @@ targets:
           - $: golangci-lint run ={replace(join(appendpath("--enable", linters), " "), "/", " ")} ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
             :: true
 
+  bench-data:
+    doc: "generate bench data"
+    depends: ["info"]
+    steps:
+      - $: ./pkg/analyse/testdata/benchmark/buildBenchData.sh
+
   test:
     doc: "Run all tests with coverage"
-    depends: ["info", "refresh", "lint"]
+    depends: ["info", "refresh", "lint", "bench-data"]
     steps:
       - $: go test -coverprofile=./={BUILD_DIR}/coverage.txt -covermode=atomic ./...
 
