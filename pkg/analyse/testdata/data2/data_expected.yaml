@@ -11,11 +11,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - 241
-                - 700
-                - 509
-                - 221
-                - 566
+                - 508
+                - 624
+                - 94
+                - 348
+                - 295
           numericMetric:
             min: 1
             max: 721
@@ -29,11 +29,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - 78
+                - 160
+                - 50
+                - 35
                 - 75
-                - 59
-                - 5
-                - 38
+                - 120
           numericMetric:
             min: 5
             max: 190
@@ -47,11 +47,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - 90
+                - 62
                 - 70
-                - 85
-                - 30
-                - 80
+                - 150
+                - 100
+                - 180
           numericMetric:
             min: 5
             max: 230
@@ -67,9 +67,9 @@ tables:
             sample:
                 - 1
                 - 3
-                - 5
                 - 2
                 - 1
+                - 4
           numericMetric:
             min: 1
             max: 6
@@ -83,11 +83,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - 95
-                - 45
-                - 68
-                - 60
-                - 54
+                - 61
+                - 72
+                - 70
+                - 90
+                - 105
           numericMetric:
             min: 1
             max: 255
@@ -102,9 +102,9 @@ tables:
             unique: 800
             sample:
                 - "False"
-                - "True"
                 - "False"
-                - "True"
+                - "False"
+                - "False"
                 - "False"
           stringMetric:
             mostFrequentLen:
@@ -134,53 +134,53 @@ tables:
             count: 800
             unique: 800
             sample:
-                - Weavile
-                - Flabébé
-                - LatiasMega Latias
-                - Machamp
-                - DarmanitanZen Mode
+                - Petilil
+                - Sentret
+                - Zebstrika
+                - Grotle
+                - Fennekin
           stringMetric:
             mostFrequentLen:
                 - length: 7
                   freq: 0.25375
                   sample:
-                    - Altaria
-                    - Crustle
-                    - Rufflet
-                    - Walrein
-                    - Machoke
+                    - Swoobat
+                    - Leafeon
+                    - Furfrou
+                    - Machamp
+                    - Nuzleaf
                 - length: 8
                   freq: 0.20125
                   sample:
-                    - Sunflora
-                    - Hoothoot
-                    - Porygon2
-                    - Meditite
-                    - Parasect
+                    - Remoraid
+                    - Sawsbuck
+                    - Shieldon
+                    - Beheeyem
+                    - Phantump
                 - length: 6
                   freq: 0.1575
                   sample:
-                    - Dialga
-                    - Oddish
-                    - Gastly
-                    - Feebas
-                    - Swalot
+                    - Snover
+                    - Klefki
+                    - Wynaut
+                    - Kakuna
+                    - Baltoy
                 - length: 9
                   freq: 0.14
                   sample:
-                    - Zebstrika
-                    - Abomasnow
-                    - Quilladin
-                    - Wobbuffet
-                    - Bellossom
+                    - Pidgeotto
+                    - Heracross
+                    - Sandslash
+                    - Tranquill
+                    - Infernape
                 - length: 10
                   freq: 0.06
                   sample:
-                    - Galvantula
-                    - Forretress
-                    - Talonflame
-                    - Kricketune
                     - Electivire
+                    - Kricketune
+                    - Ferrothorn
+                    - Karrablast
+                    - Seismitoad
             leastFrequentLen:
                 - length: 24
                   freq: 0.00125
@@ -212,11 +212,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - 75
-                - 27
+                - 30
+                - 85
+                - 45
                 - 100
-                - 50
-                - 75
+                - 80
           numericMetric:
             min: 10
             max: 194
@@ -230,11 +230,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - 130
-                - 85
-                - 85
-                - 55
-                - 130
+                - 65
+                - 77
+                - 95
+                - 45
+                - 81
           numericMetric:
             min: 20
             max: 230
@@ -248,11 +248,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - 45
-                - 30
+                - 110
+                - 60
                 - 80
-                - 72
-                - 56
+                - 80
+                - 40
           numericMetric:
             min: 5
             max: 180
@@ -266,11 +266,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - 505
-                - 420
-                - 300
+                - 348
+                - 535
                 - 405
-                - 580
+                - 405
+                - 540
           numericMetric:
             min: 180
             max: 780
@@ -285,24 +285,24 @@ tables:
             unique: 800
             sample:
                 - Water
-                - Normal
+                - Bug
                 - Water
-                - Grass
-                - Rock
+                - Electric
+                - Water
           stringMetric:
             mostFrequentLen:
                 - length: 5
                   freq: 0.3225
                   sample:
+                    - Water
+                    - Grass
                     - Steel
                     - Water
-                    - Water
-                    - Water
-                    - Water
+                    - Grass
                 - length: 6
                   freq: 0.2425
                   sample:
-                    - Dragon
+                    - Normal
                     - Normal
                     - Normal
                     - Normal
@@ -311,10 +311,10 @@ tables:
                   freq: 0.15875
                   sample:
                     - Dark
-                    - Fire
-                    - Fire
                     - Rock
+                    - Fire
                     - Dark
+                    - Fire
             leastFrequentLen:
                 - length: 7
                   freq: 0.07125
@@ -329,14 +329,14 @@ tables:
                   sample:
                     - Electric
                     - Fighting
-                    - Fighting
                     - Electric
+                    - Fighting
                     - Electric
                 - length: 3
                   freq: 0.11625
                   sample:
-                    - Ice
-                    - Ice
+                    - Bug
+                    - Bug
                     - Ice
                     - Bug
                     - Ice
@@ -349,11 +349,11 @@ tables:
             count: 800
             unique: 800
             sample:
-                - Psychic
-                - Steel
-                - Poison
-                - Psychic
+                - ""
+                - ""
                 - Flying
+                - Flying
+                - ""
           stringMetric:
             mostFrequentLen:
                 - length: 0
@@ -368,18 +368,26 @@ tables:
                   freq: 0.235
                   sample:
                     - Flying
-                    - Flying
-                    - Dragon
                     - Poison
+                    - Poison
+                    - Flying
                     - Flying
                 - length: 5
                   freq: 0.1225
                   sample:
-                    - Ghost
+                    - Fairy
+                    - Fairy
+                    - Fairy
                     - Grass
-                    - Fairy
-                    - Fairy
-                    - Steel
+                    - Ghost
+                - length: 4
+                  freq: 0.0575
+                  sample:
+                    - Dark
+                    - Rock
+                    - Fire
+                    - Rock
+                    - Rock
             leastFrequentLen:
                 - length: 3
                   freq: 0.02125
@@ -387,16 +395,16 @@ tables:
                     - Ice
                     - Ice
                     - Ice
-                    - Bug
+                    - Ice
                     - Ice
                 - length: 8
                   freq: 0.04
                   sample:
                     - Fighting
                     - Fighting
-                    - Electric
                     - Fighting
-                    - Electric
+                    - Fighting
+                    - Fighting
                 - length: 7
                   freq: 0.04125
                   sample:

@@ -36,7 +36,7 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 
 	genericMetric := model.GenericMetric{
 		Count:  int64(len(values)),
-		Unique: int64(len(values)),
+		Unique: CountUnique(values),
 		Sample: sample,
 	}
 
@@ -87,24 +87,27 @@ func ColType(values []interface{}) model.RIMOType {
 var ErrEmptySlice = errors.New("slice is empty")
 
 // Return a sample of size sampleSize from values.
-func Sample[T any](values []T, sampleSize int) ([]T, error) {
+func Sample[T comparable](values []T, sampleSize int) ([]T, error) {
 	if len(values) == 0 {
 		return nil, ErrEmptySlice
 	}
 
-	if sampleSize >= len(values) {
-		return values, nil
+	uniqueValues := Unique(values)
+
+	if sampleSize >= len(uniqueValues) {
+		// could be randomly sampled before.
+		return uniqueValues, nil
 	}
 
 	sample := make([]T, sampleSize)
 	for i := 0; i < sampleSize; i++ {
-		sample[i] = values[rand.Intn(len(values)-1)] //nolint:gosec
+		sample[i] = uniqueValues[rand.Intn(len(uniqueValues)-1)] //nolint:gosec
 	}
 
 	return sample, nil
 }
 
-func Unique(values []interface{}) int64 {
+func CountUnique(values []interface{}) int64 {
 	unique := make(map[interface{}]bool)
 
 	for _, value := range values {
@@ -112,6 +115,21 @@ func Unique(values []interface{}) int64 {
 	}
 
 	return int64(len(unique))
+}
+
+func Unique[T comparable](values []T) []T {
+	unique := make(map[T]bool)
+
+	for _, value := range values {
+		unique[value] = true
+	}
+
+	uniqueValues := make([]T, 0, len(unique))
+	for value := range unique {
+		uniqueValues = append(uniqueValues, value)
+	}
+
+	return uniqueValues
 }
 
 // Specific type metric.
@@ -177,6 +195,7 @@ func buildFreqLen(freqLen []int, lenMap map[int][]string, lenCounter map[int]int
 	lenFreqs := make([]model.LenFreq, len(freqLen))
 
 	for index, len := range freqLen {
+		// Get unique value from lenMap[len]..
 		sample, err := Sample(lenMap[len], sampleLen)
 		if err != nil {
 			return lenFreqs, fmt.Errorf("error getting sample for length %v : %w", len, err)
@@ -313,75 +332,4 @@ func ValueType(value interface{}) model.RIMOType {
 	default:
 		return model.ValueType.Undefined
 	}
-}
-
-
-// An opinion on this code ?
-
-
-type Metric[T any] struct {
-    Count  int64
-    Unique int64
-    Sample []T
-    // Add other generic metric fields here
-}
-
-func ComputeMetric[T any](colName string, values []T) (model.Column, error) {
-    // Main metric
-    name := colName
-    colType := ColType[T](values)
-    concept := ""
-    var confidential *bool = nil //nolint
-
-    // Create the column.
-    col := model.Column{ //nolint:exhaustruct
-        Name:         name,
-        Type:         colType,
-        Concept:      concept,
-        Constraint:   []string{},
-        Confidential: confidential,
-    }
-
-    // Generic metric
-    sample, err := Sample[T](values, model.SampleSize)
-    if err != nil {
-        return model.Column{}, fmt.Errorf("error computing sample in column %v : %w", name, err)
-    }
-
-    genericMetric := Metric[T]{
-        Count:  int64(len(values)),
-        Unique: int64(len(values)),
-        Sample: sample,
-    }
-
-    col.MainMetric = genericMetric
-
-    // Type specific metric
-    switch colType {
-    case model.ValueType.String:
-        metric, err := StringMetric(values)
-        if err != nil {
-            return model.Column{}, fmt.Errorf("error computing string metric in column %v : %w", name, err)
-        }
-
-        col.StringMetric = metric
-
-    case model.ValueType.Numeric:
-        metric, err := NumericMetric(values)
-        if err != nil {
-            return model.Column{}, fmt.Errorf("error computing numeric metric in column %v : %w", name, err)
-        }
-
-        col.NumericMetric = metric
-
-    case model.ValueType.Bool:
-        metric, err := BoolMetric(values)
-        if err != nil {
-            return model.Column{}, err
-        }
-
-        col.BoolMetric = metric
-    }
-
-    return col, nil
 }

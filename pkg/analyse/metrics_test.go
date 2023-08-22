@@ -116,14 +116,24 @@ func TestSample(t *testing.T) {
 	})
 }
 
+func TestCountUnique(t *testing.T) {
+	t.Parallel()
+
+	sample := []interface{}{1, 1, 2, 3}
+	expected := int64(3)
+	actual := analyse.CountUnique(sample)
+
+	assert.Equal(t, expected, actual)
+}
+
 func TestUnique(t *testing.T) {
 	t.Parallel()
 
-	sample := []interface{}{1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	expected := int64(9)
-	actual := analyse.Unique(sample)
+	values := []interface{}{1, 1, 2, 3}
+	expected := []interface{}{1, 2, 3}
+	actual := analyse.Unique(values)
 
-	assert.Equal(t, expected, actual)
+	assert.ElementsMatch(t, expected, actual)
 }
 
 // Metrics tests.

@@ -6,7 +6,7 @@ import (
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
 	"github.com/hexops/valast"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLoad(t *testing.T) {
@@ -14,7 +14,7 @@ func TestLoad(t *testing.T) {
 	t.Parallel()
 
 	data, err := analyse.Load(data1Path)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	fmt.Println(valast.String(data))
 }

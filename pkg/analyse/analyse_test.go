@@ -16,6 +16,7 @@ import (
 	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/hexops/valast"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -27,12 +28,41 @@ var (
 func TestAnalyse(t *testing.T) {
 	t.Parallel()
 
-	inputList := []string{data2Path}
-	outputPath := "./testdata/data2/data_output.yaml"
-	testPath := "./testdata/data2/data_expected.yaml"
+	testCases := []struct {
+		name       string
+		inputPath  string
+		outputPath string
+		testPath   string
+	}{
+		{
+			name:       "data1",
+			inputPath:  data1Path,
+			outputPath: "./testdata/data1/data_output.yaml",
+			testPath:   "./testdata/data1/data_expected.yaml",
+		},
+		{
+			name:       "data2",
+			inputPath:  data2Path,
+			outputPath: "./testdata/data2/data_output.yaml",
+			testPath:   "./testdata/data2/data_expected.yaml",
+		},
+	}
 
+	for _, tc := range testCases {
+		tc := tc // capture range variable
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			testAnalyse(t, tc.inputPath, tc.outputPath, tc.testPath)
+		})
+	}
+}
+
+func testAnalyse(t *testing.T, inputPath string, outputPath string, testPath string) {
+	t.Helper()
+
+	inputList := []string{inputPath}
 	err := analyse.Analyse(inputList, outputPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Compare output file with expected output file.
 	t.Run("output file comparison", func(t *testing.T) {
@@ -72,7 +102,6 @@ func TestAnalyse(t *testing.T) {
 // Benchmark Analyse pipeline.
 
 func BenchmarkAnalyse(b *testing.B) {
-
 	for _, numLines := range []int{100, 1000, 10000, 100000} {
 		inputPath := fmt.Sprintf("./testdata/benchmark/mixed/%d_input.jsonl", numLines)
 		inputList := []string{inputPath}
@@ -85,7 +114,7 @@ func BenchmarkAnalyse(b *testing.B) {
 
 			for n := 0; n < b.N; n++ {
 				err := analyse.Analyse(inputList, outputPath)
-				assert.NoError(b, err)
+				require.NoError(b, err)
 			}
 
 			elapsed := time.Since(startTime)
@@ -101,7 +130,6 @@ func BenchmarkMetric(b *testing.B) {
 
 	for _, dataType := range listType {
 		for _, numValues := range listNumValues {
-
 			inputPath := fmt.Sprintf("./testdata/benchmark/%s/%d_input.jsonl", dataType, numValues)
 			// Load inputFilePath.
 			data, err := analyse.Load(inputPath)
@@ -117,7 +145,7 @@ func BenchmarkMetric(b *testing.B) {
 
 				for n := 0; n < b.N; n++ {
 					cols = analyse.BuildColumnMetric(data, cols)
-					assert.NoError(b, err)
+					require.NoError(b, err)
 				}
 
 				elapsed := time.Since(startTime)
@@ -133,7 +161,7 @@ func loadYAML(t *testing.T, path string) model.Base {
 
 	// Load output file
 	file, err := os.Open(path)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	decoder := yaml.NewDecoder(file)
 
@@ -153,13 +181,13 @@ func getText(t *testing.T, outputPath string) string {
 	t.Helper()
 
 	file, err := os.Open(outputPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	var output string
 
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(file)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	file.Close()
 
 	output = buf.String()
