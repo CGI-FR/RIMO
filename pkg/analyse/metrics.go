@@ -314,3 +314,74 @@ func ValueType(value interface{}) model.RIMOType {
 		return model.ValueType.Undefined
 	}
 }
+
+
+// An opinion on this code ?
+
+
+type Metric[T any] struct {
+    Count  int64
+    Unique int64
+    Sample []T
+    // Add other generic metric fields here
+}
+
+func ComputeMetric[T any](colName string, values []T) (model.Column, error) {
+    // Main metric
+    name := colName
+    colType := ColType[T](values)
+    concept := ""
+    var confidential *bool = nil //nolint
+
+    // Create the column.
+    col := model.Column{ //nolint:exhaustruct
+        Name:         name,
+        Type:         colType,
+        Concept:      concept,
+        Constraint:   []string{},
+        Confidential: confidential,
+    }
+
+    // Generic metric
+    sample, err := Sample[T](values, model.SampleSize)
+    if err != nil {
+        return model.Column{}, fmt.Errorf("error computing sample in column %v : %w", name, err)
+    }
+
+    genericMetric := Metric[T]{
+        Count:  int64(len(values)),
+        Unique: int64(len(values)),
+        Sample: sample,
+    }
+
+    col.MainMetric = genericMetric
+
+    // Type specific metric
+    switch colType {
+    case model.ValueType.String:
+        metric, err := StringMetric(values)
+        if err != nil {
+            return model.Column{}, fmt.Errorf("error computing string metric in column %v : %w", name, err)
+        }
+
+        col.StringMetric = metric
+
+    case model.ValueType.Numeric:
+        metric, err := NumericMetric(values)
+        if err != nil {
+            return model.Column{}, fmt.Errorf("error computing numeric metric in column %v : %w", name, err)
+        }
+
+        col.NumericMetric = metric
+
+    case model.ValueType.Bool:
+        metric, err := BoolMetric(values)
+        if err != nil {
+            return model.Column{}, err
+        }
+
+        col.BoolMetric = metric
+    }
+
+    return col, nil
+}

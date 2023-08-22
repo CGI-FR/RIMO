@@ -5,4 +5,5 @@ bin
 .DS_Store
 
 pkg/analyse/testdata/data*/data_output.yaml
-pkg/analyse/testdata/benchmark/*
+pkg/analyse/testdata/benchmark/**/*.jsonl
+pkg/analyse/testdata/benchmark/**/*.yaml
