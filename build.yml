@@ -233,9 +233,15 @@ targets:
     steps:
       - $: ./pkg/analyse/testdata/benchmark/buildBenchData.sh
 
+  benchmark:
+    doc: "Run all benchmarks"
+    depends: ["info", "refresh", "lint", "bench-data"]
+    steps:
+      - $: go test -bench=. -benchmem -coverprofile=./={BUILD_DIR}/coverage.txt -covermode=atomic ./...
+
   test:
     doc: "Run all tests with coverage"
-    depends: ["info", "refresh", "lint", "bench-data"]
+    depends: ["info", "refresh", "lint"]
     steps:
       - $: go test -coverprofile=./={BUILD_DIR}/coverage.txt -covermode=atomic ./...
 
