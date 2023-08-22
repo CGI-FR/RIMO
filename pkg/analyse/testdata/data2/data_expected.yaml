@@ -9,13 +9,13 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 721
             sample:
-                - 508
-                - 624
-                - 94
-                - 348
-                - 295
+                - 206
+                - 626
+                - 40
+                - 42
+                - 314
           numericMetric:
             min: 1
             max: 721
@@ -27,13 +27,13 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 111
             sample:
-                - 160
-                - 50
-                - 35
-                - 75
-                - 120
+                - 135
+                - 108
+                - 55
+                - 73
+                - 135
           numericMetric:
             min: 5
             max: 190
@@ -45,13 +45,13 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 103
             sample:
-                - 62
-                - 70
-                - 150
-                - 100
-                - 180
+                - 42
+                - 53
+                - 51
+                - 68
+                - 97
           numericMetric:
             min: 5
             max: 230
@@ -63,12 +63,12 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 6
             sample:
+                - 6
                 - 1
-                - 3
-                - 2
-                - 1
+                - 5
+                - 4
                 - 4
           numericMetric:
             min: 1
@@ -81,13 +81,13 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 94
             sample:
-                - 61
-                - 72
-                - 70
-                - 90
-                - 105
+                - 120
+                - 170
+                - 123
+                - 126
+                - 89
           numericMetric:
             min: 1
             max: 255
@@ -99,12 +99,9 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 2
             sample:
-                - "False"
-                - "False"
-                - "False"
-                - "False"
+                - "True"
                 - "False"
           stringMetric:
             mostFrequentLen:
@@ -112,18 +109,10 @@ tables:
                   freq: 0.91875
                   sample:
                     - "False"
-                    - "False"
-                    - "False"
-                    - "False"
-                    - "False"
             leastFrequentLen:
                 - length: 4
                   freq: 0.08125
                   sample:
-                    - "True"
-                    - "True"
-                    - "True"
-                    - "True"
                     - "True"
         - name: Name
           type: string
@@ -134,53 +123,53 @@ tables:
             count: 800
             unique: 800
             sample:
-                - Petilil
-                - Sentret
-                - Zebstrika
-                - Grotle
-                - Fennekin
+                - Shuppet
+                - Vanillish
+                - Solrock
+                - Skiploom
+                - Phanpy
           stringMetric:
             mostFrequentLen:
                 - length: 7
                   freq: 0.25375
                   sample:
-                    - Swoobat
-                    - Leafeon
-                    - Furfrou
-                    - Machamp
-                    - Nuzleaf
+                    - Swellow
+                    - Pangoro
+                    - Sunkern
+                    - Haxorus
+                    - Floette
                 - length: 8
                   freq: 0.20125
                   sample:
-                    - Remoraid
-                    - Sawsbuck
-                    - Shieldon
-                    - Beheeyem
-                    - Phantump
+                    - Regirock
+                    - Deerling
+                    - Stantler
+                    - Stantler
+                    - Magcargo
                 - length: 6
                   freq: 0.1575
                   sample:
-                    - Snover
-                    - Klefki
+                    - Pidgey
                     - Wynaut
-                    - Kakuna
-                    - Baltoy
+                    - Mudkip
+                    - Crobat
+                    - Tauros
                 - length: 9
                   freq: 0.14
                   sample:
-                    - Pidgeotto
-                    - Heracross
-                    - Sandslash
-                    - Tranquill
-                    - Infernape
+                    - Eelektrik
+                    - Combusken
+                    - Zigzagoon
+                    - Piloswine
+                    - Magmortar
                 - length: 10
                   freq: 0.06
                   sample:
-                    - Electivire
-                    - Kricketune
-                    - Ferrothorn
-                    - Karrablast
-                    - Seismitoad
+                    - Scatterbug
+                    - Feraligatr
+                    - Scatterbug
+                    - Whirlipede
+                    - Tentacruel
             leastFrequentLen:
                 - length: 24
                   freq: 0.00125
@@ -201,8 +190,8 @@ tables:
                 - length: 3
                   freq: 0.0025
                   sample:
-                    - Muk
                     - Mew
+                    - Muk
         - name: Sp. Atk
           type: numeric
           concept: ""
@@ -210,13 +199,13 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 105
             sample:
+                - 135
+                - 67
                 - 30
-                - 85
-                - 45
-                - 100
-                - 80
+                - 88
+                - 42
           numericMetric:
             min: 10
             max: 194
@@ -228,13 +217,13 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 92
             sample:
-                - 65
-                - 77
-                - 95
-                - 45
                 - 81
+                - 51
+                - 52
+                - 160
+                - 71
           numericMetric:
             min: 20
             max: 230
@@ -246,13 +235,13 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 108
             sample:
-                - 110
-                - 60
-                - 80
-                - 80
-                - 40
+                - 76
+                - 104
+                - 50
+                - 23
+                - 45
           numericMetric:
             min: 5
             max: 180
@@ -264,13 +253,13 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 200
             sample:
-                - 348
-                - 535
+                - 534
+                - 237
+                - 314
+                - 440
                 - 405
-                - 405
-                - 540
           numericMetric:
             min: 180
             max: 780
@@ -282,62 +271,50 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 18
             sample:
-                - Water
+                - Rock
+                - Ground
                 - Bug
-                - Water
-                - Electric
-                - Water
+                - Ice
+                - Bug
           stringMetric:
             mostFrequentLen:
                 - length: 5
                   freq: 0.3225
                   sample:
-                    - Water
-                    - Grass
+                    - Fairy
+                    - Ghost
                     - Steel
-                    - Water
                     - Grass
+                    - Water
                 - length: 6
                   freq: 0.2425
                   sample:
                     - Normal
-                    - Normal
-                    - Normal
-                    - Normal
+                    - Poison
                     - Ground
+                    - Dragon
+                    - Flying
                 - length: 4
                   freq: 0.15875
                   sample:
-                    - Dark
+                    - Fire
                     - Rock
-                    - Fire
                     - Dark
-                    - Fire
             leastFrequentLen:
                 - length: 7
                   freq: 0.07125
                   sample:
                     - Psychic
-                    - Psychic
-                    - Psychic
-                    - Psychic
-                    - Psychic
                 - length: 8
                   freq: 0.08875
                   sample:
-                    - Electric
-                    - Fighting
-                    - Electric
                     - Fighting
                     - Electric
                 - length: 3
                   freq: 0.11625
                   sample:
-                    - Bug
-                    - Bug
-                    - Ice
                     - Bug
                     - Ice
         - name: Type 2
@@ -347,69 +324,53 @@ tables:
           confidential: null
           mainMetric:
             count: 800
-            unique: 800
+            unique: 19
             sample:
-                - ""
-                - ""
-                - Flying
-                - Flying
-                - ""
+                - Ground
+                - Psychic
+                - Poison
+                - Normal
+                - Grass
           stringMetric:
             mostFrequentLen:
                 - length: 0
                   freq: 0.4825
                   sample:
                     - ""
-                    - ""
-                    - ""
-                    - ""
-                    - ""
                 - length: 6
                   freq: 0.235
                   sample:
-                    - Flying
-                    - Poison
                     - Poison
                     - Flying
-                    - Flying
+                    - Dragon
+                    - Ground
+                    - Normal
                 - length: 5
                   freq: 0.1225
                   sample:
                     - Fairy
-                    - Fairy
-                    - Fairy
                     - Grass
+                    - Steel
+                    - Water
                     - Ghost
                 - length: 4
                   freq: 0.0575
                   sample:
+                    - Rock
                     - Dark
-                    - Rock
                     - Fire
-                    - Rock
-                    - Rock
             leastFrequentLen:
                 - length: 3
                   freq: 0.02125
                   sample:
                     - Ice
-                    - Ice
-                    - Ice
-                    - Ice
-                    - Ice
+                    - Bug
                 - length: 8
                   freq: 0.04
                   sample:
                     - Fighting
-                    - Fighting
-                    - Fighting
-                    - Fighting
-                    - Fighting
+                    - Electric
                 - length: 7
                   freq: 0.04125
                   sample:
-                    - Psychic
-                    - Psychic
-                    - Psychic
-                    - Psychic
                     - Psychic
