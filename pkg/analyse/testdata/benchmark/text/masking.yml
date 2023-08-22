@@ -1,5 +1,5 @@
 version: "1"
-seed: "1"
+seed: 1
 masking:
   - selector:
       jsonpath: "phoneFR"

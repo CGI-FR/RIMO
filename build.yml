@@ -227,9 +227,15 @@ targets:
           - $: golangci-lint run ={replace(join(appendpath("--enable", linters), " "), "/", " ")} ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
             :: true
 
+  bench-data:
+    doc: "generate bench data"
+    depends: ["info"]
+    steps:
+      - $: ./pkg/analyse/testdata/benchmark/buildBenchData.sh
+
   test:
     doc: "Run all tests with coverage"
-    depends: ["info", "refresh", "lint"]
+    depends: ["info", "refresh", "lint", "bench-data"]
     steps:
       - $: go test -coverprofile=./={BUILD_DIR}/coverage.txt -covermode=atomic ./...
 
