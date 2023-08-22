@@ -2,8 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 
 	"github.com/invopop/jsonschema"
 )
@@ -85,28 +83,11 @@ type (
 	}
 )
 
-// ExportBaseSchema exports the YAML schema for the Base struct to the current folder.
-func ExportSchema() error {
-	// Marshal the struct into a JSON string
-	s := jsonschema.Reflect(&Base{}) //nolint:exhaustruct
-
-	schema, err := json.MarshalIndent(s, "", "  ")
+func GetJsonSchema() (string, error) {
+	resBytes, err := json.MarshalIndent(jsonschema.Reflect(&Base{}), "", "  ")
 	if err != nil {
-		return fmt.Errorf("error marshalling JSON schema: %w", err)
+		return "", err
 	}
 
-	// Create a new file for the JSON schema
-	file, err := os.Create("rimo-schema.json")
-	if err != nil {
-		return fmt.Errorf("error creating JSON schema file: %w", err)
-	}
-	defer file.Close()
-
-	// Write the JSON data to the file
-	_, err = file.Write(schema)
-	if err != nil {
-		return fmt.Errorf("error writing JSON data to file: %w", err)
-	}
-
-	return nil
+	return string(resBytes), nil
 }

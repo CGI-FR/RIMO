@@ -38,22 +38,15 @@ func main() { //nolint:funlen
 	}
 
 	rimoSchemaCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "schema",
-		Short: "Export rimo json schema",
+		Use:   "jsonschema",
+		Short: "Return rimo jsonschema",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			// Print current working directory
-			cwd, err := os.Getwd()
+			jsonschema, err := model.GetJsonSchema()
 			if err != nil {
-				log.Fatal().Msgf("error getting current working directory: %v", err)
+				os.Exit(1)
 			}
-
-			err = model.ExportSchema()
-			if err != nil {
-				log.Fatal().Msgf("error generating rimo schema: %v", err)
-			}
-
-			log.Info().Msgf("rimo schema successfully exported in %s", cwd)
+			fmt.Println(jsonschema)
 		},
 	}
 
