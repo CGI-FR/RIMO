@@ -139,19 +139,19 @@ func BenchmarkMetric(b *testing.B) {
 
 			var cols []model.Column
 
-			b.Run(fmt.Sprintf("type= %s, numValues=%d", dataType, numValues), func(br *testing.B) {
-				br.ResetTimer()
+			b.Run(fmt.Sprintf("type= %s, numValues=%d", dataType, numValues), func(b *testing.B) {
+				b.ResetTimer()
 				startTime := time.Now()
 
-				for n := 0; n < br.N; n++ {
+				for n := 0; n < b.N; n++ {
 					cols = analyse.BuildColumnMetric(data, cols)
 					require.NoError(b, err)
 				}
-				br.StopTimer()
+				b.StopTimer()
 
 				elapsed := time.Since(startTime)
-				valuesPerSecond := float64(numValues*br.N) / elapsed.Seconds()
-				br.ReportMetric(valuesPerSecond, "lines/s")
+				valuesPerSecond := float64(numValues*b.N) / elapsed.Seconds()
+				b.ReportMetric(valuesPerSecond, "lines/s")
 			})
 		}
 	}
