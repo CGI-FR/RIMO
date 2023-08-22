@@ -42,7 +42,7 @@ func main() { //nolint:funlen
 		Short: "Return rimo jsonschema",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			jsonschema, err := model.GetJsonSchema()
+			jsonschema, err := model.GetJSONSchema()
 			if err != nil {
 				os.Exit(1)
 			}
