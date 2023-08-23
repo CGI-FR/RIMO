@@ -5,7 +5,7 @@ testcases:
       - script: rimo jsonschema > rimo.schema.json
         assertions:
           - result.code ShouldEqual 0
-      - script: diff rimo.schema.json ../../schema/v1/rimo.schema.json
+      - script: diff rimo.schema.json ../../../schema/v1/rimo.schema.json
         assertions:
           - result.code ShouldEqual 0
           - result.systemout ShouldBeEmpty
