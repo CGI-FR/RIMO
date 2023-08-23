@@ -256,7 +256,7 @@ targets:
 
   test-int:
     doc: "Run all integration tests"
-    depends: ["info", "refresh", "lint", "test", "release"]
+    depends: ["info", "refresh", "lint", "test", "benchmark", "release"]
     steps:
       - $: venom run test/suites/*
 
