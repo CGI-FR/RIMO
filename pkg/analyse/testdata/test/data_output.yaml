@@ -1,0 +1,134 @@
+database: data
+tables:
+    - name: input
+      columns:
+        - name: EMAIL
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - anomnym@linopimo.fr
+          stringMetric:
+            mostFrequentLen:
+                - length: 19
+                  freq: 1
+                  sample:
+                    - anomnym@linopimo.fr
+            leastFrequentLen: []
+        - name: GROUPE_ID
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - 3
+          numericMetric:
+            min: 3
+            max: 3
+            mean: 3
+        - name: ID
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - 61
+          numericMetric:
+            min: 61
+            max: 61
+            mean: 61
+        - name: ID_TYPE_UTILISATEUR
+          type: undefined
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - null
+        - name: LOGIN
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - HELPDESKLBP
+          stringMetric:
+            mostFrequentLen:
+                - length: 11
+                  freq: 1
+                  sample:
+                    - HELPDESKLBP
+            leastFrequentLen: []
+        - name: MDP
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - HELPDESKLBP
+          stringMetric:
+            mostFrequentLen:
+                - length: 11
+                  freq: 1
+                  sample:
+                    - HELPDESKLBP
+            leastFrequentLen: []
+        - name: NOM
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - BRUNET
+          stringMetric:
+            mostFrequentLen:
+                - length: 6
+                  freq: 1
+                  sample:
+                    - BRUNET
+            leastFrequentLen: []
+        - name: PRENOM
+          type: undefined
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - null
+        - name: PROFIL_ID
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 1
+            unique: 1
+            sample:
+                - 2
+          numericMetric:
+            min: 2
+            max: 2
+            mean: 2

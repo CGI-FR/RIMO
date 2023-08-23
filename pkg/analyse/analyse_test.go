@@ -22,6 +22,8 @@ import (
 var (
 	data1Path = "./testdata/data1/data_input.jsonl" //nolint:gochecknoglobals
 	data2Path = "./testdata/data2/data_input.jsonl" //nolint:gochecknoglobals
+	testPath  = "./testdata/test/data_input.jsonl"  //nolint:gochecknoglobals
+
 )
 
 // Execute Analyse pipeline and compare with expected result.
@@ -97,6 +99,17 @@ func testAnalyse(t *testing.T, inputPath string, outputPath string, testPath str
 			t.Errorf("base are not similar : %s", diff)
 		}
 	})
+}
+
+// Allow to quickly run analyse pipeline on testdata.
+func TestRunAnalyse(t *testing.T) {
+	t.Parallel()
+
+	inputPath := []string{testPath}
+	outputPath := "./testdata/test/data_output.yaml"
+
+	err := analyse.Analyse(inputPath, outputPath)
+	require.NoError(t, err)
 }
 
 // Benchmark Analyse pipeline.
