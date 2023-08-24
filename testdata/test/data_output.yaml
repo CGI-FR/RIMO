@@ -9,6 +9,7 @@ tables:
           confidential: null
           mainMetric:
             count: 1
+            empty: 0
             unique: 1
             sample:
                 - anomnym@linopimo.fr
@@ -26,6 +27,7 @@ tables:
           confidential: null
           mainMetric:
             count: 1
+            empty: 0
             unique: 1
             sample:
                 - 3
@@ -40,6 +42,7 @@ tables:
           confidential: null
           mainMetric:
             count: 1
+            empty: 0
             unique: 1
             sample:
                 - 61
@@ -54,9 +57,9 @@ tables:
           confidential: null
           mainMetric:
             count: 1
-            unique: 1
-            sample:
-                - null
+            empty: 1
+            unique: 0
+            sample: []
         - name: LOGIN
           type: string
           concept: ""
@@ -64,15 +67,16 @@ tables:
           confidential: null
           mainMetric:
             count: 1
+            empty: 0
             unique: 1
             sample:
-                - HELPDESKLBP
+                - '**'
           stringMetric:
             mostFrequentLen:
-                - length: 11
+                - length: 2
                   freq: 1
                   sample:
-                    - HELPDESKLBP
+                    - '**'
             leastFrequentLen: []
         - name: MDP
           type: string
@@ -81,15 +85,16 @@ tables:
           confidential: null
           mainMetric:
             count: 1
+            empty: 0
             unique: 1
             sample:
-                - HELPDESKLBP
+                - '**'
           stringMetric:
             mostFrequentLen:
-                - length: 11
+                - length: 2
                   freq: 1
                   sample:
-                    - HELPDESKLBP
+                    - '**'
             leastFrequentLen: []
         - name: NOM
           type: string
@@ -98,6 +103,7 @@ tables:
           confidential: null
           mainMetric:
             count: 1
+            empty: 0
             unique: 1
             sample:
                 - BRUNET
@@ -115,9 +121,9 @@ tables:
           confidential: null
           mainMetric:
             count: 1
-            unique: 1
-            sample:
-                - null
+            empty: 1
+            unique: 0
+            sample: []
         - name: PROFIL_ID
           type: numeric
           concept: ""
@@ -125,6 +131,7 @@ tables:
           confidential: null
           mainMetric:
             count: 1
+            empty: 0
             unique: 1
             sample:
                 - 2
