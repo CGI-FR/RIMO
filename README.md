@@ -3,15 +3,6 @@
 ## Description
 
 Rimo contains tools that helps creating a *masking.yaml* for [PIMO](https://github.com/CGI-FR/PIMO).
-<!-- It works as a 6 steps process : -->
-<!-- ![rimo steps](.github/img/rimo_steps.png "rimo steps") -->
-<!--
-1. `gather` : orchestrate LINO to extract table of the database into a *.jsonl* file
-2. `analyse` : extract meaningful information on database from *.jsonl*
-3. `export` : dump data into an *Excel* file which serves as a configuration means
-4. `import` : load, store and verify inputted data of the *Excel* file into a *.yaml* file
-5. `build` : create a *pimo_masking.yaml* from *.yaml*
-6. `script` : build a bash script to execute pipeline for PIMO -->
 
 <!-- ## Installation
 `rimo` command line work in relative project's directory, like `git` or `docker` -->

@@ -63,7 +63,6 @@ func main() { //nolint:funlen
 			if err != nil {
 				os.Exit(1)
 			}
-
 			fmt.Println(jsonschema)
 		},
 	}
