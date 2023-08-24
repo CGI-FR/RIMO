@@ -1,12 +1,12 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/cgi-fr/rimo/pkg/io"
 	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -58,42 +58,33 @@ func main() { //nolint:funlen
 	}
 
 	rimoAnalyseCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "analyse [inputPath] [outputPath]",
+		Use:   "analyse [inputDir] [outputDir]",
 		Short: "Generate a rimo.yaml from a directory of .jsonl files",
 		Args:  cobra.ExactArgs(2), //nolint:gomnd
 		Run: func(cmd *cobra.Command, args []string) {
-			inputPath := args[0]
-			if err := CheckDir(inputPath); err != nil {
-				log.Fatal().Msgf("error checking input directory: %v", err)
-			}
-
-			outputPath := args[1]
-			if err := CheckDir(outputPath); err != nil {
-				log.Fatal().Msgf("error checking output directory: %v", err)
-			}
+			inputDir := args[0]
+			outputDir := args[1]
 
 			// List .jsonl files in input directory
-			inputList, err := FilesList(inputPath, ".jsonl")
+			if err := io.ValidateDirPath(inputDir); err != nil {
+				log.Fatal().Msgf("error validating input directory: %v", err)
+			}
+
+			inputList, err := FilesList(inputDir, ".jsonl")
 			if err != nil {
 				log.Fatal().Msgf("error listing files: %v", err)
 			}
+
 			if len(inputList) == 0 {
-				log.Fatal().Msgf("no .jsonl files found in %s", inputPath)
+				log.Fatal().Msgf("no .jsonl files found in %s", inputDir)
 			}
 
-			// Output path : outpathPath + basename + .yaml
-			basename, err := analyse.GetBaseName(inputList[0])
-			if err != nil {
-				log.Fatal().Msgf("error getting basename: %v", err)
-			}
-			outputPath = filepath.Join(outputPath, basename+".yaml")
-
-			err = analyse.Analyse(inputList, outputPath)
+			err = analyse.Orchestrator(inputList, outputDir)
 			if err != nil {
 				log.Fatal().Msgf("error generating rimo.yaml: %v", err)
 			}
 
-			log.Info().Msgf("Successfully generated rimo.yaml at %s", outputPath)
+			log.Info().Msgf("Successfully generated rimo.yaml in %s", outputDir)
 		},
 	}
 
@@ -104,52 +95,6 @@ func main() { //nolint:funlen
 		log.Err(err).Msg("Error when executing command")
 		os.Exit(1)
 	}
-}
-
-var (
-	ErrNotExist = errors.New("path does not exist")
-	ErrNotDir   = errors.New("path is not a directory")
-	ErrNotFile  = errors.New("path is not a file")
-)
-
-func CheckFile(path string) error {
-	// Get absPath
-	path, err := filepath.Abs(path)
-	if err != nil {
-		return fmt.Errorf("error getting absolute path: %w", err)
-	}
-
-	fileInfo, err := os.Stat(path)
-	// Check if the file exists
-	if os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrNotExist, path)
-	}
-	// Check if the file is a regular file
-	if !fileInfo.Mode().IsRegular() {
-		return fmt.Errorf("%w: %s", ErrNotFile, path)
-	}
-
-	return nil
-}
-
-func CheckDir(path string) error {
-	// Get absPath
-	path, err := filepath.Abs(path)
-	if err != nil {
-		return fmt.Errorf("error getting absolute path: %w", err)
-	}
-
-	fileInfo, err := os.Stat(path)
-	// Check if path exists
-	if os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrNotExist, path)
-	}
-	// Check if path is a directory
-	if !fileInfo.Mode().IsDir() {
-		return fmt.Errorf("%w: %s", ErrNotDir, path)
-	}
-
-	return nil
 }
 
 func FilesList(path string, extension string) ([]string, error) {

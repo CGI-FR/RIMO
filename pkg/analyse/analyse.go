@@ -3,158 +3,181 @@ package analyse
 import (
 	"errors"
 	"fmt"
-	"log"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/cgi-fr/rimo/pkg/io"
+	"github.com/cgi-fr/rimo/pkg/metric"
 	"github.com/cgi-fr/rimo/pkg/model"
 )
 
-// Handle execution pipeline of analyse pkg.
-func Analyse(inputList []string, outputPath string) error {
-	// Ensure all input files relate to same Base.
-	baseName, err := GetUniqueBaseName(inputList)
+var ErrWrongParameter = errors.New("wrong parameter")
+
+// Handle execution pipeline of rimo analyse.
+func Orchestrator(inputList []string, outputPath string) error {
+	// Process input
+	err := ProcessInput(inputList, outputPath)
 	if err != nil {
-		return fmt.Errorf("failed to extract database name: %w", err)
-	}
-	// Treatment of input file.
-	tables := make([]model.Table, 0, len(inputList))
-
-	for i := range inputList {
-		inputPath := inputList[i]
-		// Extract Base and Table name from inputFilePath.
-		tableName, err := GetTableName(inputPath)
-		if err != nil {
-			return fmt.Errorf("failed to extract table name: %w", err)
-		}
-		// Load inputFilePath.
-		data, err := Load(inputPath)
-		if err != nil {
-			return fmt.Errorf("failed to load %s: %w", inputPath, err)
-		}
-		// Analyse
-		var cols []model.Column
-
-		cols = BuildColumnMetric(data, cols)
-
-		// Sort cols by name.
-		sort.Slice(cols, func(i, j int) bool {
-			return cols[i].Name < cols[j].Name
-		})
-
-		table := model.Table{
-			Name:    tableName,
-			Columns: cols,
-		}
-
-		// Append tables to Base structure.
-		tables = append(tables, table)
+		return err
 	}
 
-	// Sort tables by name.
-	sort.Slice(tables, func(i, j int) bool {
-		return tables[i].Name < tables[j].Name
-	})
-
-	base := model.Base{
-		Name:   baseName,
-		Tables: tables,
-	}
-
-	// Export
-	err = Export(base, outputPath)
+	// Compute model.base
+	base, err := Build(inputList)
 	if err != nil {
-		return fmt.Errorf("failed to export: %w", err)
+		return err
+	}
+
+	// Export rimo.yaml
+	outputPath = filepath.Join(outputPath, base.Name+".yaml")
+
+	err = io.Export(base, outputPath)
+	if err != nil {
+		return fmt.Errorf("%w : cannot export to %s", err, outputPath)
 	}
 
 	return nil
 }
 
-func BuildColumnMetric(data DataMap, cols []model.Column) []model.Column {
-	for colName, values := range data {
-		column, err := ComputeMetric(colName, values)
-		if err != nil {
-			log.Fatalf("failed to compute metric: %v", err)
-		}
-
-		cols = append(cols, column)
+func ProcessInput(inputList []string, outputPath string) error {
+	// verify output dirPath
+	err := io.ValidateDirPath(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to validate output path: %w", err)
 	}
 
-	return cols
+	// validate input filepath
+	for i := range inputList {
+		err := io.ValidateFilePath(inputList[i])
+		if err != nil {
+			return fmt.Errorf("failed to validate input file: %w", err)
+		}
+	}
+
+	// verify that input files relates to the same base
+	err = BaseIsUnique(inputList)
+	if err != nil {
+		return fmt.Errorf("failed to validate input file: %w", err)
+	}
+
+	return nil
+}
+
+// Return a model.Base from inputList.
+func Build(inputList []string) (model.Base, error) {
+	baseName, _, err := ExtractName(inputList[0])
+	if err != nil {
+		return model.Base{}, fmt.Errorf("failed to extract base name for %s: %w", inputList[0], err)
+	}
+
+	base := model.Base{
+		Name:   baseName,
+		Tables: []model.Table{},
+	}
+
+	for _, inputPath := range inputList {
+		_, tableName, err := ExtractName(inputPath)
+		if err != nil {
+			return model.Base{}, fmt.Errorf("failed to extract table name for %s: %w", inputPath, err)
+		}
+
+		columns, err := Analyse(inputPath)
+		if err != nil {
+			return model.Base{}, fmt.Errorf("failed to analyse %s: %w", inputPath, err)
+		}
+
+		// Add columns to base
+		table := model.Table{
+			Name:    tableName,
+			Columns: columns,
+		}
+		base.Tables = append(base.Tables, table)
+	}
+
+	SortBase(&base)
+
+	return base, nil
+}
+
+// Sort tables and columns by name.
+func SortBase(base *model.Base) {
+	for i := range base.Tables {
+		sort.Slice(base.Tables[i].Columns, func(j, k int) bool {
+			return base.Tables[i].Columns[j].Name < base.Tables[i].Columns[k].Name
+		})
+	}
+
+	sort.Slice(base.Tables, func(i, j int) bool {
+		return base.Tables[i].Name < base.Tables[j].Name
+	})
+}
+
+// Return a list of column from a jsonl file.
+func Analyse(path string) ([]model.Column, error) {
+	// Load file in a dataMap.
+	data, err := io.Load(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load jsonl file: %w", err)
+	}
+
+	columns := []model.Column{}
+
+	for colName, values := range data {
+		column, err := metric.ComputeMetric(colName, values)
+		if err != nil {
+			return nil, fmt.Errorf("failed to compute metric: %w", err)
+		}
+
+		columns = append(columns, column)
+	}
+
+	return columns, nil
 }
 
 // Error definitions.
 
 var ErrNonExtractibleValue = errors.New("couldn't extract base or table name from path")
 
-func GetUniqueBaseName(inputList []string) (string, error) {
-	baseName, err := GetBaseName(inputList[0])
-	if err != nil {
-		log.Fatalf("failed to extract database name: %v", err)
-	}
-
-	for i := range inputList {
-		newBaseName, err := GetBaseName(inputList[i])
-		if err != nil {
-			log.Fatalf("failed to extract database name: %v", err)
-		}
-
-		if newBaseName != baseName {
-			log.Fatalf("input files do not relate to same Base: %s", baseName)
-		}
-	}
-
-	return baseName, err
-}
-
-func GetBaseName(path string) (string, error) {
+func ExtractName(path string) (string, string, error) {
 	// path format : /path/to/jsonl/BASE_TABLE.jsonl
-	baseName := filepath.Base(path)
-	baseName = baseName[:len(baseName)-len(filepath.Ext(baseName))]
-	// Split at _ to get Base name.
-	parts := strings.Split(baseName, "_")
-	if len(parts) < 2 { //nolint:gomnd
-		return "", fmt.Errorf("%w : unable to extract base name from %s", ErrNonExtractibleValue, path)
+	fileName := strings.TrimSuffix(filepath.Base(path), filepath.Ext(filepath.Base(path)))
+
+	parts := strings.Split(fileName, "_")
+	if len(parts) != 2 { //nolint:gomnd
+		return "", "", fmt.Errorf("%w : %s", ErrNonExtractibleValue, path)
 	}
 
-	baseName = parts[0]
+	baseName := parts[0]
 	if baseName == "" {
-		return "", fmt.Errorf("%w : base name is empty from %s", ErrNonExtractibleValue, path)
+		return "", "", fmt.Errorf("%w : base name is empty from %s", ErrNonExtractibleValue, path)
 	}
 
-	return baseName, nil
-}
-
-func GetTableName(path string) (string, error) {
-	// path format : /path/to/jsonl/BASE_TABLE.jsonl
-	tableName := filepath.Base(path)
-	tableName = tableName[:len(tableName)-len(filepath.Ext(tableName))]
-	// Split at _ to get Table name.
-	parts := strings.Split(tableName, "_")
-	if len(parts) < 2 { //nolint:gomnd
-		return "", fmt.Errorf("%w : unable to extract table name from %s", ErrNonExtractibleValue, path)
-	}
-
-	tableName = parts[1]
+	tableName := parts[1]
 	if tableName == "" {
-		return "", fmt.Errorf("%w : table name is empty from %s", ErrNonExtractibleValue, path)
+		return "", "", fmt.Errorf("%w : table name is empty from %s", ErrNonExtractibleValue, path)
 	}
 
-	return tableName, nil
+	return baseName, tableName, nil
 }
 
-// Ensure file exist and is a regular file.
-func CheckFile(path string) {
-	fileInfo, err := os.Stat(path)
-	absPath, _ := filepath.Abs(path)
+var ErrNonUniqueBase = errors.New("base name is not unique")
 
-	if os.IsNotExist(err) {
-		log.Fatalf("file does not exist: %s", absPath)
+func BaseIsUnique(pathList []string) error {
+	baseName, _, err := ExtractName(pathList[0])
+	if err != nil {
+		return err
 	}
 
-	if !fileInfo.Mode().IsRegular() {
-		log.Fatalf("not a regular file: %s", absPath)
+	for _, path := range pathList {
+		baseNameI, _, err := ExtractName(path)
+		if err != nil {
+			return err
+		}
+
+		if baseName != baseNameI {
+			return fmt.Errorf("%w : %s and %s", ErrNonUniqueBase, baseName, baseNameI)
+		}
 	}
+
+	return nil
 }

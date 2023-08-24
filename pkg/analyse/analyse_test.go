@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -13,103 +14,99 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
+	"github.com/cgi-fr/rimo/pkg/io"
 	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/hexops/valast"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	data1Path = "./testdata/data1/data_input.jsonl" //nolint:gochecknoglobals
-	data2Path = "./testdata/data2/data_input.jsonl" //nolint:gochecknoglobals
-	testPath  = "./testdata/test/data_input.jsonl"  //nolint:gochecknoglobals
-
+const (
+	dataDir      = "../../testdata/"
+	inputName    = "data_input.jsonl"
+	outputName   = "data_output.yaml"
+	expectedName = "data_expected.yaml"
 )
+
+type testCase struct {
+	name         string
+	inputPath    string
+	outputPath   string
+	expectedPath string
+}
+
+func getTestCase(dataFolder string) testCase {
+	return testCase{
+		name:         filepath.Base(dataFolder),
+		inputPath:    filepath.Join(dataFolder, inputName),
+		outputPath:   filepath.Join(dataFolder, outputName),
+		expectedPath: filepath.Join(dataFolder, expectedName),
+	}
+}
 
 // Execute Analyse pipeline and compare with expected result.
 func TestAnalyse(t *testing.T) {
 	t.Parallel()
 
-	testCases := []struct {
-		name       string
-		inputPath  string
-		outputPath string
-		testPath   string
-	}{
-		{
-			name:       "data1",
-			inputPath:  data1Path,
-			outputPath: "./testdata/data1/data_output.yaml",
-			testPath:   "./testdata/data1/data_expected.yaml",
-		},
-		{
-			name:       "data2",
-			inputPath:  data2Path,
-			outputPath: "./testdata/data2/data_output.yaml",
-			testPath:   "./testdata/data2/data_expected.yaml",
-		},
-	}
+	testCases := []testCase{}
+	testCases = append(testCases, getTestCase("../../testdata/data1/"))
+	testCases = append(testCases, getTestCase("../../testdata/data2/"))
 
-	for _, tc := range testCases {
-		tc := tc // capture range variable
-		t.Run(tc.name, func(t *testing.T) {
+	for _, testCase := range testCases {
+		testCase := testCase // capture range variable
+		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
-			testAnalyse(t, tc.inputPath, tc.outputPath, tc.testPath)
+
+			runAnalyse(t, testCase.inputPath, testCase.outputPath)
+			compareFileOutput(t, testCase.outputPath, testCase.expectedPath)
+			compareObjectOutput(t, testCase.outputPath, testCase.expectedPath)
 		})
 	}
 }
 
-func testAnalyse(t *testing.T, inputPath string, outputPath string, testPath string) {
+func runAnalyse(t *testing.T, inputPath string, outputPath string) {
 	t.Helper()
 
 	inputList := []string{inputPath}
-	err := analyse.Analyse(inputList, outputPath)
+
+	base, err := analyse.Build(inputList)
 	require.NoError(t, err)
 
-	// Compare output file with expected output file.
-	t.Run("output file comparison", func(t *testing.T) {
-		t.Parallel()
-
-		actualOutput := getText(t, outputPath)
-		expectedOutput := getText(t, testPath)
-
-		// Call removeSampleFromStrings
-		actualOutput = removeSampleFromStrings(actualOutput)
-		expectedOutput = removeSampleFromStrings(expectedOutput)
-
-		// Compare the expected output and actual output
-		assert.Equal(t, expectedOutput, actualOutput)
-	})
-
-	// Compare loaded output file with loaded expected output file.
-	// EqualBase() is used to compare two model.Base.
-	t.Run("loaded object comparison", func(t *testing.T) {
-		t.Parallel()
-
-		actualOutputBase := loadYAML(t, outputPath)
-		expectedOutputBase := loadYAML(t, testPath)
-
-		// Remove sample fields from both model.Base.
-		actualOutputBase = removeSampleFromBase(actualOutputBase)
-		expectedOutputBase = removeSampleFromBase(expectedOutputBase)
-
-		// Compare the expected output and actual output except all sample fields.
-		equal, diff := EqualBase(expectedOutputBase, actualOutputBase)
-		if !equal {
-			t.Errorf("base are not similar : %s", diff)
-		}
-	})
+	if outputPath != "" {
+		err = io.Export(base, outputPath)
+		require.NoError(t, err)
+	}
 }
 
-// Allow to quickly run analyse pipeline on testdata.
-func TestRunAnalyse(t *testing.T) {
-	t.Parallel()
+func compareFileOutput(t *testing.T, outputPath string, testPath string) {
+	t.Helper()
 
-	inputPath := []string{testPath}
-	outputPath := "./testdata/test/data_output.yaml"
+	actualOutput := getText(t, outputPath)
+	expectedOutput := getText(t, testPath)
 
-	err := analyse.Analyse(inputPath, outputPath)
-	require.NoError(t, err)
+	// Call removeSampleFromStrings
+	actualOutput = removeSampleFromStrings(actualOutput)
+	expectedOutput = removeSampleFromStrings(expectedOutput)
+
+	// Compare the expected output and actual output
+	assert.Equal(t, expectedOutput, actualOutput)
+}
+
+func compareObjectOutput(t *testing.T, outputPath string, testPath string) {
+	t.Helper()
+
+	actualOutputBase := loadYAML(t, outputPath)
+	expectedOutputBase := loadYAML(t, testPath)
+
+	// Remove sample fields from both model.Base.
+	actualOutputBase = removeSampleFromBase(actualOutputBase)
+	expectedOutputBase = removeSampleFromBase(expectedOutputBase)
+
+	// Compare the expected output and actual output except all sample fields.
+	equal, diff := EqualBase(expectedOutputBase, actualOutputBase)
+	if !equal {
+		t.Errorf("base are not similar : %s", diff)
+	}
 }
 
 // Benchmark Analyse pipeline.
@@ -122,11 +119,13 @@ func BenchmarkAnalyse(b *testing.B) {
 
 		b.Run(fmt.Sprintf("numLines=%d", numLines), func(b *testing.B) {
 			b.ResetTimer()
-
 			startTime := time.Now()
 
 			for n := 0; n < b.N; n++ {
-				err := analyse.Analyse(inputList, outputPath)
+				base, err := analyse.Build(inputList)
+				require.NoError(b, err)
+
+				err = io.Export(base, outputPath)
 				require.NoError(b, err)
 			}
 
@@ -137,38 +136,46 @@ func BenchmarkAnalyse(b *testing.B) {
 	}
 }
 
-func BenchmarkMetric(b *testing.B) {
-	listNumValues := []int{100, 1000, 10000}
-	listType := []string{"numeric", "text", "bool"}
+func TestExtractName(t *testing.T) {
+	t.Parallel()
 
-	for _, dataType := range listType {
-		for _, numValues := range listNumValues {
-			inputPath := fmt.Sprintf("./testdata/benchmark/%s/%d_input.jsonl", dataType, numValues)
-			// Load inputFilePath.
-			data, err := analyse.Load(inputPath)
-			if err != nil {
-				b.Fatalf("failed to load %s: %v", inputPath, err)
-			}
+	path := "path/to/dir/basename_tablename.jsonl"
+	expectedBase, expectedName := "basename", "tablename"
+	actualBase, actualName, err := analyse.ExtractName(path)
+	assert.NoError(t, err)
 
-			var cols []model.Column
+	assert.Equal(t, expectedBase, actualBase)
+	assert.Equal(t, expectedName, actualName)
 
-			b.Run(fmt.Sprintf("type= %s, numValues=%d", dataType, numValues), func(b *testing.B) {
-				b.ResetTimer()
-				startTime := time.Now()
+	path = "basename_tablename.jsonl"
+	expectedBase, expectedName = "basename", "tablename"
+	actualBase, actualName, err = analyse.ExtractName(path)
+	assert.NoError(t, err)
 
-				for n := 0; n < b.N; n++ {
-					cols = analyse.BuildColumnMetric(data, cols)
-					require.NoError(b, err)
-				}
-				b.StopTimer()
+	assert.Equal(t, expectedBase, actualBase)
+	assert.Equal(t, expectedName, actualName)
 
-				elapsed := time.Since(startTime)
-				valuesPerSecond := float64(numValues*b.N) / elapsed.Seconds()
-				b.ReportMetric(valuesPerSecond, "lines/s")
-			})
-		}
+	invalidPath := ""
+
+	_, _, err = analyse.ExtractName(invalidPath)
+	if !errors.Is(err, analyse.ErrNonExtractibleValue) {
+		t.Errorf("expected error %v, but got %v", analyse.ErrNonExtractibleValue, err)
 	}
 }
+
+func TestBaseIsUnique(t *testing.T) {
+	t.Parallel()
+
+	inputList := []string{
+		"/data/somewhere/BASE_test.jsonl",
+		"/data/somewhere/BASE3221_test.jsonl",
+	}
+
+	err := analyse.BaseIsUnique(inputList)
+	assert.ErrorIs(t, err, analyse.ErrNonUniqueBase)
+}
+
+// Helper functions
 
 func loadYAML(t *testing.T, path string) model.Base {
 	t.Helper()
@@ -207,17 +214,6 @@ func getText(t *testing.T, outputPath string) string {
 	output = buf.String()
 
 	return output
-}
-
-// UTILS FUNCTIONS.
-
-// DeepEqual two model.Base.
-func EqualBase(base1, base2 model.Base) (bool, string) {
-	if !reflect.DeepEqual(base1, base2) {
-		return false, fmt.Sprintf("base is different : %s \n \n %s", valast.String(base1), valast.String(base2))
-	}
-
-	return true, ""
 }
 
 func removeSampleFromBase(base model.Base) model.Base {
@@ -275,56 +271,11 @@ func removeSampleFromStrings(rimoString string) string {
 	return rimoString
 }
 
-// TESTS .......
-
-func TestGetBaseName(t *testing.T) {
-	t.Helper()
-	t.Parallel()
-
-	path := "path/to/dir/basename_tablename.jsonl"
-	expected := "basename"
-
-	if baseName, err := analyse.GetBaseName(path); baseName != expected || err != nil {
-		t.Errorf("GetBaseName(%q) = (%q, %v), expected (%q, %v)", path, baseName, err, expected, nil)
+// DeepEqual two model.Base.
+func EqualBase(base1, base2 model.Base) (bool, string) {
+	if !reflect.DeepEqual(base1, base2) {
+		return false, fmt.Sprintf("base is different : %s \n \n %s", valast.String(base1), valast.String(base2))
 	}
 
-	path2 := "basename_tablename.jsonl"
-	expected2 := "basename"
-
-	if baseName, err := analyse.GetBaseName(path2); baseName != expected2 || err != nil {
-		t.Errorf("GetBaseName(%q) = (%q, %v), expected (%q, %v)", path2, baseName, err, expected2, nil)
-	}
-
-	invalidPath := ""
-
-	_, err := analyse.GetBaseName(invalidPath)
-	if !errors.Is(err, analyse.ErrNonExtractibleValue) {
-		t.Errorf("expected error %v, but got %v", analyse.ErrNonExtractibleValue, err)
-	}
-}
-
-func TestGetTableName(t *testing.T) {
-	t.Helper()
-	t.Parallel()
-
-	path := "path/to/dir/basename_tablename.jsonl"
-	expected := "tablename"
-
-	if tableName, err := analyse.GetTableName(path); tableName != expected || err != nil {
-		t.Errorf("GetTableName(%q) = (%q, %v), expected (%q, %v)", path, tableName, err, expected, nil)
-	}
-
-	path2 := "basename_tablename.jsonl"
-	expected2 := "tablename"
-
-	if tableName, err := analyse.GetTableName(path2); tableName != expected2 || err != nil {
-		t.Errorf("GetTableName(%q) = (%q, %v), expected (%q, %v)", path2, tableName, err, expected2, nil)
-	}
-
-	invalidPath := ""
-
-	_, err := analyse.GetTableName(invalidPath)
-	if !errors.Is(err, analyse.ErrNonExtractibleValue) {
-		t.Errorf("expected error %v, but got %v", analyse.ErrNonExtractibleValue, err)
-	}
+	return true, ""
 }

@@ -59,8 +59,9 @@ type (
 // RIMO YAML metrics.
 type (
 	GenericMetric struct {
-		Count  int64         `json:"count"  jsonschema:"required" yaml:"count"`
-		Unique int64         `json:"unique" jsonschema:"required" yaml:"unique"`
+		Count  int           `json:"count"  jsonschema:"required" yaml:"count"`
+		Empty  int           `json:"empty"  jsonschema:"required" yaml:"empty"`
+		Unique int           `json:"unique" jsonschema:"required" yaml:"unique"`
 		Sample []interface{} `json:"sample" jsonschema:"required" yaml:"sample"`
 	}
 	StringMetric struct {

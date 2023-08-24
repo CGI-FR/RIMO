@@ -9,13 +9,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 721
             sample:
-                - 601
-                - 25
-                - 345
-                - 110
-                - 654
+                - 195
+                - 462
+                - 79
+                - 7
+                - 262
           numericMetric:
             min: 1
             max: 721
@@ -27,13 +28,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 111
             sample:
+                - 23
+                - 24
+                - 24
                 - 95
-                - 88
-                - 97
-                - 64
-                - 29
+                - 86
           numericMetric:
             min: 5
             max: 190
@@ -45,13 +47,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 103
             sample:
-                - 110
-                - 56
-                - 160
-                - 53
-                - 38
+                - 130
+                - 94
+                - 90
+                - 107
+                - 67
           numericMetric:
             min: 5
             max: 230
@@ -63,13 +66,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 6
             sample:
-                - 6
-                - 6
-                - 5
                 - 1
+                - 1
+                - 2
                 - 6
+                - 2
           numericMetric:
             min: 1
             max: 6
@@ -81,13 +85,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 94
             sample:
-                - 59
-                - 116
-                - 66
-                - 101
-                - 58
+                - 55
+                - 20
+                - 20
+                - 20
+                - 85
           numericMetric:
             min: 1
             max: 255
@@ -99,6 +104,7 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 2
             sample:
                 - "False"
@@ -121,55 +127,56 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 800
             sample:
-                - Simipour
-                - Marill
-                - Archeops
-                - Stantler
-                - Spinda
+                - Kadabra
+                - Igglybuff
+                - Vanillish
+                - Lapras
+                - Darumaka
           stringMetric:
             mostFrequentLen:
                 - length: 7
                   freq: 0.25375
                   sample:
-                    - Pansage
-                    - Suicune
-                    - Ivysaur
-                    - Snorunt
-                    - Koffing
+                    - Wailmer
+                    - Rhyhorn
+                    - Altaria
+                    - Sableye
+                    - Darkrai
                 - length: 8
                   freq: 0.20125
                   sample:
-                    - Greninja
-                    - Cobalion
-                    - Mime Jr.
-                    - Slurpuff
-                    - Greninja
+                    - Simisage
+                    - Gigalith
+                    - Froslass
+                    - Sunflora
+                    - Ducklett
                 - length: 6
                   freq: 0.1575
                   sample:
-                    - Skrelp
-                    - Marill
-                    - Vulpix
-                    - Lairon
-                    - Golbat
+                    - Seadra
+                    - Pidgey
+                    - Feebas
+                    - Kirlia
+                    - Celebi
                 - length: 9
                   freq: 0.14
                   sample:
-                    - Clawitzer
-                    - Alomomola
-                    - Diggersby
-                    - Azumarill
-                    - Mightyena
+                    - Chikorita
+                    - Wobbuffet
+                    - Volcanion
+                    - Poliwhirl
+                    - Heliolisk
                 - length: 10
                   freq: 0.06
                   sample:
-                    - Chesnaught
-                    - Escavalier
-                    - Forretress
-                    - Lickilicky
-                    - Whirlipede
+                    - Barbaracle
+                    - Misdreavus
+                    - Gothitelle
+                    - Hitmonchan
+                    - Kricketune
             leastFrequentLen:
                 - length: 24
                   freq: 0.00125
@@ -199,13 +206,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 105
             sample:
-                - 10
-                - 165
-                - 122
-                - 74
-                - 129
+                - 77
+                - 67
+                - 87
+                - 103
+                - 110
           numericMetric:
             min: 10
             max: 194
@@ -217,13 +225,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 92
             sample:
-                - 77
-                - 53
-                - 40
-                - 135
-                - 90
+                - 89
+                - 128
+                - 38
+                - 86
+                - 60
           numericMetric:
             min: 20
             max: 230
@@ -235,13 +244,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 108
             sample:
-                - 62
-                - 72
-                - 92
-                - 35
-                - 145
+                - 91
+                - 135
+                - 20
+                - 74
+                - 125
           numericMetric:
             min: 5
             max: 180
@@ -253,13 +263,14 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 200
             sample:
-                - 515
-                - 302
-                - 236
-                - 555
-                - 385
+                - 328
+                - 180
+                - 355
+                - 488
+                - 292
           numericMetric:
             min: 180
             max: 780
@@ -271,31 +282,32 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 18
             sample:
-                - Dragon
-                - Steel
-                - Dragon
-                - Ice
-                - Grass
+                - Rock
+                - Fairy
+                - Flying
+                - Flying
+                - Dark
           stringMetric:
             mostFrequentLen:
                 - length: 5
                   freq: 0.3225
                   sample:
+                    - Grass
+                    - Water
                     - Fairy
                     - Ghost
                     - Steel
-                    - Grass
-                    - Water
                 - length: 6
                   freq: 0.2425
                   sample:
+                    - Flying
                     - Normal
                     - Poison
                     - Ground
                     - Dragon
-                    - Flying
                 - length: 4
                   freq: 0.15875
                   sample:
@@ -324,35 +336,35 @@ tables:
           confidential: null
           mainMetric:
             count: 800
+            empty: 0
             unique: 19
             sample:
-                - Bug
-                - Psychic
-                - Fire
                 - Fairy
+                - Electric
+                - Fire
+                - Grass
                 - Psychic
           stringMetric:
             mostFrequentLen:
                 - length: 0
                   freq: 0.4825
-                  sample:
-                    - ""
+                  sample: []
                 - length: 6
                   freq: 0.235
                   sample:
-                    - Poison
                     - Flying
                     - Dragon
                     - Ground
                     - Normal
+                    - Poison
                 - length: 5
                   freq: 0.1225
                   sample:
-                    - Fairy
-                    - Grass
                     - Steel
                     - Water
                     - Ghost
+                    - Fairy
+                    - Grass
                 - length: 4
                   freq: 0.0575
                   sample:
@@ -368,8 +380,8 @@ tables:
                 - length: 8
                   freq: 0.04
                   sample:
-                    - Electric
                     - Fighting
+                    - Electric
                 - length: 7
                   freq: 0.04125
                   sample:
