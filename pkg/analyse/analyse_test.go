@@ -113,9 +113,9 @@ func compareObjectOutput(t *testing.T, outputPath string, testPath string) {
 
 func BenchmarkAnalyse(b *testing.B) {
 	for _, numLines := range []int{100, 1000, 10000, 100000} {
-		inputPath := fmt.Sprintf("./testdata/benchmark/mixed/%d_input.jsonl", numLines)
+		inputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%d_input.jsonl", numLines))
 		inputList := []string{inputPath}
-		outputPath := fmt.Sprintf("./testdata/benchmark/mixed/%d_output.yaml", numLines)
+		outputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%d_output.yaml", numLines))
 
 		b.Run(fmt.Sprintf("numLines=%d", numLines), func(b *testing.B) {
 			b.ResetTimer()
