@@ -29,9 +29,9 @@ import (
 func TestBooleanMetric(t *testing.T) {
 	t.Parallel()
 
-	values := []interface{}{true, true, false, false}
+	values := []interface{}{true, true, nil, false}
 	expectedMetric := model.BoolMetric{
-		TrueRatio: float64(1) / float64(2),
+		TrueRatio: float64(2) / float64(3),
 	}
 
 	actualMetric := model.BoolMetric{} //nolint:exhaustruct

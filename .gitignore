@@ -4,9 +4,10 @@ bin
 *.log
 .DS_Store
 
-/testdata/data*/data_output.yaml
+testdata/data*/data_output.yaml
 
-/testdata/benchmark/**/*.jsonl
-/testdata/benchmark/**/*.yaml
+testdata/benchmark/**/*.jsonl
+testdata/benchmark/**/*.yaml
 
 test/suites/cli/rimo.schema.json
+test/suites/testdata/data1/output/data.yaml
