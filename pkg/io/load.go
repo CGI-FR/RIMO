@@ -15,11 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-<<<<<<< HEAD:pkg/io/load.go
 package io
-=======
-package analyse
->>>>>>> origin:pkg/analyse/load.go
 
 import (
 	"bufio"
