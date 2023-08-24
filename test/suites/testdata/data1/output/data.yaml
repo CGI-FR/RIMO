@@ -1,6 +1,6 @@
-database: data1
+database: data
 tables:
-    - name: testcase
+    - name: input
       columns:
         - name: address
           type: string
@@ -12,11 +12,11 @@ tables:
             empty: 0
             unique: 10
             sample:
-                - 2035 Simmons Islands Heatherchester, IN 46152
+                - PSC 4713, Box 9649 APO AA 43433
                 - 9038 Frye Ramp South Cheryltown, CT 54262
-                - 095 Jennifer Turnpike Castrobury, NY 98111
-                - 2035 Simmons Islands Heatherchester, IN 46152
-                - 0301 Amy Grove Apt. 325 Janefort, MA 84102
+                - 25545 Cole Court Newtonfurt, KY 13882
+                - 06210 David Court South Kimberly, IL 10236
+                - 536 Robinson Estates Austinside, NV 69535
           stringMetric:
             mostFrequentLen:
                 - length: 42
@@ -61,11 +61,11 @@ tables:
             empty: 0
             unique: 9
             sample:
-                - 45
-                - 61
-                - 47
                 - 35
-                - 45
+                - 73
+                - 73
+                - 80
+                - 73
           numericMetric:
             min: 29
             max: 95
@@ -80,21 +80,21 @@ tables:
             empty: 0
             unique: 10
             sample:
-                - "2014-09-09"
+                - "2003-10-11"
                 - "2022-04-23"
-                - "2004-07-04"
-                - "2013-06-11"
-                - "2013-06-11"
+                - "2001-08-23"
+                - "2001-08-23"
+                - "2003-10-11"
           stringMetric:
             mostFrequentLen:
                 - length: 10
                   freq: 1
                   sample:
-                    - "2013-06-11"
-                    - "2001-08-23"
-                    - "2014-09-09"
+                    - "2022-04-23"
+                    - "2004-07-04"
+                    - "2004-07-04"
+                    - "2005-05-10"
                     - "2014-07-24"
-                    - "2011-07-13"
             leastFrequentLen: []
         - name: phone
           type: string
@@ -106,20 +106,20 @@ tables:
             empty: 0
             unique: 10
             sample:
-                - "7795418893"
-                - (330)616-7639x7810
-                - 001-958-985-3039
+                - 001-845-854-2110
+                - +1-407-997-8293x68130
+                - (517)819-3454
+                - 001-845-854-2110
                 - 260-587-0590
-                - 828-755-3826
           stringMetric:
             mostFrequentLen:
                 - length: 16
                   freq: 0.4
                   sample:
+                    - 001-845-854-2110
                     - 001-533-758-7269
                     - 001-958-985-3039
                     - 001-866-271-0116
-                    - 001-845-854-2110
                 - length: 12
                   freq: 0.2
                   sample:

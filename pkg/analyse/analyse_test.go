@@ -1,3 +1,20 @@
+// Copyright (C) 2023 CGI France
+//
+// This file is part of RIMO.
+//
+// RIMO is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// RIMO is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
+
 package analyse_test
 
 import (
@@ -115,19 +132,17 @@ func BenchmarkAnalyse(b *testing.B) {
 	for _, numLines := range []int{100, 1000, 10000, 100000} {
 		inputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%d_input.jsonl", numLines))
 		inputList := []string{inputPath}
-		outputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%d_output.yaml", numLines))
+		outputPath := filepath.Join(dataDir, "benchmark/mixed/")
 
 		b.Run(fmt.Sprintf("numLines=%d", numLines), func(b *testing.B) {
-			b.ResetTimer()
 			startTime := time.Now()
 
+			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
-				base, err := analyse.Build(inputList)
-				require.NoError(b, err)
-
-				err = io.Export(base, outputPath)
+				err := analyse.Orchestrator(inputList, outputPath)
 				require.NoError(b, err)
 			}
+			b.StopTimer()
 
 			elapsed := time.Since(startTime)
 			linesPerSecond := float64(numLines*b.N) / elapsed.Seconds()

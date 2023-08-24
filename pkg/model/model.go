@@ -1,9 +1,25 @@
+// Copyright (C) 2023 CGI France
+//
+// This file is part of RIMO.
+//
+// RIMO is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// RIMO is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
+
 package model
 
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/invopop/jsonschema"
 )
@@ -86,28 +102,11 @@ type (
 	}
 )
 
-// ExportBaseSchema exports the YAML schema for the Base struct to the current folder.
-func ExportSchema() error {
-	// Marshal the struct into a JSON string
-	s := jsonschema.Reflect(&Base{}) //nolint:exhaustruct
-
-	schema, err := json.MarshalIndent(s, "", "  ")
+func GetJSONSchema() (string, error) {
+	resBytes, err := json.MarshalIndent(jsonschema.Reflect(&Base{}), "", "  ") //nolint:exhaustruct
 	if err != nil {
-		return fmt.Errorf("error marshalling JSON schema: %w", err)
+		return "", fmt.Errorf("couldn't unmarshall Base in JSON : %w", err)
 	}
 
-	// Create a new file for the JSON schema
-	file, err := os.Create("rimo-schema.json")
-	if err != nil {
-		return fmt.Errorf("error creating JSON schema file: %w", err)
-	}
-	defer file.Close()
-
-	// Write the JSON data to the file
-	_, err = file.Write(schema)
-	if err != nil {
-		return fmt.Errorf("error writing JSON data to file: %w", err)
-	}
-
-	return nil
+	return string(resBytes), nil
 }

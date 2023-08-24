@@ -9,3 +9,4 @@ bin
 /testdata/benchmark/**/*.jsonl
 /testdata/benchmark/**/*.yaml
 
+test/suites/cli/rimo.schema.json

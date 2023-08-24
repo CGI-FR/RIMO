@@ -231,13 +231,13 @@ targets:
     doc: "generate bench data"
     depends: ["info"]
     steps:
-      - $: ./pkg/analyse/testdata/benchmark/buildBenchData.sh
+      - $: ./testdata/benchmark/buildBenchData.sh
 
   benchmark:
     doc: "Run all benchmarks"
     depends: ["info", "refresh", "lint", "bench-data"]
     steps:
-      - $: go test -bench=. -benchmem -coverprofile=./={BUILD_DIR}/coverage.txt -covermode=atomic ./...
+      - $: go test -bench=. -benchmem -coverprofile=./={BUILD_DIR}/coverage_benchmark.txt -covermode=atomic ./...
 
   test:
     doc: "Run all tests with coverage"
@@ -256,7 +256,7 @@ targets:
 
   test-int:
     doc: "Run all integration tests"
-    depends: ["info", "refresh", "lint", "test", "release"]
+    depends: ["info", "refresh", "lint", "test", "benchmark", "release"]
     steps:
       - $: venom run test/suites/*
 

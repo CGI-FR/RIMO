@@ -1,3 +1,20 @@
+// Copyright (C) 2023 CGI France
+//
+// This file is part of RIMO.
+//
+// RIMO is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// RIMO is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
+
 package main
 
 import (
@@ -38,22 +55,16 @@ func main() { //nolint:funlen
 	}
 
 	rimoSchemaCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "schema",
-		Short: "Export rimo json schema",
+		Use:   "jsonschema",
+		Short: "Return rimo jsonschema",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			// Print current working directory
-			cwd, err := os.Getwd()
+			jsonschema, err := model.GetJSONSchema()
 			if err != nil {
-				log.Fatal().Msgf("error getting current working directory: %v", err)
+				os.Exit(1)
 			}
 
-			err = model.ExportSchema()
-			if err != nil {
-				log.Fatal().Msgf("error generating rimo schema: %v", err)
-			}
-
-			log.Info().Msgf("rimo schema successfully exported in %s", cwd)
+			fmt.Println(jsonschema)
 		},
 	}
 

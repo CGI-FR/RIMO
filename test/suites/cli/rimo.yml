@@ -6,9 +6,12 @@ testcases:
           rimo analyse ../testdata/data1/ ../testdata/data1/output/
         assertions:
           - result.code ShouldEqual 0
-  - name: rimo schema
+  - name: rimo jsonschema
     steps:
-      - script: |-
-          rimo schema
+      - script: rimo jsonschema > rimo.schema.json
         assertions:
           - result.code ShouldEqual 0
+      - script: diff rimo.schema.json ../../../schema/v1/rimo.schema.json
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldBeEmpty
