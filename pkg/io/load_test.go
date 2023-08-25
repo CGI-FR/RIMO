@@ -15,23 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package analyse_test
+package io_test
 
 import (
-	"fmt"
+	"path/filepath"
 	"testing"
 
-	"github.com/cgi-fr/rimo/pkg/analyse"
-	"github.com/hexops/valast"
+	"github.com/cgi-fr/rimo/pkg/io"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLoad(t *testing.T) {
-	t.Helper()
 	t.Parallel()
 
-	data, err := analyse.Load(data1Path)
-	require.NoError(t, err)
+	path := filepath.Join(dataDir, "data1/data_input.jsonl")
 
-	fmt.Println(valast.String(data))
+	_, err := io.Load(path)
+	require.NoError(t, err)
 }

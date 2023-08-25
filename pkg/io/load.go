@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package analyse
+package io
 
 import (
 	"bufio"
@@ -37,6 +37,8 @@ var (
 	ErrSameColumn   = errors.New("column found twice in JSON")
 )
 
+type DataMap map[string][]interface{}
+
 // Load .jsonl and return DataMap.
 func Load(inputPath string) (DataMap, error) {
 	file, err := os.Open(inputPath)
@@ -49,13 +51,11 @@ func Load(inputPath string) (DataMap, error) {
 
 	data, err := LoadJSONLines(scanner)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't load %s : %w", inputPath, err)
+		return nil, err
 	}
 
 	return data, nil
 }
-
-type DataMap map[string][]interface{}
 
 // Reads JSON lines  structure: { "col_name1" : value1, "col_name2" : value1, ... }.
 func LoadJSONLines(scanner *bufio.Scanner) (DataMap, error) {

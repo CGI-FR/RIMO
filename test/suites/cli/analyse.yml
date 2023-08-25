@@ -1,8 +1,0 @@
-name: first run rimo
-testcases:
-  - name: rimo analyse pipeline
-    steps:
-      - script: |-
-          rimo analyse ../testdata/data1/ ../testdata/data1/
-        assertions:
-          - result.code ShouldEqual 0

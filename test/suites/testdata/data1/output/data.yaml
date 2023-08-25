@@ -9,21 +9,22 @@ tables:
           confidential: null
           mainMetric:
             count: 10
+            empty: 0
             unique: 10
             sample:
-                - 38432 Moreno Turnpike Garrettland, TN 72939
-                - 38432 Moreno Turnpike Garrettland, TN 72939
-                - 25545 Cole Court Newtonfurt, KY 13882
+                - PSC 4713, Box 9649 APO AA 43433
                 - 9038 Frye Ramp South Cheryltown, CT 54262
                 - 25545 Cole Court Newtonfurt, KY 13882
+                - 06210 David Court South Kimberly, IL 10236
+                - 536 Robinson Estates Austinside, NV 69535
           stringMetric:
             mostFrequentLen:
                 - length: 42
                   freq: 0.3
                   sample:
-                    - 095 Jennifer Turnpike Castrobury, NY 98111
                     - 06210 David Court South Kimberly, IL 10236
                     - 0301 Amy Grove Apt. 325 Janefort, MA 84102
+                    - 095 Jennifer Turnpike Castrobury, NY 98111
                 - length: 41
                   freq: 0.2
                   sample:
@@ -57,13 +58,14 @@ tables:
           confidential: null
           mainMetric:
             count: 10
+            empty: 0
             unique: 9
             sample:
+                - 35
                 - 73
-                - 95
-                - 45
-                - 29
-                - 47
+                - 73
+                - 80
+                - 73
           numericMetric:
             min: 29
             max: 95
@@ -75,23 +77,24 @@ tables:
           confidential: null
           mainMetric:
             count: 10
+            empty: 0
             unique: 10
             sample:
-                - "2004-07-04"
+                - "2003-10-11"
+                - "2022-04-23"
                 - "2001-08-23"
                 - "2001-08-23"
-                - "2013-06-11"
-                - "2001-08-23"
+                - "2003-10-11"
           stringMetric:
             mostFrequentLen:
                 - length: 10
                   freq: 1
                   sample:
+                    - "2022-04-23"
+                    - "2004-07-04"
+                    - "2004-07-04"
                     - "2005-05-10"
-                    - "2011-07-13"
-                    - "2013-06-11"
-                    - "2022-04-23"
-                    - "2022-04-23"
+                    - "2014-07-24"
             leastFrequentLen: []
         - name: phone
           type: string
@@ -100,22 +103,23 @@ tables:
           confidential: null
           mainMetric:
             count: 10
+            empty: 0
             unique: 10
             sample:
-                - 001-958-985-3039
+                - 001-845-854-2110
+                - +1-407-997-8293x68130
                 - (517)819-3454
-                - (517)819-3454
-                - 001-866-271-0116
-                - (517)819-3454
+                - 001-845-854-2110
+                - 260-587-0590
           stringMetric:
             mostFrequentLen:
                 - length: 16
                   freq: 0.4
                   sample:
-                    - 001-958-985-3039
-                    - 001-866-271-0116
                     - 001-845-854-2110
                     - 001-533-758-7269
+                    - 001-958-985-3039
+                    - 001-866-271-0116
                 - length: 12
                   freq: 0.2
                   sample:

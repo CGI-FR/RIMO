@@ -2,11 +2,16 @@
 
 ## Description
 
-Rimo contains a series of tools that helps to create a *masking.yaml* for [PIMO](https://github.com/CGI-FR/PIMO).
+Rimo contains tools that helps creating a *masking.yaml* for [PIMO](https://github.com/CGI-FR/PIMO).
 <!-- It works as a 6 steps process : -->
 <!-- ![rimo steps](.github/img/rimo_steps.png "rimo steps") -->
-
-<!-- 1. `analyse` : extract meaningful information on database from *.jsonl* -->
+<!--
+1. `gather` : orchestrate LINO to extract table of the database into a *.jsonl* file
+2. `analyse` : extract meaningful information on database from *.jsonl*
+3. `export` : dump data into an *Excel* file which serves as a configuration means
+4. `import` : load, store and verify inputted data of the *Excel* file into a *.yaml* file
+5. `build` : create a *pimo_masking.yaml* from *.yaml*
+6. `script` : build a bash script to execute pipeline for PIMO -->
 
 <!-- ## Installation
 `rimo` command line work in relative project's directory, like `git` or `docker` -->
@@ -14,25 +19,30 @@ Rimo contains a series of tools that helps to create a *masking.yaml* for [PIMO]
 ## Usage
 
 ### `rimo analyse`
+### `rimo analyse`
 
 ```console
-rimo analyse input output
+rimo analyse [inputDir] [outputDir]
 ```
 
-- `input` : path to a directory containing to *jsonl* files
-- `output` : path to a directory where output the *.yaml* file
+- `inputDir` : path to a directory containing *jsonl* files.
+- `output` : path to a directory where *rimo.yaml* will be created.
 
-**input.jsonl** is a JSON single line that contains a pair of (column_name, value) for every row of the database table
+**inputDir** must contain .jsonl files named basename_tablename.jsonl and respecting this format :
 
-**output.yaml** contain various metrics on table's columns and a small default configuration for PIMO. An example can be found in *src/unit_test/testcase_output.yaml*.
+```json
+{"colName1": value1, "colName2": value2 }
+{"colName1": value2, "colName2": value2 }
+...
+```
 
-### `rimo jsonschema`
+such files can be generated using [LINO](https://github.com/CGI-FR/LINO)
 
-Generate the json schema of rimo.
+**outputDir** will generate basename.yaml in output directory containing various metrics. An example can be found in *testdata/data1/data_expected.yaml*.
 
 ## Tests
 
-To run tests execute `neon test-int`.
+Run `neon test-int` to execute unit-test and Venom test.
 
 ## Project status
 
@@ -41,21 +51,22 @@ In active development
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-`testcase_data.jsonl` in *tests/data* is generated using Faker and does contain any real information.
 
 ## License
 
 Copyright (C) 2023 CGI France
 
-PIMO is free software: you can redistribute it and/or modify
+This file is part of RIMO.
+
+RIMO is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-PIMO is distributed in the hope that it will be useful,
+RIMO is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
- along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
+along with RIMO.  If not, see <http://www.gnu.org/licenses/>.

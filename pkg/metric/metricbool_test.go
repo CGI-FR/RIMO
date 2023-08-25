@@ -15,32 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package analyse
+package metric_test
 
 import (
-	"fmt"
-	"os"
+	"testing"
 
+	"github.com/cgi-fr/rimo/pkg/metric"
 	"github.com/cgi-fr/rimo/pkg/model"
-	"gopkg.in/yaml.v3"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func Export(base model.Base, outputPath string) error {
-	// Create output file.
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		return fmt.Errorf("failed to create output file: %w", err)
-	}
-	defer outputFile.Close()
+func TestBooleanMetric(t *testing.T) {
+	t.Parallel()
 
-	// Encode Base to YAML.
-	encoder := yaml.NewEncoder(outputFile)
-	defer encoder.Close()
-
-	err = encoder.Encode(base)
-	if err != nil {
-		return fmt.Errorf("failed to encode Base to YAML: %w", err)
+	values := []interface{}{true, true, nil, false}
+	expectedMetric := model.BoolMetric{
+		TrueRatio: float64(2) / float64(3),
 	}
 
-	return nil
+	actualMetric := model.BoolMetric{} //nolint:exhaustruct
+	err := metric.SetBoolMetric(values, &actualMetric)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedMetric, actualMetric)
 }
