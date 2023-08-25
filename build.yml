@@ -237,7 +237,7 @@ targets:
     doc: "Run all benchmarks"
     depends: ["info", "refresh", "lint", "bench-data"]
     steps:
-      - $: go test -bench=. -benchmem -coverprofile=./={BUILD_DIR}/coverage_benchmark.txt -covermode=atomic ./...
+      - $: go test -bench=. -benchmem ./... -run=^# -benchtime=30s | tee ./={BUILD_DIR}/benchstats.txt
 
   test:
     doc: "Run all tests with coverage"
