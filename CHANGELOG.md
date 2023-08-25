@@ -16,4 +16,4 @@ Types of changes
 
 ## [0.1.0]
 
-- Added `rimo analyse` command
+- `Added` rimo analyse command
