@@ -1,8 +1,0 @@
-version: "1"
-seed: 1
-masking:
-  - selector:
-      jsonpath: "phoneFR"
-    masks:
-      - add: ""
-      - regex: "0[1-6]( [0-9]{2}){4}"
