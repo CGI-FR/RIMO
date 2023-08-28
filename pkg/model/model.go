@@ -20,6 +20,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/invopop/jsonschema"
 )
@@ -101,6 +102,18 @@ type (
 		TrueRatio float64 `json:"trueRatio" jsonschema:"required" yaml:"trueRatio"`
 	}
 )
+
+func (base *Base) SortBase() {
+	for _, table := range base.Tables {
+		sort.Slice(table.Columns, func(i, j int) bool {
+			return table.Columns[i].Name < table.Columns[j].Name
+		})
+	}
+
+	sort.Slice(base.Tables, func(i, j int) bool {
+		return base.Tables[i].Name < base.Tables[j].Name
+	})
+}
 
 func GetJSONSchema() (string, error) {
 	resBytes, err := json.MarshalIndent(jsonschema.Reflect(&Base{}), "", "  ") //nolint:exhaustruct

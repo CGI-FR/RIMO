@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/cgi-fr/rimo/pkg/io"
@@ -111,22 +110,9 @@ func Build(inputList []string) (model.Base, error) {
 		base.Tables = append(base.Tables, table)
 	}
 
-	SortBase(&base)
+	base.SortBase()
 
 	return base, nil
-}
-
-// Sort tables and columns by name.
-func SortBase(base *model.Base) {
-	for i := range base.Tables {
-		sort.Slice(base.Tables[i].Columns, func(j, k int) bool {
-			return base.Tables[i].Columns[j].Name < base.Tables[i].Columns[k].Name
-		})
-	}
-
-	sort.Slice(base.Tables, func(i, j int) bool {
-		return base.Tables[i].Name < base.Tables[j].Name
-	})
 }
 
 // Return a list of column from a jsonl file.
