@@ -39,7 +39,7 @@ func SetStringMetric(values []interface{}, metric *model.StringMetric) error {
 
 		stringValue, ok := value.(string)
 		if !ok {
-			return fmt.Errorf("%w : expected numeric found %T: %v", ErrValueType, value, value)
+			return fmt.Errorf("%w : expected string found %T: %v", ErrValueType, value, value)
 		}
 
 		length := len(stringValue)
