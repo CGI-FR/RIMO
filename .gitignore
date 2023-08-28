@@ -11,4 +11,3 @@ testdata/benchmark/**/*.yaml
 
 test/suites/cli/rimo.schema.json
 test/suites/testdata/data1/output/data.yaml
-test/suites/testdata/data1/output/data.yaml
