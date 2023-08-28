@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/metric"
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -43,7 +43,7 @@ func TestColType(t *testing.T) {
 		t.Parallel()
 
 		slice := []interface{}{nil, 2, 3}
-		expected := model.ValueType.Numeric
+		expected := rimo.ColType.Numeric
 
 		actual := metric.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -53,7 +53,7 @@ func TestColType(t *testing.T) {
 		t.Parallel()
 
 		slice := []interface{}{nil, "text", nil}
-		expected := model.ValueType.String
+		expected := rimo.ColType.String
 
 		actual := metric.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -63,7 +63,7 @@ func TestColType(t *testing.T) {
 		t.Parallel()
 
 		slice := []interface{}{nil, true, false}
-		expected := model.ValueType.Bool
+		expected := rimo.ColType.Bool
 
 		actual := metric.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -74,7 +74,7 @@ func TestColType(t *testing.T) {
 		t.Parallel()
 
 		slice := []interface{}{"text", 2, false}
-		expected := model.ValueType.String
+		expected := rimo.ColType.String
 
 		actual := metric.ColType(slice)
 		require.Equal(t, expected, actual)
@@ -84,7 +84,7 @@ func TestColType(t *testing.T) {
 		t.Parallel()
 
 		slice := []interface{}{nil, nil, nil}
-		expected := model.ValueType.Undefined
+		expected := rimo.ColType.Undefined
 
 		actual := metric.ColType(slice)
 		require.Equal(t, expected, actual)

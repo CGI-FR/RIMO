@@ -20,10 +20,10 @@ package metric
 import (
 	"fmt"
 
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 )
 
-func SetNumericMetric(values []interface{}, metric *model.NumericMetric) error {
+func SetNumericMetric(values []interface{}, metric *rimo.NumericMetric) error {
 	nonNullCount := 0
 
 	value := GetFirstValue(values)

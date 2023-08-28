@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/cgi-fr/rimo/pkg/model/base",
+  "$id": "https://github.com/cgi-fr/rimo/pkg/rimo/base",
   "$ref": "#/$defs/Base",
   "$defs": {
     "Base": {

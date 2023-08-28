@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package model
+package rimo
 
 import (
 	"encoding/json"
@@ -25,8 +25,6 @@ import (
 	"github.com/invopop/jsonschema"
 )
 
-type RIMOType string
-
 const (
 	SampleSize              int = 5
 	MostFrequentLenSize     int = 5
@@ -35,11 +33,13 @@ const (
 	LeastFrequentSampleSize int = 5
 )
 
-var ValueType = struct { //nolint:gochecknoglobals
-	String    RIMOType
-	Numeric   RIMOType
-	Bool      RIMOType
-	Undefined RIMOType
+type ValueType string
+
+var ColType = struct { //nolint:gochecknoglobals
+	String    ValueType
+	Numeric   ValueType
+	Bool      ValueType
+	Undefined ValueType
 }{
 	String:    "string",
 	Numeric:   "numeric",
@@ -61,7 +61,7 @@ type (
 
 	Column struct {
 		Name         string        `json:"name"         jsonschema:"required" yaml:"name"`
-		Type         RIMOType      `json:"type"         jsonschema:"required" validate:"oneof=string numeric boolean" yaml:"type"` //nolint:lll
+		Type         ValueType     `json:"type"         jsonschema:"required" validate:"oneof=string numeric boolean" yaml:"type"` //nolint:lll
 		Concept      string        `json:"concept"      jsonschema:"required" yaml:"concept"`
 		Constraint   []string      `json:"constraint"   jsonschema:"required" yaml:"constraint"`
 		Confidential *bool         `json:"confidential" jsonschema:"required" yaml:"confidential"`
@@ -103,6 +103,22 @@ type (
 	}
 )
 
+func GetJSONSchema() (string, error) {
+	resBytes, err := json.MarshalIndent(jsonschema.Reflect(&Base{}), "", "  ") //nolint:exhaustruct
+	if err != nil {
+		return "", fmt.Errorf("couldn't unmarshall Base in JSON : %w", err)
+	}
+
+	return string(resBytes), nil
+}
+
+func NewBase(name string) *Base {
+	return &Base{
+		Name:   name,
+		Tables: make([]Table, 0),
+	}
+}
+
 func (base *Base) SortBase() {
 	for _, table := range base.Tables {
 		sort.Slice(table.Columns, func(i, j int) bool {
@@ -115,11 +131,18 @@ func (base *Base) SortBase() {
 	})
 }
 
-func GetJSONSchema() (string, error) {
-	resBytes, err := json.MarshalIndent(jsonschema.Reflect(&Base{}), "", "  ") //nolint:exhaustruct
-	if err != nil {
-		return "", fmt.Errorf("couldn't unmarshall Base in JSON : %w", err)
+func (base *Base) AddColumn(column Column, tableName string) {
+	// Check if the table already exists in the base
+	for _, table := range base.Tables {
+		if table.Name == tableName {
+			// Add the column to the existing table
+			table.Columns = append(table.Columns, column)
+
+			return
+		}
 	}
 
-	return string(resBytes), nil
+	// If the table does not exist, create a new table and add it to the base
+	table := Table{Name: tableName, Columns: []Column{column}}
+	base.Tables = append(base.Tables, table)
 }

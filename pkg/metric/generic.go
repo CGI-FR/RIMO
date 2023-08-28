@@ -22,13 +22,13 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 )
 
 var ErrEmptySlice = errors.New("slice is empty")
 
-func SetGenericMetric(values []interface{}, metric *model.GenericMetric) error {
-	sample, err := Sample(values, model.SampleSize)
+func SetGenericMetric(values []interface{}, metric *rimo.GenericMetric) error {
+	sample, err := Sample(values, rimo.SampleSize)
 	if err != nil {
 		return fmt.Errorf("error computing sample: %w", err)
 	}

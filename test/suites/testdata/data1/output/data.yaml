@@ -12,11 +12,11 @@ tables:
             empty: 0
             unique: 10
             sample:
-                - PSC 4713, Box 9649 APO AA 43433
-                - 9038 Frye Ramp South Cheryltown, CT 54262
-                - 25545 Cole Court Newtonfurt, KY 13882
+                - 38432 Moreno Turnpike Garrettland, TN 72939
+                - 275 Stone Ridges Suite 885 East Aliciafurt, MH 15407
                 - 06210 David Court South Kimberly, IL 10236
-                - 536 Robinson Estates Austinside, NV 69535
+                - 9038 Frye Ramp South Cheryltown, CT 54262
+                - 2035 Simmons Islands Heatherchester, IN 46152
           stringMetric:
             mostFrequentLen:
                 - length: 42
@@ -61,11 +61,11 @@ tables:
             empty: 0
             unique: 9
             sample:
-                - 35
-                - 73
-                - 73
+                - 65
+                - 95
                 - 80
-                - 73
+                - 80
+                - 45
           numericMetric:
             min: 29
             max: 95
@@ -81,20 +81,20 @@ tables:
             unique: 10
             sample:
                 - "2003-10-11"
-                - "2022-04-23"
-                - "2001-08-23"
-                - "2001-08-23"
-                - "2003-10-11"
+                - "2014-09-09"
+                - "2014-09-09"
+                - "2013-06-11"
+                - "2013-06-11"
           stringMetric:
             mostFrequentLen:
                 - length: 10
                   freq: 1
                   sample:
-                    - "2022-04-23"
-                    - "2004-07-04"
-                    - "2004-07-04"
-                    - "2005-05-10"
-                    - "2014-07-24"
+                    - "2010-11-18"
+                    - "2003-10-11"
+                    - "2010-11-18"
+                    - "2011-07-13"
+                    - "2003-10-11"
             leastFrequentLen: []
         - name: phone
           type: string
@@ -106,11 +106,11 @@ tables:
             empty: 0
             unique: 10
             sample:
-                - 001-845-854-2110
-                - +1-407-997-8293x68130
-                - (517)819-3454
-                - 001-845-854-2110
+                - (330)616-7639x7810
                 - 260-587-0590
+                - 001-958-985-3039
+                - +1-407-997-8293x68130
+                - 001-866-271-0116
           stringMetric:
             mostFrequentLen:
                 - length: 16

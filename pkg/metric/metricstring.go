@@ -22,10 +22,10 @@ import (
 	"math"
 	"sort"
 
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 )
 
-func SetStringMetric(values []interface{}, metric *model.StringMetric) error {
+func SetStringMetric(values []interface{}, metric *rimo.StringMetric) error {
 	// Store strings by length.
 	lenMap := make(map[int][]string)
 	// Count length occurrence.
@@ -63,14 +63,14 @@ func SetStringMetric(values []interface{}, metric *model.StringMetric) error {
 		lenLeastFreqLen[i] = sortedLength[index]
 	}
 
-	leastFreqLen, err := buildFreqLen(lenLeastFreqLen, lenMap, lenCounter, totalCount, model.LeastFrequentSampleSize)
+	leastFreqLen, err := buildFreqLen(lenLeastFreqLen, lenMap, lenCounter, totalCount, rimo.LeastFrequentSampleSize)
 	if err != nil {
 		return fmt.Errorf("error building least frequent length : %w", err)
 	}
 
 	metric.LeastFreqLen = leastFreqLen
 
-	mostFreqLen, err := buildFreqLen(lenMostFreqLen, lenMap, lenCounter, totalCount, model.MostFrequentSampleSize)
+	mostFreqLen, err := buildFreqLen(lenMostFreqLen, lenMap, lenCounter, totalCount, rimo.MostFrequentSampleSize)
 	if err != nil {
 		return fmt.Errorf("error building most frequent length : %w", err)
 	}
@@ -80,8 +80,8 @@ func SetStringMetric(values []interface{}, metric *model.StringMetric) error {
 	return nil
 }
 
-func buildFreqLen(freqLen []int, lenMap map[int][]string, lenCounter map[int]int, totalCount int, sampleLen int) ([]model.LenFreq, error) { //nolint
-	lenFreqs := make([]model.LenFreq, len(freqLen))
+func buildFreqLen(freqLen []int, lenMap map[int][]string, lenCounter map[int]int, totalCount int, sampleLen int) ([]rimo.LenFreq, error) { //nolint
+	lenFreqs := make([]rimo.LenFreq, len(freqLen))
 
 	for index, len := range freqLen {
 		// Get unique value from lenMap[len]..
@@ -90,7 +90,7 @@ func buildFreqLen(freqLen []int, lenMap map[int][]string, lenCounter map[int]int
 			return lenFreqs, fmt.Errorf("error getting sample for length %v : %w", len, err)
 		}
 
-		lenFreqs[index] = model.LenFreq{
+		lenFreqs[index] = rimo.LenFreq{
 			Length: len,
 			Freq:   GetFrequency(lenCounter[len], totalCount),
 			Sample: sample,
@@ -101,13 +101,13 @@ func buildFreqLen(freqLen []int, lenMap map[int][]string, lenCounter map[int]int
 }
 
 func getFreqSize(nunique int) (int, int) {
-	mostFrequentLenSize := model.MostFrequentLenSize
-	leastFrequentLenSize := model.LeastFrequentLenSize
+	mostFrequentLenSize := rimo.MostFrequentLenSize
+	leastFrequentLenSize := rimo.LeastFrequentLenSize
 
-	if nunique < model.MostFrequentLenSize+model.LeastFrequentLenSize {
+	if nunique < rimo.MostFrequentLenSize+rimo.LeastFrequentLenSize {
 		// Modify MostFrequentLenSize and LeastFrequentLenSize to fit the number of unique length.
 		// Should keep ratio of MostFrequentLenSize and LeastFrequentLenSize.
-		ratio := float64(model.MostFrequentLenSize) / float64(model.MostFrequentLenSize+model.LeastFrequentLenSize)
+		ratio := float64(rimo.MostFrequentLenSize) / float64(rimo.MostFrequentLenSize+rimo.LeastFrequentLenSize)
 		mostFrequentLenSize = int(math.Round(float64(nunique) * ratio))
 		leastFrequentLenSize = nunique - mostFrequentLenSize
 	}

@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +31,7 @@ const (
 	dataDir = "../../testdata/benchmark"
 )
 
-var result model.Base //nolint:gochecknoglobals // used in benchmark to avoid misleading compiler optimisation.
+var result rimo.Base //nolint:gochecknoglobals // used in benchmark to avoid misleading compiler optimisation.
 
 func BenchmarkMetric(b *testing.B) {
 	listNumValues := []int{100, 1000, 10000}
@@ -44,7 +44,7 @@ func BenchmarkMetric(b *testing.B) {
 			b.Run(fmt.Sprintf("type= %s, numValues=%d", dataType, numValues), func(b *testing.B) {
 				startTime := time.Now()
 
-				base := model.Base{} //nolint:exhaustruct
+				base := rimo.Base{} //nolint:exhaustruct
 				var err error
 
 				for n := 0; n < b.N; n++ {

@@ -32,7 +32,7 @@ import (
 
 	"github.com/cgi-fr/rimo/pkg/analyse"
 	"github.com/cgi-fr/rimo/pkg/io"
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/hexops/valast"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -115,7 +115,7 @@ func compareObjectOutput(t *testing.T, outputPath string, testPath string) {
 	actualOutputBase := loadYAML(t, outputPath)
 	expectedOutputBase := loadYAML(t, testPath)
 
-	// Remove sample fields from both model.Base.
+	// Remove sample fields from both rimo.Base.
 	actualOutputBase = removeSampleFromBase(actualOutputBase)
 	expectedOutputBase = removeSampleFromBase(expectedOutputBase)
 
@@ -192,7 +192,7 @@ func TestBaseIsUnique(t *testing.T) {
 
 // Helper functions
 
-func loadYAML(t *testing.T, path string) model.Base {
+func loadYAML(t *testing.T, path string) rimo.Base {
 	t.Helper()
 
 	// Load output file
@@ -201,7 +201,7 @@ func loadYAML(t *testing.T, path string) model.Base {
 
 	decoder := yaml.NewDecoder(file)
 
-	var base model.Base
+	var base rimo.Base
 	err = decoder.Decode(&base)
 
 	if err != nil {
@@ -231,12 +231,12 @@ func getText(t *testing.T, outputPath string) string {
 	return output
 }
 
-func removeSampleFromBase(base model.Base) model.Base {
+func removeSampleFromBase(base rimo.Base) rimo.Base {
 	for tableI, table := range base.Tables {
 		for columnJ, column := range table.Columns {
 			column.MainMetric.Sample = nil
 
-			if column.Type == model.ValueType.String {
+			if column.Type == rimo.ColType.String {
 				for freqLen := range column.StringMetric.MostFreqLen {
 					column.StringMetric.MostFreqLen[freqLen].Sample = nil
 				}
@@ -262,7 +262,7 @@ func removeSampleFromStrings(rimoString string) string {
 
 	var skipLine int
 
-	sampleSizeSkip := model.SampleSize + 1
+	sampleSizeSkip := rimo.SampleSize + 1
 
 	for _, line := range lines {
 		// sample of stringMetric.MostFreqLen and stringMetric.LeastFreqLen may be of different length, skipping when nex
@@ -286,8 +286,8 @@ func removeSampleFromStrings(rimoString string) string {
 	return rimoString
 }
 
-// DeepEqual two model.Base.
-func EqualBase(base1, base2 model.Base) (bool, string) {
+// DeepEqual two rimo.Base.
+func EqualBase(base1, base2 rimo.Base) (bool, string) {
 	if !reflect.DeepEqual(base1, base2) {
 		return false, fmt.Sprintf("base is different : %s \n \n %s", valast.String(base1), valast.String(base2))
 	}

@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/metric"
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,18 +30,18 @@ func TestStringMetric(t *testing.T) {
 	t.Parallel()
 
 	text := []interface{}{"1", "1", "1", "1", "22", "22", "22", "331", "332", "4441"}
-	expectedMetric := model.StringMetric{
-		MostFreqLen: []model.LenFreq{
+	expectedMetric := rimo.StringMetric{
+		MostFreqLen: []rimo.LenFreq{
 			{Length: 1, Freq: 0.4, Sample: []string{"1"}},
 			{Length: 2, Freq: 0.3, Sample: []string{"22"}},
 		},
-		LeastFreqLen: []model.LenFreq{
+		LeastFreqLen: []rimo.LenFreq{
 			{Length: 4, Freq: 0.1, Sample: []string{"4441"}},
 			{Length: 3, Freq: 0.2, Sample: []string{"331", "332"}},
 		},
 	}
 
-	actualMetric := model.StringMetric{} //nolint:exhaustruct
+	actualMetric := rimo.StringMetric{} //nolint:exhaustruct
 
 	err := metric.SetStringMetric(text, &actualMetric)
 	if err != nil {

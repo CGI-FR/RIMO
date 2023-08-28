@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/metric"
-	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -30,11 +30,11 @@ func TestBooleanMetric(t *testing.T) {
 	t.Parallel()
 
 	values := []interface{}{true, true, nil, false}
-	expectedMetric := model.BoolMetric{
+	expectedMetric := rimo.BoolMetric{
 		TrueRatio: float64(2) / float64(3),
 	}
 
-	actualMetric := model.BoolMetric{} //nolint:exhaustruct
+	actualMetric := rimo.BoolMetric{} //nolint:exhaustruct
 	err := metric.SetBoolMetric(values, &actualMetric)
 	require.NoError(t, err)
 
