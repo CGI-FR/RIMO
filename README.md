@@ -31,9 +31,8 @@ rimo analyse [inputDir] [outputDir]
 **inputDir** must contain .jsonl files named basename_tablename.jsonl and respecting this format :
 
 ```json
-{"colName1": value1, "colName2": value2 }
-{"colName1": value2, "colName2": value2 }
-...
+{"colName1": "value1", "colName2": "value2" }
+{"colName1": "value2", "colName2": "value2" }
 ```
 
 such files can be generated using [LINO](https://github.com/CGI-FR/LINO)
