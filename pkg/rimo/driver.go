@@ -7,19 +7,10 @@ func AnalyseBase(reader Reader, writer Writer) error {
 
 	base := NewBase(baseName)
 
-	for reader.Next() { // itère sur les colonnes
-		columnIterator := reader.Value()
-		tableName := columnIterator.TableName()
-		colName := columnIterator.ColumnName()
-		colValues := make([]interface{}, 0)
-
-		for columnIterator.Next() {
-			colValue, err := columnIterator.Value()
-			if err != nil {
-				return fmt.Errorf("failed to get column value : %w", err)
-			}
-
-			colValues = append(colValues, colValue)
+	for reader.Next() { // itère colonne par colonne
+		colValues, colName, tableName, err := reader.Value()
+		if err != nil {
+			return fmt.Errorf("failed to get column value : %w", err)
 		}
 
 		column, err := Analyse(colValues, colName)

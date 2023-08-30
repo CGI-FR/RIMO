@@ -8,14 +8,39 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type FileWriter struct {
-	rimo.Writer
+// Terminal writter interface
+
+type TerminalWriter struct{}
+
+func TerminalWriterFactory() *TerminalWriter {
+	writer := TerminalWriter{}
+
+	return &writer
+}
+
+func (w *TerminalWriter) Export(base *rimo.Base) error {
+	fmt.Printf("%v\n", base)
+
+	return nil
+}
+
+// YAML Writter interface
+
+type YAMLWriter struct {
 	outputPath string
 }
 
-// Write a YAML file from a RIMO base at outputPath.
-func (w *FileWriter) Export(base rimo.Base) error {
-	err := ValidateFilePath(w.outputPath)
+func YAMLWriterFactory(filepath string) *YAMLWriter {
+	writer := YAMLWriter{
+		outputPath: filepath,
+	}
+
+	return &writer
+}
+
+// Write a YAML file from RIMO base at outputPath.
+func (w *YAMLWriter) Export(base *rimo.Base) error {
+	err := ValidateOutputPath(w.outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to validate file path: %w", err)
 	}
