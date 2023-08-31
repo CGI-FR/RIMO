@@ -115,7 +115,9 @@ func (r *TestReader) Value() ([]interface{}, string, string, error) {
 
 // LogWritter
 
-type LogWriter struct{}
+type LogWriter struct {
+	base model.Base
+}
 
 func (w *LogWriter) Export(base *model.Base) error {
 	log.Printf("BASE returned \n \n : %s", valast.String(&base))
@@ -123,17 +125,6 @@ func (w *LogWriter) Export(base *model.Base) error {
 	return nil
 }
 
-// ReturnWriter : return the base object through GetBase() method.
-type ReturnWriter struct {
-	base model.Base
-}
-
-func (w *ReturnWriter) Export(base *model.Base) error {
-	w.base = *base
-
-	return nil
-}
-
-func (w *ReturnWriter) GetBase() model.Base {
+func (w *LogWriter) GetBase() model.Base {
 	return w.base
 }
