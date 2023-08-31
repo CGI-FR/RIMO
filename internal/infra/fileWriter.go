@@ -4,21 +4,21 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/cgi-fr/rimo/pkg/model"
 	"gopkg.in/yaml.v3"
 )
 
 // Terminal writter interface
 
-type TerminalWriter struct{}
+type StdoutWriter struct{}
 
-func TerminalWriterFactory() *TerminalWriter {
-	writer := TerminalWriter{}
+func StdoutWriterFactory() *StdoutWriter {
+	writer := StdoutWriter{}
 
 	return &writer
 }
 
-func (w *TerminalWriter) Export(base *rimo.Base) error {
+func (w *StdoutWriter) Export(base *model.Base) error {
 	fmt.Printf("%v\n", base)
 
 	return nil
@@ -39,7 +39,7 @@ func YAMLWriterFactory(filepath string) *YAMLWriter {
 }
 
 // Write a YAML file from RIMO base at outputPath.
-func (w *YAMLWriter) Export(base *rimo.Base) error {
+func (w *YAMLWriter) Export(base *model.Base) error {
 	err := ValidateOutputPath(w.outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to validate file path: %w", err)
