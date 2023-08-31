@@ -130,9 +130,9 @@ func (r *FilesReader) Value() ([]interface{}, string, string, error) {
 	}
 
 	// colIndex = n : current file have been partially processed
-
+	currentColName := r.colNameMapIndex[r.colIndex]
 	// return values, colName, tableName
-	return r.dataMap[r.colNameMapIndex[r.colIndex]], r.colNameMapIndex[r.colIndex], r.tableName, nil
+	return r.dataMap[currentColName], currentColName, r.tableName, nil
 }
 
 func (r *FilesReader) isBaseUnique() (string, error) {
