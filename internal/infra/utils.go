@@ -41,25 +41,6 @@ func ValidateFilePath(path string) error {
 	return nil
 }
 
-func ValidateDirPath(path string) error {
-	fileInfo, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrDirDoesNotExist, path)
-	} else if err != nil {
-		return fmt.Errorf("failed to get directory info: %w", err)
-	}
-
-	if !fileInfo.IsDir() {
-		return fmt.Errorf("%w: %s", ErrPathIsNotDir, path)
-	}
-
-	if fileInfo.Mode().Perm()&WriteDirPerm != WriteDirPerm {
-		return fmt.Errorf("%w: %s", ErrWriteDirPermission, path)
-	}
-
-	return nil
-}
-
 // Takes a filepath but only checks the directory part of it.
 func ValidateOutputPath(path string) error {
 	// Check if path is a directory
@@ -69,6 +50,7 @@ func ValidateOutputPath(path string) error {
 	// Get directory out of filepath
 	dirPath := filepath.Dir(path)
 
+	// Check if directory exists
 	fileInfo, err := os.Stat(dirPath)
 	if os.IsNotExist(err) {
 		return fmt.Errorf("%w: %s", ErrDirDoesNotExist, dirPath)
@@ -76,6 +58,7 @@ func ValidateOutputPath(path string) error {
 		return fmt.Errorf("failed to get directory info: %w", err)
 	}
 
+	// Check directory permissions
 	if fileInfo.Mode().Perm()&WriteDirPerm != WriteDirPerm {
 		return fmt.Errorf("%w: %s", ErrWriteDirPermission, dirPath)
 	}
