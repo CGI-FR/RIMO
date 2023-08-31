@@ -64,7 +64,7 @@ func FilesReaderFactory(filepathList []string) (*FilesReader, error) {
 	return &filesReader, nil
 }
 
-// RIMO.Reader interface implementation
+// Reader interface implementation
 
 func (r *FilesReader) BaseName() string {
 	return r.baseName
