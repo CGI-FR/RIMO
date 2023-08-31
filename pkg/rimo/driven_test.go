@@ -17,7 +17,7 @@ func TestTestInterface(t *testing.T) {
 
 	var _ rimo.Reader = (*TestReader)(nil)
 
-	var _ rimo.Writer = (*LogWriter)(nil)
+	var _ rimo.Writer = (*TestWriter)(nil)
 }
 
 // Note : numeric value should be converted to float64.
@@ -50,7 +50,7 @@ func TestPipeline(t *testing.T) {
 	}
 
 	// LogWriter
-	testWriter := LogWriter{}
+	testWriter := TestWriter{} //nolint:exhaustruct
 
 	err := rimo.AnalyseBase(&testReader, &testWriter)
 	if err != nil {
@@ -113,18 +113,18 @@ func (r *TestReader) Value() ([]interface{}, string, string, error) {
 	return r.currentValues, r.currentColName, r.currentTableName, nil
 }
 
-// LogWritter
+// TestWriter implementation
 
-type LogWriter struct {
+type TestWriter struct {
 	base model.Base
 }
 
-func (w *LogWriter) Export(base *model.Base) error {
+func (w *TestWriter) Export(base *model.Base) error {
 	log.Printf("BASE returned \n \n : %s", valast.String(&base))
 
 	return nil
 }
 
-func (w *LogWriter) GetBase() model.Base {
+func (w *TestWriter) GetBase() model.Base {
 	return w.base
 }
