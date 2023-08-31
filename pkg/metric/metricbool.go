@@ -20,11 +20,11 @@ package metric
 import (
 	"fmt"
 
-	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 // Bool metric : TrueRatio.
-func SetBoolMetric(values []interface{}, metric *rimo.BoolMetric) error {
+func SetBoolMetric(values []interface{}, metric *model.BoolMetric) error {
 	nullCount := 0
 	trueCount := 0
 

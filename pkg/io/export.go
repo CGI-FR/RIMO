@@ -21,11 +21,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/cgi-fr/rimo/pkg/model"
 	"gopkg.in/yaml.v3"
 )
 
-func Export(base rimo.Base, outputPath string) error {
+func Export(base model.Base, outputPath string) error {
 	// Create output file.
 	outputFile, err := os.Create(outputPath)
 	if err != nil {

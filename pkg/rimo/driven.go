@@ -1,5 +1,9 @@
 package rimo
 
+import (
+	"github.com/cgi-fr/rimo/pkg/model"
+)
+
 type Reader interface {
 	BaseName() string
 	Next() bool                                    // itère sur les colonnes.
@@ -7,5 +11,5 @@ type Reader interface {
 }
 
 type Writer interface {
-	Export(base *Base) error
+	Export(base *model.Base) error
 }

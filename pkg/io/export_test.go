@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/io"
-	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,12 +35,12 @@ const (
 func TestExport(t *testing.T) {
 	t.Parallel()
 
-	base := rimo.Base{
+	base := model.Base{
 		Name: "databaseName",
-		Tables: []rimo.Table{
+		Tables: []model.Table{
 			{
 				Name:    "tableName",
-				Columns: []rimo.Column{},
+				Columns: []model.Column{},
 			},
 		},
 	}

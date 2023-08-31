@@ -25,7 +25,7 @@ import (
 
 	"github.com/cgi-fr/rimo/pkg/io"
 	"github.com/cgi-fr/rimo/pkg/metric"
-	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 var ErrWrongParameter = errors.New("wrong parameter")
@@ -80,30 +80,30 @@ func ProcessInput(inputList []string, outputPath string) error {
 }
 
 // Return a rimo.Base from inputList.
-func Build(inputList []string) (rimo.Base, error) {
+func Build(inputList []string) (model.Base, error) {
 	baseName, _, err := ExtractName(inputList[0])
 	if err != nil {
-		return rimo.Base{}, fmt.Errorf("failed to extract base name for %s: %w", inputList[0], err)
+		return model.Base{}, fmt.Errorf("failed to extract base name for %s: %w", inputList[0], err)
 	}
 
-	base := rimo.Base{
+	base := model.Base{
 		Name:   baseName,
-		Tables: []rimo.Table{},
+		Tables: []model.Table{},
 	}
 
 	for _, inputPath := range inputList {
 		_, tableName, err := ExtractName(inputPath)
 		if err != nil {
-			return rimo.Base{}, fmt.Errorf("failed to extract table name for %s: %w", inputPath, err)
+			return model.Base{}, fmt.Errorf("failed to extract table name for %s: %w", inputPath, err)
 		}
 
 		columns, err := Analyse(inputPath)
 		if err != nil {
-			return rimo.Base{}, fmt.Errorf("failed to analyse %s: %w", inputPath, err)
+			return model.Base{}, fmt.Errorf("failed to analyse %s: %w", inputPath, err)
 		}
 
 		// Add columns to base
-		table := rimo.Table{
+		table := model.Table{
 			Name:    tableName,
 			Columns: columns,
 		}
@@ -116,14 +116,14 @@ func Build(inputList []string) (rimo.Base, error) {
 }
 
 // Return a list of column from a jsonl file.
-func Analyse(path string) ([]rimo.Column, error) {
+func Analyse(path string) ([]model.Column, error) {
 	// Load file in a dataMap.
 	data, err := io.Load(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load jsonl file: %w", err)
 	}
 
-	columns := []rimo.Column{}
+	columns := []model.Column{}
 
 	for colName, values := range data {
 		column, err := metric.ComputeMetric(colName, values)

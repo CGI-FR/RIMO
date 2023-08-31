@@ -22,62 +22,62 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 var ErrValueType = errors.New("value type error")
 
-// Return a rimo.Column.
-func ComputeMetric(colName string, values []interface{}) (rimo.Column, error) {
+// Return a model.Column.
+func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 	var confidential *bool = nil //nolint
 
 	// Create the column.
-	col := rimo.Column{
+	col := model.Column{
 		Name:          colName,
-		Type:          ColType(values),
+		Type:          GetColType(values),
 		Concept:       "",
 		Constraint:    []string{},
 		Confidential:  confidential,
-		MainMetric:    rimo.GenericMetric{}, //nolint:exhaustruct
-		StringMetric:  rimo.StringMetric{},  //nolint:exhaustruct
-		NumericMetric: rimo.NumericMetric{}, //nolint:exhaustruct
-		BoolMetric:    rimo.BoolMetric{},    //nolint:exhaustruct
+		MainMetric:    model.GenericMetric{}, //nolint:exhaustruct
+		StringMetric:  model.StringMetric{},  //nolint:exhaustruct
+		NumericMetric: model.NumericMetric{}, //nolint:exhaustruct
+		BoolMetric:    model.BoolMetric{},    //nolint:exhaustruct
 	}
 
 	// Generic metric
 	err := SetGenericMetric(values, &col.MainMetric)
 	if err != nil {
-		return rimo.Column{}, fmt.Errorf("error computing generic metric in column %v : %w", col.Name, err)
+		return model.Column{}, fmt.Errorf("error computing generic metric in column %v : %w", col.Name, err)
 	}
 
 	// Type specific metric
 	switch col.Type {
-	case rimo.ColType.String:
+	case model.ColType.String:
 		err := SetStringMetric(values, &col.StringMetric)
 		if err != nil {
-			return rimo.Column{}, fmt.Errorf("error computing string metric in column %v : %w", col.Name, err)
+			return model.Column{}, fmt.Errorf("error computing string metric in column %v : %w", col.Name, err)
 		}
 
-	case rimo.ColType.Numeric:
+	case model.ColType.Numeric:
 		err := SetNumericMetric(values, &col.NumericMetric)
 		if err != nil {
-			return rimo.Column{}, fmt.Errorf("error computing numeric metric in column %v : %w", col.Name, err)
+			return model.Column{}, fmt.Errorf("error computing numeric metric in column %v : %w", col.Name, err)
 		}
 
-	case rimo.ColType.Bool:
+	case model.ColType.Bool:
 		err := SetBoolMetric(values, &col.BoolMetric)
 		if err != nil {
-			return rimo.Column{}, fmt.Errorf("error computing bool metric in column %v : %w", col.Name, err)
+			return model.Column{}, fmt.Errorf("error computing bool metric in column %v : %w", col.Name, err)
 		}
 	}
 
 	return col, nil
 }
 
-func ColType(values []interface{}) rimo.ValueType {
-	colType := rimo.ColType.Undefined
-	for i := 0; i < len(values) && colType == rimo.ColType.Undefined; i++ {
-		colType = ValueType(values[i])
+func GetColType(values []interface{}) model.ValueType {
+	colType := model.ColType.Undefined
+	for i := 0; i < len(values) && colType == model.ColType.Undefined; i++ {
+		colType = ColType(values[i])
 	}
 
 	return colType
@@ -100,19 +100,19 @@ func GetFirstValue(values []interface{}) interface{} {
 	return nil
 }
 
-func ValueType(value interface{}) rimo.ValueType {
+func ColType(value interface{}) model.ValueType {
 	switch value.(type) {
 	case int:
-		return rimo.ColType.Numeric
+		return model.ColType.Numeric
 	case float64:
-		return rimo.ColType.Numeric
+		return model.ColType.Numeric
 	case json.Number:
-		return rimo.ColType.Numeric
+		return model.ColType.Numeric
 	case string:
-		return rimo.ColType.String
+		return model.ColType.String
 	case bool:
-		return rimo.ColType.Bool
+		return model.ColType.Bool
 	default:
-		return rimo.ColType.Undefined
+		return model.ColType.Undefined
 	}
 }

@@ -3,8 +3,6 @@ package infra
 import (
 	"errors"
 	"fmt"
-
-	"github.com/cgi-fr/rimo/pkg/rimo"
 )
 
 // Errors declaration.
@@ -22,7 +20,6 @@ var (
 // Interface itself with a Loader interface. Which currently only supports YAML files.
 // Loader and FilesReader can be initialized with LoaderFactory and FilesReaderFactory.
 type FilesReader struct {
-	rimo.Reader
 	filepathList []string
 	loader       JSONLinesLoader // responsible of loading a file format
 	baseName     string
