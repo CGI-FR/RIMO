@@ -1,5 +1,12 @@
 package model
 
+import (
+	"fmt"
+	"reflect"
+
+	"github.com/hexops/valast"
+)
+
 // RIMO YAML structure.
 type (
 	Base struct {
@@ -13,3 +20,14 @@ type (
 		Columns []Column `json:"columns" jsonschema:"required" yaml:"columns"`
 	}
 )
+
+// Should be improved with more detail about difference.
+func SameBase(base1, base2 *Base) (bool, string) {
+	if !reflect.DeepEqual(base1, base2) {
+		msg := fmt.Sprintf("base is different : %s \n \n %s", valast.String(base1), valast.String(base2))
+
+		return false, msg
+	}
+
+	return true, ""
+}

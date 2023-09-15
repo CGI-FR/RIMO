@@ -7,7 +7,6 @@ import (
 
 	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/cgi-fr/rimo/pkg/rimo"
-	"github.com/hexops/valast"
 )
 
 // TESTS
@@ -18,44 +17,6 @@ func TestTestInterface(t *testing.T) {
 	var _ rimo.Reader = (*TestReader)(nil)
 
 	var _ rimo.Writer = (*TestWriter)(nil)
-}
-
-// Note : numeric value should be converted to float64.
-func TestPipeline(t *testing.T) {
-	t.Parallel()
-
-	// Set up TestReader
-	baseName := "databaseName"
-	tableNames := []string{"tableTest"}
-	testInput := []colInput{
-		{
-			ColName:   "string",
-			ColValues: []interface{}{"val1", "val2", "val3"},
-		},
-		{
-			ColName:   "col2",
-			ColValues: []interface{}{true, false, nil},
-		},
-		{
-			ColName:   "col9",
-			ColValues: []interface{}{float64(31), float64(29), float64(42)},
-		},
-	}
-
-	testReader := TestReader{ //nolint:exhaustruct
-		baseName:   baseName,
-		tableNames: tableNames,
-		data:       testInput,
-		index:      0,
-	}
-
-	// LogWriter
-	testWriter := TestWriter{} //nolint:exhaustruct
-
-	err := rimo.AnalyseBase(&testReader, &testWriter)
-	if err != nil {
-		t.Errorf("Error: %v", err)
-	}
 }
 
 // TestReader implementation
@@ -107,8 +68,8 @@ func (r *TestReader) Next() bool {
 	return true
 }
 
-func (r *TestReader) Value() ([]interface{}, string, string, error) {
-	log.Printf("Processing %s column in %s table", r.currentTableName, r.currentColName)
+func (r *TestReader) Value() ([]interface{}, string, string, error) { //nolint:wsl
+	// log.Printf("Processing %s column in %s table", r.currentTableName, r.currentColName)
 
 	return r.currentValues, r.currentColName, r.currentTableName, nil
 }
@@ -120,11 +81,11 @@ type TestWriter struct {
 }
 
 func (w *TestWriter) Export(base *model.Base) error {
-	log.Printf("BASE returned \n \n : %s", valast.String(&base))
+	w.base = *base
 
 	return nil
 }
 
-func (w *TestWriter) GetBase() model.Base {
-	return w.base
+func (w *TestWriter) Base() *model.Base {
+	return &w.base
 }

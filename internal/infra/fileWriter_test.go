@@ -55,7 +55,8 @@ func TestWriterYAML(t *testing.T) {
 	outputFile := filepath.Join(tempDir, "output.yaml")
 
 	// Create the writer
-	writer := infra.YAMLWriterFactory(outputFile)
+	writer, err := infra.YAMLWriterFactory(outputFile)
+	require.NoError(t, err)
 
 	err = writer.Export(&base)
 	require.NoError(t, err)

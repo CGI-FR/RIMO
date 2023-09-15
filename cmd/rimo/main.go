@@ -41,7 +41,7 @@ var (
 	builtBy   string //nolint: gochecknoglobals
 )
 
-func main() { //nolint:funlen
+func main() { //nolint:funlen,cyclop
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) //nolint: exhaustruct
 
 	log.Info().Msgf("%v %v (commit=%v date=%v by=%v)", name, version, commit, buildDate, builtBy)
@@ -78,6 +78,8 @@ func main() { //nolint:funlen
 			inputDir := args[0]
 			outputDir := args[1]
 
+			// Reader
+
 			inputList, err := BuildFilepathList(inputDir, ".jsonl")
 			if err != nil {
 				log.Fatal().Msgf("error listing files: %v", err)
@@ -88,7 +90,19 @@ func main() { //nolint:funlen
 				log.Fatal().Msgf("error creating reader: %v", err)
 			}
 
-			writer := infra.YAMLWriterFactory(outputDir)
+			// Writer
+			// (could be relocated to infra.FilesReader)
+			baseName, _, err := infra.ExtractName(inputList[0])
+			if err != nil {
+				log.Fatal().Msgf("error extracting base name: %v", err)
+			}
+
+			outputPath := filepath.Join(outputDir, fmt.Sprintf("%s.yaml", baseName))
+
+			writer, err := infra.YAMLWriterFactory(outputPath)
+			if err != nil {
+				log.Fatal().Msgf("error creating writer: %v", err)
+			}
 
 			err = rimo.AnalyseBase(reader, writer)
 			if err != nil {
@@ -154,7 +168,7 @@ func FilesList(path string, extension string) ([]string, error) {
 var ErrNoFile = fmt.Errorf("no file found")
 
 func BuildFilepathList(path string, extension string) ([]string, error) {
-	err := infra.ValidateDirPath(path)
+	err := ValidateDirPath(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to validate input directory: %w", err)
 	}
@@ -171,4 +185,23 @@ func BuildFilepathList(path string, extension string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+func ValidateDirPath(path string) error {
+	fileInfo, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("%w: %s", infra.ErrDirDoesNotExist, path)
+	} else if err != nil {
+		return fmt.Errorf("failed to get directory info: %w", err)
+	}
+
+	if !fileInfo.IsDir() {
+		return fmt.Errorf("%w: %s", infra.ErrPathIsNotDir, path)
+	}
+
+	if fileInfo.Mode().Perm()&infra.WriteDirPerm != infra.WriteDirPerm {
+		return fmt.Errorf("%w: %s", infra.ErrWriteDirPermission, path)
+	}
+
+	return nil
 }

@@ -132,7 +132,7 @@ func BenchmarkAnalyse(b *testing.B) {
 	for _, numLines := range []int{100, 1000, 10000, 100000} {
 		inputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%d_input.jsonl", numLines))
 		inputList := []string{inputPath}
-		outputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%d_output.jsonl", numLines))
+		outputPath := filepath.Join(dataDir, "benchmark/mixed/")
 
 		b.Run(fmt.Sprintf("numLines=%d", numLines), func(b *testing.B) {
 			startTime := time.Now()

@@ -1,12 +1,8 @@
 package rimo_test
 
 import (
-	"bytes"
 	"fmt"
-	"os"
 	"path/filepath"
-	"reflect"
-	"strings"
 	"testing"
 	"time"
 
@@ -17,7 +13,6 @@ import (
 	"github.com/hexops/valast"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v3"
 )
 
 // Run Analyse pipeline with FilesReader and TestWriter and compare with expected result.
@@ -44,8 +39,53 @@ func getTestCase(dataFolder string) testCase {
 	}
 }
 
-// Execute Analyse pipeline and compare with expected result.
-func TestAnalyse(t *testing.T) {
+// PIPELINE TESTS
+
+// Note : numeric value should be converted to float64.
+func TestManualPipeline(t *testing.T) {
+	t.Parallel()
+
+	// Set up TestReader
+	baseName := "databaseName"
+	tableNames := []string{"tableTest"}
+	testInput := []colInput{
+		{
+			ColName:   "string",
+			ColValues: []interface{}{"val1", "val2", "val3"},
+		},
+		{
+			ColName:   "col2",
+			ColValues: []interface{}{true, false, nil},
+		},
+		{
+			ColName:   "col9",
+			ColValues: []interface{}{float64(31), float64(29), float64(42)},
+		},
+		{
+			ColName:   "empty",
+			ColValues: []interface{}{nil, nil, nil},
+		},
+	}
+
+	testReader := TestReader{ //nolint:exhaustruct
+		baseName:   baseName,
+		tableNames: tableNames,
+		data:       testInput,
+		index:      0,
+	}
+
+	testWriter := TestWriter{} //nolint:exhaustruct
+
+	err := rimo.AnalyseBase(&testReader, &testWriter)
+	if err != nil {
+		t.Errorf("Error: %v", err)
+	}
+
+	t.Logf("Base returned : %s", valast.String(*testWriter.Base()))
+}
+
+// Ensure that the pipeline produce the same base as expected.
+func TestPipeline(t *testing.T) {
 	t.Parallel()
 
 	testCases := []testCase{}
@@ -57,6 +97,8 @@ func TestAnalyse(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
+			// Actual base
+
 			reader, err := infra.FilesReaderFactory([]string{testCase.inputPath})
 			assert.NoError(t, err)
 
@@ -65,41 +107,23 @@ func TestAnalyse(t *testing.T) {
 			err = rimo.AnalyseBase(reader, writer)
 			assert.NoError(t, err)
 
-			base := writer.GetBase()
-			compareObjectOutput(t, base, testCase.expectedPath)
+			actualBase := writer.Base()
 
-			compareFileOutput(t, testCase.outputPath, testCase.expectedPath)
+			// Expected base
+			expectedBase, err := model.LoadBase(testCase.expectedPath)
+			if err != nil {
+				t.Errorf("Error: %v", err)
+			}
+
+			// Remove sample
+			model.RemoveSampleFromBase(expectedBase)
+			model.RemoveSampleFromBase(actualBase)
+			// Compare
+			equal, diff := model.SameBase(expectedBase, actualBase)
+			if !equal {
+				t.Errorf("Base are not equal:\n%s", diff)
+			}
 		})
-	}
-}
-
-func compareFileOutput(t *testing.T, outputPath string, testPath string) {
-	t.Helper()
-
-	actualOutput := getText(t, outputPath)
-	expectedOutput := getText(t, testPath)
-
-	// Call removeSampleFromStrings
-	actualOutput = removeSampleFromStrings(actualOutput)
-	expectedOutput = removeSampleFromStrings(expectedOutput)
-
-	// Compare the expected output and actual output
-	assert.Equal(t, expectedOutput, actualOutput)
-}
-
-func compareObjectOutput(t *testing.T, actualBase model.Base, testPath string) {
-	t.Helper()
-
-	expectedBase := loadYAML(t, testPath)
-
-	// Remove sample fields from both rimo.Base.
-	actualBase = removeSampleFromBase(actualBase)
-	expectedBase = removeSampleFromBase(expectedBase)
-
-	// Compare the expected output and actual output except all sample fields.
-	equal, diff := EqualBase(expectedBase, actualBase)
-	if !equal {
-		t.Errorf("base are not similar : %s", diff)
 	}
 }
 
@@ -116,7 +140,8 @@ func BenchmarkAnalyseInterface(b *testing.B) {
 			reader, err := infra.FilesReaderFactory(inputList)
 			require.NoError(b, err)
 
-			writer := infra.YAMLWriterFactory(outputPath)
+			writer, err := infra.YAMLWriterFactory(outputPath)
+			require.NoError(b, err)
 
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
@@ -130,109 +155,4 @@ func BenchmarkAnalyseInterface(b *testing.B) {
 			b.ReportMetric(linesPerSecond, "lines/s")
 		})
 	}
-}
-
-// Helper functions
-
-func loadYAML(t *testing.T, path string) model.Base {
-	t.Helper()
-
-	// Load output file
-	file, err := os.Open(path)
-	require.NoError(t, err)
-
-	decoder := yaml.NewDecoder(file)
-
-	var base model.Base
-	err = decoder.Decode(&base)
-
-	if err != nil {
-		t.Errorf("error while decoding yaml file: %v", err)
-	}
-
-	file.Close()
-
-	return base
-}
-
-func getText(t *testing.T, outputPath string) string {
-	t.Helper()
-
-	file, err := os.Open(outputPath)
-	require.NoError(t, err)
-
-	var output string
-
-	buf := new(bytes.Buffer)
-	_, err = buf.ReadFrom(file)
-	require.NoError(t, err)
-	file.Close()
-
-	output = buf.String()
-
-	return output
-}
-
-func removeSampleFromBase(base model.Base) model.Base {
-	for tableI, table := range base.Tables {
-		for columnJ, column := range table.Columns {
-			column.MainMetric.Sample = nil
-
-			if column.Type == model.ColType.String {
-				for freqLen := range column.StringMetric.MostFreqLen {
-					column.StringMetric.MostFreqLen[freqLen].Sample = nil
-				}
-
-				for freqLen := range column.StringMetric.LeastFreqLen {
-					column.StringMetric.LeastFreqLen[freqLen].Sample = nil
-				}
-			}
-
-			base.Tables[tableI].Columns[columnJ] = column
-		}
-	}
-
-	return base
-}
-
-func removeSampleFromStrings(rimoString string) string {
-	// Split at every new line
-	lines := strings.Split(rimoString, "\n")
-
-	// Filter out sample by skipping sampleSize + 1 lines when a line contain "sample" or "leastFrequentSample:"
-	var filteredLines []string
-
-	var skipLine int
-
-	sampleSizeSkip := model.SampleSize + 1
-
-	for _, line := range lines {
-		// sample of stringMetric.MostFreqLen and stringMetric.LeastFreqLen may be of different length, skipping when nex
-		if skipLine > 0 && strings.Contains(line, "   - length:") || strings.Contains(line, "    - name:") {
-			skipLine = 0
-		}
-
-		switch {
-		case skipLine > 0:
-			skipLine--
-		case strings.Contains(line, "sample:"):
-			skipLine = sampleSizeSkip
-		default:
-			filteredLines = append(filteredLines, line)
-		}
-	}
-
-	// Join the filtered lines back into a string
-	rimoString = strings.Join(filteredLines, "\n")
-
-	return rimoString
-}
-
-// DeepEqual two rimo.Base.
-func EqualBase(base1, base2 model.Base) (bool, string) {
-	if !reflect.DeepEqual(base1, base2) {
-		return false, fmt.Sprintf("base is different : %s \n \n %s", valast.String(base1), valast.String(base2))
-	}
-
-	return true, ""
 }

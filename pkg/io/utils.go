@@ -20,6 +20,7 @@ package io
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 var (
@@ -73,6 +74,34 @@ func ValidateDirPath(path string) error {
 
 	if fileInfo.Mode().Perm()&WriteDirPerm != WriteDirPerm {
 		return fmt.Errorf("%w : %s", ErrWriteDirPermission, path)
+	}
+
+	return nil
+}
+
+// Temporary function to solve a fail test where outPath is now a filepath and not a directory path
+// This is a hotfix and will be removed when interface are pushed
+// This is copied from internal/infra/utils.go
+// Takes a filepath but only checks the directory part of it.
+func ValidateOutputPath(path string) error {
+	// Check if path is a directory
+	if filepath.Ext(path) == "" {
+		return fmt.Errorf("%w: %s", ErrPathIsNotDir, path)
+	}
+	// Get directory out of filepath
+	dirPath := filepath.Dir(path)
+
+	// Check if directory exists
+	fileInfo, err := os.Stat(dirPath)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("%w: %s", ErrDirDoesNotExist, dirPath)
+	} else if err != nil {
+		return fmt.Errorf("failed to get directory info: %w", err)
+	}
+
+	// Check directory permissions
+	if fileInfo.Mode().Perm()&WriteDirPerm != WriteDirPerm {
+		return fmt.Errorf("%w: %s", ErrWriteDirPermission, dirPath)
 	}
 
 	return nil

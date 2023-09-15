@@ -30,21 +30,21 @@ type YAMLWriter struct {
 	outputPath string
 }
 
-func YAMLWriterFactory(filepath string) *YAMLWriter {
+func YAMLWriterFactory(filepath string) (*YAMLWriter, error) {
+	err := ValidateOutputPath(filepath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to validate file path: %w", err)
+	}
+
 	writer := YAMLWriter{
 		outputPath: filepath,
 	}
 
-	return &writer
+	return &writer, nil
 }
 
 // Write a YAML file from RIMO base at outputPath.
 func (w *YAMLWriter) Export(base *model.Base) error {
-	err := ValidateOutputPath(w.outputPath)
-	if err != nil {
-		return fmt.Errorf("failed to validate file path: %w", err)
-	}
-
 	outputFile, err := os.Create(w.outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to create output file: %w", err)
