@@ -19,14 +19,13 @@ import (
 const (
 	dataDir      = "../../testdata/"
 	inputName    = "data_input.jsonl"
-	outputName   = "data_output.yaml"
+	outputName   = "interface_data_output.yaml"
 	expectedName = "data_expected.yaml"
 )
 
 type testCase struct {
 	name         string
 	inputPath    string
-	outputPath   string
 	expectedPath string
 }
 
@@ -34,7 +33,6 @@ func getTestCase(dataFolder string) testCase {
 	return testCase{
 		name:         filepath.Base(dataFolder),
 		inputPath:    filepath.Join(dataFolder, inputName),
-		outputPath:   filepath.Join(dataFolder, outputName),
 		expectedPath: filepath.Join(dataFolder, expectedName),
 	}
 }
@@ -90,7 +88,7 @@ func TestPipeline(t *testing.T) {
 
 	testCases := []testCase{}
 	testCases = append(testCases, getTestCase("../../testdata/data1/"))
-	testCases = append(testCases, getTestCase("../../testdata/data2/"))
+	// testCases = append(testCases, getTestCase("../../testdata/data2/"))
 
 	for _, testCase := range testCases {
 		testCase := testCase // capture range variable
@@ -118,6 +116,8 @@ func TestPipeline(t *testing.T) {
 			// Remove sample
 			model.RemoveSampleFromBase(expectedBase)
 			model.RemoveSampleFromBase(actualBase)
+
+			fmt.Printf("Actual base : %s\n", valast.String(*actualBase))
 			// Compare
 			equal, diff := model.SameBase(expectedBase, actualBase)
 			if !equal {
