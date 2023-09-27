@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1693232609229,
+  "lastUpdate": 1695848463238,
   "repoUrl": "https://github.com/CGI-FR/RIMO",
   "entries": {
     "Benchmark": [
@@ -336,6 +336,54 @@ window.BENCHMARK_DATA = {
             "value": 90032,
             "unit": "allocs/op",
             "extra": "91 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "116900975+mathisdrn@users.noreply.github.com",
+            "name": "mathisdrn",
+            "username": "mathisdrn"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "cdbbd75279fc5b7d3b11ddff6a0d909023cdf256",
+          "message": "refactor: expose interfaces and a driver to client\n\n* refactor: renamed model to rimo\r\n\r\n* feat: defined interface\r\n\r\n* refactor: .gitignore\r\n\r\n* feat: added FileWriter interface\r\n\r\n* feat: fileWriter interface with test\r\n\r\n* feat: loader for JSONL\r\n\r\n* test: rimo interface test\r\n\r\n* feat: added filesReader interface\r\n\r\n* test: FilesReader with 2 files\r\n\r\n* refactor: re adding to model package to avoid circular dependency\r\n\r\n* feat(rimo): driven_test.go\r\n\r\n* refactor(rimo): improve Writer name\r\n\r\n* refactor: renamed testWriter() and added GetBase() method\r\n\r\n* feat: TestWriter improv (similar to prev commit)\r\n\r\n* refactor: minor typo\r\n\r\n* test: RIMO pipeline infra_test.go\r\n\r\n* refactor: added cobra command using interface\r\n\r\n* refactor: more explicit variable naming\r\n\r\n* refactor: removed unusued function\r\n\r\n* refactor: added test to compare pipeline with expected output\r\n\r\n* refactor: fix : giving filesReader proper filepath\r\n\r\n* refactor: almost work as expected\r\n\r\n* refactor: updated schema from rimo pkg to model pkg\r\n\r\n* refactor: work as expected\r\n\r\n* fix: remove old analyse command\r\n\r\n* chore: remove dead code\r\n\r\n* docs: add GPLv3 license header in new files\r\n\r\n* fix: remove output test from git\r\n\r\n---------\r\n\r\nCo-authored-by: Youen Péron <youen.peron@cgi.com>",
+          "timestamp": "2023-09-27T22:43:03+02:00",
+          "tree_id": "65d970da16ca6e2778c0d418c670283c4585c1e6",
+          "url": "https://github.com/CGI-FR/RIMO/commit/cdbbd75279fc5b7d3b11ddff6a0d909023cdf256"
+        },
+        "date": 1695848462800,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - ns/op",
+            "value": 6906414531,
+            "unit": "ns/op",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - lines/s",
+            "value": 14479,
+            "unit": "lines/s",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - B/op",
+            "value": 1358506976,
+            "unit": "B/op",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - allocs/op",
+            "value": 13663849,
+            "unit": "allocs/op",
+            "extra": "1 times\n2 procs"
           }
         ]
       }
