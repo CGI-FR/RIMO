@@ -23,8 +23,6 @@ import (
 	"path/filepath"
 
 	"github.com/cgi-fr/rimo/internal/infra"
-	"github.com/cgi-fr/rimo/pkg/analyse"
-	"github.com/cgi-fr/rimo/pkg/io"
 	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/rs/zerolog"
@@ -41,7 +39,7 @@ var (
 	builtBy   string //nolint: gochecknoglobals
 )
 
-func main() { //nolint:funlen,cyclop
+func main() { //nolint:funlen
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) //nolint: exhaustruct
 
 	log.Info().Msgf("%v %v (commit=%v date=%v by=%v)", name, version, commit, buildDate, builtBy)
@@ -70,8 +68,8 @@ func main() { //nolint:funlen,cyclop
 	}
 
 	// Make use of interface instead of analyse/pkg
-	rimoAnalyseInterfaceCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "analyse2 [inputDir] [outputDir]",
+	rimoAnalyseCmd := &cobra.Command{ //nolint:exhaustruct
+		Use:   "analyse [inputDir] [outputDir]",
 		Short: "Generate a rimo.yaml from a directory of .jsonl files",
 		Args:  cobra.ExactArgs(2), //nolint:gomnd
 		Run: func(cmd *cobra.Command, args []string) {
@@ -113,39 +111,7 @@ func main() { //nolint:funlen,cyclop
 		},
 	}
 
-	rimoAnalyseCmd := &cobra.Command{ //nolint:exhaustruct
-		Use:   "analyse [inputDir] [outputDir]",
-		Short: "Generate a rimo.yaml from a directory of .jsonl files",
-		Args:  cobra.ExactArgs(2), //nolint:gomnd
-		Run: func(cmd *cobra.Command, args []string) {
-			inputDir := args[0]
-			outputDir := args[1]
-
-			// List .jsonl files in input directory
-			if err := io.ValidateDirPath(inputDir); err != nil {
-				log.Fatal().Msgf("error validating input directory: %v", err)
-			}
-
-			inputList, err := FilesList(inputDir, ".jsonl")
-			if err != nil {
-				log.Fatal().Msgf("error listing files: %v", err)
-			}
-
-			if len(inputList) == 0 {
-				log.Fatal().Msgf("no .jsonl files found in %s", inputDir)
-			}
-
-			err = analyse.Orchestrator(inputList, outputDir)
-			if err != nil {
-				log.Fatal().Msgf("error generating rimo.yaml: %v", err)
-			}
-
-			log.Info().Msgf("Successfully generated rimo.yaml in %s", outputDir)
-		},
-	}
-
 	rootCmd.AddCommand(rimoAnalyseCmd)
-	rootCmd.AddCommand(rimoAnalyseInterfaceCmd)
 	rootCmd.AddCommand(rimoSchemaCmd)
 
 	if err := rootCmd.Execute(); err != nil {
