@@ -12,24 +12,24 @@ tables:
             empty: 0
             unique: 10
             sample:
-                - 536 Robinson Estates Austinside, NV 69535
-                - 095 Jennifer Turnpike Castrobury, NY 98111
-                - 275 Stone Ridges Suite 885 East Aliciafurt, MH 15407
-                - 25545 Cole Court Newtonfurt, KY 13882
+                - 06210 David Court South Kimberly, IL 10236
                 - 38432 Moreno Turnpike Garrettland, TN 72939
+                - PSC 4713, Box 9649 APO AA 43433
+                - 2035 Simmons Islands Heatherchester, IN 46152
+                - 095 Jennifer Turnpike Castrobury, NY 98111
           stringMetric:
             mostFrequentLen:
                 - length: 42
                   freq: 0.3
                   sample:
-                    - 095 Jennifer Turnpike Castrobury, NY 98111
                     - 06210 David Court South Kimberly, IL 10236
                     - 0301 Amy Grove Apt. 325 Janefort, MA 84102
+                    - 095 Jennifer Turnpike Castrobury, NY 98111
                 - length: 41
                   freq: 0.2
                   sample:
-                    - 536 Robinson Estates Austinside, NV 69535
                     - 9038 Frye Ramp South Cheryltown, CT 54262
+                    - 536 Robinson Estates Austinside, NV 69535
                 - length: 31
                   freq: 0.1
                   sample:
@@ -61,11 +61,11 @@ tables:
             empty: 0
             unique: 9
             sample:
-                - 65
-                - 45
-                - 29
+                - 35
+                - 80
                 - 73
-                - 47
+                - 95
+                - 65
           numericMetric:
             min: 29
             max: 95
@@ -80,21 +80,21 @@ tables:
             empty: 0
             unique: 10
             sample:
-                - "2022-04-23"
                 - "2010-11-18"
-                - "2003-10-11"
+                - "2011-07-13"
+                - "2011-07-13"
+                - "2001-08-23"
                 - "2010-11-18"
-                - "2004-07-04"
           stringMetric:
             mostFrequentLen:
                 - length: 10
                   freq: 1
                   sample:
+                    - "2011-07-13"
                     - "2001-08-23"
-                    - "2005-05-10"
-                    - "2010-11-18"
-                    - "2003-10-11"
                     - "2014-07-24"
+                    - "2003-10-11"
+                    - "2011-07-13"
             leastFrequentLen: []
         - name: phone
           type: string
@@ -106,10 +106,10 @@ tables:
             empty: 0
             unique: 10
             sample:
-                - 001-958-985-3039
-                - 001-958-985-3039
+                - 001-533-758-7269
+                - "7795418893"
+                - 001-866-271-0116
                 - +1-407-997-8293x68130
-                - (517)819-3454
                 - +1-407-997-8293x68130
           stringMetric:
             mostFrequentLen:
