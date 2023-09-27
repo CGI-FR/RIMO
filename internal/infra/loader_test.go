@@ -15,32 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package io
+package infra_test
 
 import (
 	"fmt"
-	"os"
+	"path/filepath"
+	"testing"
 
-	"github.com/cgi-fr/rimo/pkg/model"
-	"gopkg.in/yaml.v3"
+	"github.com/cgi-fr/rimo/internal/infra"
+	"github.com/stretchr/testify/require"
 )
 
-func Export(base model.Base, outputPath string) error {
-	// Create output file.
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		return fmt.Errorf("failed to create output file: %w", err)
-	}
-	defer outputFile.Close()
+func TestLoaderJSONL(t *testing.T) {
+	t.Parallel()
 
-	// Encode Base to YAML.
-	encoder := yaml.NewEncoder(outputFile)
-	defer encoder.Close()
+	path := filepath.Join(testdataDir, "data1/data_input.jsonl")
 
-	err = encoder.Encode(base)
-	if err != nil {
-		return fmt.Errorf("failed to encode Base to YAML: %w", err)
-	}
+	LoaderJSONL := infra.JSONLinesLoader{}
 
-	return nil
+	data, err := LoaderJSONL.Load(path)
+	require.NoError(t, err)
+	fmt.Printf("dataMap: %v\n", data)
 }

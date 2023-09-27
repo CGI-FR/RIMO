@@ -22,9 +22,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cgi-fr/rimo/pkg/analyse"
-	"github.com/cgi-fr/rimo/pkg/io"
+	"github.com/cgi-fr/rimo/internal/infra"
 	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -67,6 +67,7 @@ func main() { //nolint:funlen
 		},
 	}
 
+	// Make use of interface instead of analyse/pkg
 	rimoAnalyseCmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "analyse [inputDir] [outputDir]",
 		Short: "Generate a rimo.yaml from a directory of .jsonl files",
@@ -75,21 +76,33 @@ func main() { //nolint:funlen
 			inputDir := args[0]
 			outputDir := args[1]
 
-			// List .jsonl files in input directory
-			if err := io.ValidateDirPath(inputDir); err != nil {
-				log.Fatal().Msgf("error validating input directory: %v", err)
-			}
+			// Reader
 
-			inputList, err := FilesList(inputDir, ".jsonl")
+			inputList, err := BuildFilepathList(inputDir, ".jsonl")
 			if err != nil {
 				log.Fatal().Msgf("error listing files: %v", err)
 			}
 
-			if len(inputList) == 0 {
-				log.Fatal().Msgf("no .jsonl files found in %s", inputDir)
+			reader, err := infra.FilesReaderFactory(inputList)
+			if err != nil {
+				log.Fatal().Msgf("error creating reader: %v", err)
 			}
 
-			err = analyse.Orchestrator(inputList, outputDir)
+			// Writer
+			// (could be relocated to infra.FilesReader)
+			baseName, _, err := infra.ExtractName(inputList[0])
+			if err != nil {
+				log.Fatal().Msgf("error extracting base name: %v", err)
+			}
+
+			outputPath := filepath.Join(outputDir, fmt.Sprintf("%s.yaml", baseName))
+
+			writer, err := infra.YAMLWriterFactory(outputPath)
+			if err != nil {
+				log.Fatal().Msgf("error creating writer: %v", err)
+			}
+
+			err = rimo.AnalyseBase(reader, writer)
 			if err != nil {
 				log.Fatal().Msgf("error generating rimo.yaml: %v", err)
 			}
@@ -116,4 +129,45 @@ func FilesList(path string, extension string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+var ErrNoFile = fmt.Errorf("no file found")
+
+func BuildFilepathList(path string, extension string) ([]string, error) {
+	err := ValidateDirPath(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to validate input directory: %w", err)
+	}
+
+	pattern := filepath.Join(path, "*"+extension)
+
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, fmt.Errorf("error listing files: %w", err)
+	}
+
+	if len(files) == 0 {
+		return nil, fmt.Errorf("%w : no %s files found in %s", ErrNoFile, extension, path)
+	}
+
+	return files, nil
+}
+
+func ValidateDirPath(path string) error {
+	fileInfo, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("%w: %s", infra.ErrDirDoesNotExist, path)
+	} else if err != nil {
+		return fmt.Errorf("failed to get directory info: %w", err)
+	}
+
+	if !fileInfo.IsDir() {
+		return fmt.Errorf("%w: %s", infra.ErrPathIsNotDir, path)
+	}
+
+	if fileInfo.Mode().Perm()&infra.WriteDirPerm != infra.WriteDirPerm {
+		return fmt.Errorf("%w: %s", infra.ErrWriteDirPermission, path)
+	}
+
+	return nil
 }

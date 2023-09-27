@@ -34,7 +34,7 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 	// Create the column.
 	col := model.Column{
 		Name:          colName,
-		Type:          ColType(values),
+		Type:          GetColType(values),
 		Concept:       "",
 		Constraint:    []string{},
 		Confidential:  confidential,
@@ -52,19 +52,19 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 
 	// Type specific metric
 	switch col.Type {
-	case model.ValueType.String:
+	case model.ColType.String:
 		err := SetStringMetric(values, &col.StringMetric)
 		if err != nil {
 			return model.Column{}, fmt.Errorf("error computing string metric in column %v : %w", col.Name, err)
 		}
 
-	case model.ValueType.Numeric:
+	case model.ColType.Numeric:
 		err := SetNumericMetric(values, &col.NumericMetric)
 		if err != nil {
 			return model.Column{}, fmt.Errorf("error computing numeric metric in column %v : %w", col.Name, err)
 		}
 
-	case model.ValueType.Bool:
+	case model.ColType.Bool:
 		err := SetBoolMetric(values, &col.BoolMetric)
 		if err != nil {
 			return model.Column{}, fmt.Errorf("error computing bool metric in column %v : %w", col.Name, err)
@@ -74,10 +74,10 @@ func ComputeMetric(colName string, values []interface{}) (model.Column, error) {
 	return col, nil
 }
 
-func ColType(values []interface{}) model.RIMOType {
-	colType := model.ValueType.Undefined
-	for i := 0; i < len(values) && colType == model.ValueType.Undefined; i++ {
-		colType = ValueType(values[i])
+func GetColType(values []interface{}) model.ValueType {
+	colType := model.ColType.Undefined
+	for i := 0; i < len(values) && colType == model.ColType.Undefined; i++ {
+		colType = ColType(values[i])
 	}
 
 	return colType
@@ -89,6 +89,7 @@ func GetFrequency(occurrence int, count int) float64 {
 	return float64(occurrence) / float64(count)
 }
 
+// To check why not using isNil() ?
 func GetFirstValue(values []interface{}) interface{} {
 	for _, value := range values {
 		if value != nil {
@@ -99,19 +100,19 @@ func GetFirstValue(values []interface{}) interface{} {
 	return nil
 }
 
-func ValueType(value interface{}) model.RIMOType {
+func ColType(value interface{}) model.ValueType {
 	switch value.(type) {
 	case int:
-		return model.ValueType.Numeric
+		return model.ColType.Numeric
 	case float64:
-		return model.ValueType.Numeric
+		return model.ColType.Numeric
 	case json.Number:
-		return model.ValueType.Numeric
+		return model.ColType.Numeric
 	case string:
-		return model.ValueType.String
+		return model.ColType.String
 	case bool:
-		return model.ValueType.Bool
+		return model.ColType.Bool
 	default:
-		return model.ValueType.Undefined
+		return model.ColType.Undefined
 	}
 }

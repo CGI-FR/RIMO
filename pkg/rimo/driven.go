@@ -15,21 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package io_test
+package rimo
 
 import (
-	"path/filepath"
-	"testing"
-
-	"github.com/cgi-fr/rimo/pkg/io"
-	"github.com/stretchr/testify/require"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
-func TestLoad(t *testing.T) {
-	t.Parallel()
+type Reader interface {
+	BaseName() string
+	Next() bool                                    // itère sur les colonnes.
+	Value() ([]interface{}, string, string, error) // colValues, colName, tableName
+}
 
-	path := filepath.Join(dataDir, "data1/data_input.jsonl")
-
-	_, err := io.Load(path)
-	require.NoError(t, err)
+type Writer interface {
+	Export(base *model.Base) error
 }

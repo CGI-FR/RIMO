@@ -1,0 +1,115 @@
+database: data
+tables:
+    - name: input
+      columns:
+        - name: address
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 3
+            empty: 0
+            unique: 3
+            sample:
+                - PSC
+                - "095"
+                - "06210"
+          stringMetric:
+            mostFrequentLen:
+                - length: 3
+                  freq: 0.6666666666666666
+                  sample:
+                    - PSC
+                    - "095"
+            leastFrequentLen:
+                - length: 5
+                  freq: 0.3333333333333333
+                  sample:
+                    - "06210"
+        - name: age
+          type: numeric
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 3
+            empty: 2
+            unique: 1
+            sample:
+                - 61
+          numericMetric:
+            min: 61
+            max: 61
+            mean: 61
+        - name: empty
+          type: undefined
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 3
+            empty: 3
+            unique: 0
+            sample: []
+        - name: major
+          type: bool
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 3
+            empty: 0
+            unique: 2
+            sample:
+                - true
+                - false
+          boolMetric:
+            trueRatio: 0.6666666666666666
+    - name: input2
+      columns:
+        - name: string
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 4
+            empty: 0
+            unique: 4
+            sample:
+                - Hello World
+                - Hello World2
+                - Hello World3
+                - Hello World5
+          stringMetric:
+            mostFrequentLen:
+                - length: 12
+                  freq: 0.75
+                  sample:
+                    - Hello World2
+                    - Hello World3
+                    - Hello World5
+            leastFrequentLen:
+                - length: 11
+                  freq: 0.25
+                  sample:
+                    - Hello World
+        - name: time
+          type: string
+          concept: ""
+          constraint: []
+          confidential: null
+          mainMetric:
+            count: 4
+            empty: 0
+            unique: 1
+            sample:
+                - "20:03"
+          stringMetric:
+            mostFrequentLen:
+                - length: 5
+                  freq: 1
+                  sample:
+                    - "20:03"
+            leastFrequentLen: []

@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package io_test
+package infra_test
 
 import (
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/cgi-fr/rimo/pkg/io"
+	"github.com/cgi-fr/rimo/internal/infra"
 	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -32,7 +32,7 @@ const (
 	dataDir = "../../testdata/"
 )
 
-func TestExport(t *testing.T) {
+func TestWriterYAML(t *testing.T) {
 	t.Parallel()
 
 	base := model.Base{
@@ -54,8 +54,11 @@ func TestExport(t *testing.T) {
 	// Create a temporary file for the output
 	outputFile := filepath.Join(tempDir, "output.yaml")
 
-	// Export the base to the output file
-	err = io.Export(base, outputFile)
+	// Create the writer
+	writer, err := infra.YAMLWriterFactory(outputFile)
+	require.NoError(t, err)
+
+	err = writer.Export(&base)
 	require.NoError(t, err)
 
 	// Read the output file and check its contents

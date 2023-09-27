@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package io
+package infra
 
 import (
 	"bufio"
@@ -39,8 +39,14 @@ var (
 
 type DataMap map[string][]interface{}
 
-// Load .jsonl and return DataMap.
-func Load(inputPath string) (DataMap, error) {
+// JSONLinesLoader loads JSON lines files with this format : { "col_name1" : value1, "col_name2" : value1, ... }.
+// It may be interesting performance wise to use this format :
+// "col_name1" : [value1, value2, ...],
+// "col_name2" : [value1, value2, ...],
+
+type JSONLinesLoader struct{}
+
+func (l *JSONLinesLoader) Load(inputPath string) (DataMap, error) {
 	file, err := os.Open(inputPath)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't load %s : %w", inputPath, err)
@@ -49,7 +55,7 @@ func Load(inputPath string) (DataMap, error) {
 
 	scanner := bufio.NewScanner(file)
 
-	data, err := LoadJSONLines(scanner)
+	data, err := l.LoadJSONLines(scanner)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +64,7 @@ func Load(inputPath string) (DataMap, error) {
 }
 
 // Reads JSON lines  structure: { "col_name1" : value1, "col_name2" : value1, ... }.
-func LoadJSONLines(scanner *bufio.Scanner) (DataMap, error) {
+func (l *JSONLinesLoader) LoadJSONLines(scanner *bufio.Scanner) (DataMap, error) {
 	var data map[string][]interface{} = DataMap{}
 
 	lineNumber := 0
