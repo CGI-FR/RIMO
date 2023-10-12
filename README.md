@@ -11,6 +11,8 @@ Rimo contains tools that helps creating a *masking.yaml* for [PIMO](https://gith
 
 ### `rimo analyse`
 
+![rimo](docs/rimo.png)
+
 ```console
 rimo analyse [inputDir] [outputDir]
 ```
