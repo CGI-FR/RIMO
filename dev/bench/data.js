@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695848463238,
+  "lastUpdate": 1697140673225,
   "repoUrl": "https://github.com/CGI-FR/RIMO",
   "entries": {
     "Benchmark": [
@@ -382,6 +382,54 @@ window.BENCHMARK_DATA = {
           {
             "name": "BenchmarkAnalyseInterface/numLines=100000 - allocs/op",
             "value": 13663849,
+            "unit": "allocs/op",
+            "extra": "1 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "89643755+giraud10@users.noreply.github.com",
+            "name": "giraud10",
+            "username": "giraud10"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b654755e714c2cf537a5dc20b8cd69f3f67d8b7c",
+          "message": "docs: add rimo schema (#30)",
+          "timestamp": "2023-10-12T21:41:28+02:00",
+          "tree_id": "2ac92db707ef21b94d9e73ac76ba0123e9376d9d",
+          "url": "https://github.com/CGI-FR/RIMO/commit/b654755e714c2cf537a5dc20b8cd69f3f67d8b7c"
+        },
+        "date": 1697140672815,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - ns/op",
+            "value": 6195392178,
+            "unit": "ns/op",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - lines/s",
+            "value": 16141,
+            "unit": "lines/s",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - B/op",
+            "value": 1358497248,
+            "unit": "B/op",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - allocs/op",
+            "value": 13663645,
             "unit": "allocs/op",
             "extra": "1 times\n2 procs"
           }
