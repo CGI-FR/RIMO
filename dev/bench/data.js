@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1697140673225,
+  "lastUpdate": 1698683816819,
   "repoUrl": "https://github.com/CGI-FR/RIMO",
   "entries": {
     "Benchmark": [
@@ -430,6 +430,54 @@ window.BENCHMARK_DATA = {
           {
             "name": "BenchmarkAnalyseInterface/numLines=100000 - allocs/op",
             "value": 13663645,
+            "unit": "allocs/op",
+            "extra": "1 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3f38faa956a76f9c90f4c8f6148c6212abc33b1b",
+          "message": "feat: new string metrics minLen and maxLen (#31)",
+          "timestamp": "2023-10-30T17:19:57+01:00",
+          "tree_id": "dfb0b0c21e4941c7fe1d17e884dcce5486b33a04",
+          "url": "https://github.com/CGI-FR/RIMO/commit/3f38faa956a76f9c90f4c8f6148c6212abc33b1b"
+        },
+        "date": 1698683816437,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - ns/op",
+            "value": 6206281503,
+            "unit": "ns/op",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - lines/s",
+            "value": 16112,
+            "unit": "lines/s",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - B/op",
+            "value": 1358582320,
+            "unit": "B/op",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100000 - allocs/op",
+            "value": 13664310,
             "unit": "allocs/op",
             "extra": "1 times\n2 procs"
           }
