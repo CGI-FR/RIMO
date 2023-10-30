@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.2.0]
+
+- `Added` new string metrics `minLen` and `maxLen`
+
 ## [0.1.0]
 
 - `Added` rimo analyse command

@@ -148,6 +148,12 @@
     },
     "StringMetric": {
       "properties": {
+        "minLen": {
+          "type": "integer"
+        },
+        "maxLen": {
+          "type": "integer"
+        },
         "mostFrequentLen": {
           "items": {
             "$ref": "#/$defs/LenFreq"
@@ -164,6 +170,8 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
+        "minLen",
+        "maxLen",
         "mostFrequentLen",
         "leastFrequentLen"
       ]

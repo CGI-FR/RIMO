@@ -31,14 +31,10 @@ func TestStringMetric(t *testing.T) {
 
 	text := []interface{}{"1", "1", "1", "1", "22", "22", "22", "331", "332", "4441"}
 	expectedMetric := model.StringMetric{
-		MostFreqLen: []model.LenFreq{
-			{Length: 1, Freq: 0.4, Sample: []string{"1"}},
-			{Length: 2, Freq: 0.3, Sample: []string{"22"}},
-		},
-		LeastFreqLen: []model.LenFreq{
-			{Length: 4, Freq: 0.1, Sample: []string{"4441"}},
-			{Length: 3, Freq: 0.2, Sample: []string{"331", "332"}},
-		},
+		MinLen:       1,
+		MaxLen:       4,
+		MostFreqLen:  []model.LenFreq{{Length: 1, Freq: 0.4, Sample: []string{"1"}}, {Length: 2, Freq: 0.3, Sample: []string{"22"}}},            //nolint:lll
+		LeastFreqLen: []model.LenFreq{{Length: 4, Freq: 0.1, Sample: []string{"4441"}}, {Length: 3, Freq: 0.2, Sample: []string{"331", "332"}}}, //nolint:lll
 	}
 
 	actualMetric := model.StringMetric{} //nolint:exhaustruct

@@ -27,6 +27,8 @@ type (
 	}
 
 	StringMetric struct {
+		MinLen       int       `json:"minLen"  jsonschema:"required" yaml:"minLen"`
+		MaxLen       int       `json:"maxLen"  jsonschema:"required" yaml:"maxLen"`
 		MostFreqLen  []LenFreq `json:"mostFrequentLen"  jsonschema:"required" yaml:"mostFrequentLen"`
 		LeastFreqLen []LenFreq `json:"leastFrequentLen" jsonschema:"required" yaml:"leastFrequentLen"`
 	}
