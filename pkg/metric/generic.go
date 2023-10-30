@@ -23,6 +23,7 @@ import (
 	"math/rand"
 
 	"github.com/cgi-fr/rimo/pkg/model"
+	"golang.org/x/exp/constraints"
 )
 
 var ErrEmptySlice = errors.New("slice is empty")
@@ -104,4 +105,20 @@ func Unique[T comparable](values []T) []T {
 
 func isNil[T comparable](v T) bool {
 	return v == *new(T)
+}
+
+func min[T constraints.Ordered](a, b T) T {
+	if a < b {
+		return a
+	}
+
+	return b
+}
+
+func max[T constraints.Ordered](a, b T) T {
+	if a > b {
+		return a
+	}
+
+	return b
 }

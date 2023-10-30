@@ -1,144 +1,150 @@
 database: data
 tables:
-    - name: input
-      columns:
-        - name: address
-          type: string
-          concept: ""
-          constraint: []
-          confidential: null
-          mainMetric:
-            count: 10
-            empty: 0
-            unique: 10
-            sample:
-                - PSC 4713, Box 9649 APO AA 43433
-                - 275 Stone Ridges Suite 885 East Aliciafurt, MH 15407
+  - name: input
+    columns:
+      - name: address
+        type: string
+        concept: ""
+        constraint: []
+        confidential: null
+        mainMetric:
+          count: 10
+          empty: 0
+          unique: 10
+          sample:
+            - PSC 4713, Box 9649 APO AA 43433
+            - 275 Stone Ridges Suite 885 East Aliciafurt, MH 15407
+            - 06210 David Court South Kimberly, IL 10236
+            - 0301 Amy Grove Apt. 325 Janefort, MA 84102
+            - 06210 David Court South Kimberly, IL 10236
+        stringMetric:
+          minLen: 31
+          maxLen: 52
+          mostFrequentLen:
+            - length: 42
+              freq: 0.3
+              sample:
+                - 095 Jennifer Turnpike Castrobury, NY 98111
                 - 06210 David Court South Kimberly, IL 10236
                 - 0301 Amy Grove Apt. 325 Janefort, MA 84102
-                - 06210 David Court South Kimberly, IL 10236
-          stringMetric:
-            mostFrequentLen:
-                - length: 42
-                  freq: 0.3
-                  sample:
-                    - 095 Jennifer Turnpike Castrobury, NY 98111
-                    - 06210 David Court South Kimberly, IL 10236
-                    - 0301 Amy Grove Apt. 325 Janefort, MA 84102
-                - length: 41
-                  freq: 0.2
-                  sample:
-                    - 536 Robinson Estates Austinside, NV 69535
-                    - 9038 Frye Ramp South Cheryltown, CT 54262
-                - length: 31
-                  freq: 0.1
-                  sample:
-                    - PSC 4713, Box 9649 APO AA 43433
-                - length: 37
-                  freq: 0.1
-                  sample:
-                    - 25545 Cole Court Newtonfurt, KY 13882
-            leastFrequentLen:
-                - length: 52
-                  freq: 0.1
-                  sample:
-                    - 275 Stone Ridges Suite 885 East Aliciafurt, MH 15407
-                - length: 45
-                  freq: 0.1
-                  sample:
-                    - 2035 Simmons Islands Heatherchester, IN 46152
-                - length: 43
-                  freq: 0.1
-                  sample:
-                    - 38432 Moreno Turnpike Garrettland, TN 72939
-        - name: age
-          type: numeric
-          concept: ""
-          constraint: []
-          confidential: null
-          mainMetric:
-            count: 10
-            empty: 0
-            unique: 9
-            sample:
-                - 61
-                - 73
-                - 95
-                - 65
-                - 45
-          numericMetric:
-            min: 29
-            max: 95
-            mean: 57.7
-        - name: date
-          type: string
-          concept: ""
-          constraint: []
-          confidential: null
-          mainMetric:
-            count: 10
-            empty: 0
-            unique: 10
-            sample:
-                - "2022-04-23"
+            - length: 41
+              freq: 0.2
+              sample:
+                - 536 Robinson Estates Austinside, NV 69535
+                - 9038 Frye Ramp South Cheryltown, CT 54262
+            - length: 31
+              freq: 0.1
+              sample:
+                - PSC 4713, Box 9649 APO AA 43433
+            - length: 37
+              freq: 0.1
+              sample:
+                - 25545 Cole Court Newtonfurt, KY 13882
+          leastFrequentLen:
+            - length: 52
+              freq: 0.1
+              sample:
+                - 275 Stone Ridges Suite 885 East Aliciafurt, MH 15407
+            - length: 45
+              freq: 0.1
+              sample:
+                - 2035 Simmons Islands Heatherchester, IN 46152
+            - length: 43
+              freq: 0.1
+              sample:
+                - 38432 Moreno Turnpike Garrettland, TN 72939
+      - name: age
+        type: numeric
+        concept: ""
+        constraint: []
+        confidential: null
+        mainMetric:
+          count: 10
+          empty: 0
+          unique: 9
+          sample:
+            - 61
+            - 73
+            - 95
+            - 65
+            - 45
+        numericMetric:
+          min: 29
+          max: 95
+          mean: 57.7
+      - name: date
+        type: string
+        concept: ""
+        constraint: []
+        confidential: null
+        mainMetric:
+          count: 10
+          empty: 0
+          unique: 10
+          sample:
+            - "2022-04-23"
+            - "2010-11-18"
+            - "2005-05-10"
+            - "2014-09-09"
+            - "2014-07-24"
+        stringMetric:
+          minLen: 10
+          maxLen: 10
+          mostFrequentLen:
+            - length: 10
+              freq: 1
+              sample:
+                - "2001-08-23"
+                - "2005-05-10"
+                - "2004-07-04"
                 - "2010-11-18"
                 - "2005-05-10"
-                - "2014-09-09"
-                - "2014-07-24"
-          stringMetric:
-            mostFrequentLen:
-                - length: 10
-                  freq: 1
-                  sample:
-                    - "2001-08-23"
-                    - "2005-05-10"
-                    - "2004-07-04"
-                    - "2010-11-18"
-                    - "2005-05-10"
-            leastFrequentLen: []
-        - name: phone
-          type: string
-          concept: ""
-          constraint: []
-          confidential: null
-          mainMetric:
-            count: 10
-            empty: 0
-            unique: 10
-            sample:
+          leastFrequentLen: []
+      - name: phone
+        type: string
+        concept: ""
+        constraint: []
+        confidential: null
+        mainMetric:
+          count: 10
+          empty: 0
+          unique: 10
+          sample:
+            - 001-845-854-2110
+            - (517)819-3454
+            - 001-845-854-2110
+            - 001-958-985-3039
+            - 001-958-985-3039
+        stringMetric:
+          minLen: 10
+          maxLen: 21
+          mostFrequentLen:
+            - length: 16
+              freq: 0.4
+              sample:
+                - 001-533-758-7269
+                - 001-958-985-3039
+                - 001-866-271-0116
                 - 001-845-854-2110
+            - length: 12
+              freq: 0.2
+              sample:
+                - 828-755-3826
+                - 260-587-0590
+            - length: 10
+              freq: 0.1
+              sample:
+                - "7795418893"
+          leastFrequentLen:
+            - length: 21
+              freq: 0.1
+              sample:
+                - +1-407-997-8293x68130
+            - length: 18
+              freq: 0.1
+              sample:
+                - (330)616-7639x7810
+            - length: 13
+              freq: 0.1
+              sample:
                 - (517)819-3454
-                - 001-845-854-2110
-                - 001-958-985-3039
-                - 001-958-985-3039
-          stringMetric:
-            mostFrequentLen:
-                - length: 16
-                  freq: 0.4
-                  sample:
-                    - 001-533-758-7269
-                    - 001-958-985-3039
-                    - 001-866-271-0116
-                    - 001-845-854-2110
-                - length: 12
-                  freq: 0.2
-                  sample:
-                    - 828-755-3826
-                    - 260-587-0590
-                - length: 10
-                  freq: 0.1
-                  sample:
-                    - "7795418893"
-            leastFrequentLen:
-                - length: 21
-                  freq: 0.1
-                  sample:
-                    - +1-407-997-8293x68130
-                - length: 18
-                  freq: 0.1
-                  sample:
-                    - (330)616-7639x7810
-                - length: 13
-                  freq: 0.1
-                  sample:
-                    - (517)819-3454

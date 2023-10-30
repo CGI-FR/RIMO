@@ -32,6 +32,9 @@ func SetStringMetric(values []interface{}, metric *model.StringMetric) error {
 	lenCounter := make(map[int]int)
 	totalCount := len(values)
 
+	metric.MinLen = math.MaxInt
+	metric.MaxLen = 0
+
 	for _, value := range values {
 		if value == nil {
 			continue
@@ -45,6 +48,9 @@ func SetStringMetric(values []interface{}, metric *model.StringMetric) error {
 		length := len(stringValue)
 		lenMap[length] = append(lenMap[length], stringValue)
 		lenCounter[length]++
+
+		metric.MinLen = min(metric.MinLen, length)
+		metric.MaxLen = max(metric.MaxLen, length)
 	}
 
 	// Create a list of unique lengths sorted by descending frequency, break ties with ascending length
