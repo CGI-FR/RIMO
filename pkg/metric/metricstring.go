@@ -185,7 +185,12 @@ func (s *String) Build() model.Col[string] {
 		lengths = append(lengths, len)
 	}
 
-	sort.Ints(lengths)
+	sort.Slice(lengths, func(i, j int) bool {
+		freqi := float64(s.byLen[lengths[i]].CountTotal()) / float64(s.main.CountTotal())
+		freqj := float64(s.byLen[lengths[j]].CountTotal()) / float64(s.main.CountTotal())
+
+		return freqi > freqj
+	})
 
 	result.StringMetric.CountLen = len(lengths)
 	result.StringMetric.MaxLen = lengths[0]
