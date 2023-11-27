@@ -2,11 +2,24 @@ package metric
 
 import "golang.org/x/exp/constraints"
 
+type Factory[T constraints.Ordered] interface {
+	Create() Analyser[T]
+}
+
+type DefaultFactory[T constraints.Ordered] struct {
+	SampleSize uint
+}
+
+func (f DefaultFactory[T]) Create() Analyser[T] {
+	return NewCounter[T](f.SampleSize)
+}
+
 type Analyser[T constraints.Ordered] interface {
 	Read(*T)
 }
 
 type Stateless[T constraints.Ordered] interface {
+	Analyser[T]
 	CountTotal() uint
 	CountNulls() uint
 	CountEmpty() uint
@@ -20,7 +33,7 @@ type Statefull[T constraints.Ordered] interface {
 	CountDistinct() uint
 }
 
-type counter[T constraints.Ordered] struct {
+type Counter[T constraints.Ordered] struct {
 	countTotal uint
 	countNulls uint
 	countEmpty uint
@@ -30,8 +43,8 @@ type counter[T constraints.Ordered] struct {
 	zero       T
 }
 
-func NewCounter[T constraints.Ordered](samplerSize uint) Stateless[T] {
-	return &counter[T]{
+func NewCounter[T constraints.Ordered](samplerSize uint) *Counter[T] {
+	return &Counter[T]{
 		countTotal: 0,
 		countNulls: 0,
 		countEmpty: 0,
@@ -40,7 +53,7 @@ func NewCounter[T constraints.Ordered](samplerSize uint) Stateless[T] {
 	}
 }
 
-func (c *counter[T]) Read(value *T) {
+func (c *Counter[T]) Read(value *T) {
 	c.countTotal++
 
 	switch {
@@ -53,6 +66,14 @@ func (c *counter[T]) Read(value *T) {
 	if value != nil {
 		c.samples.Add(*value)
 
+		if c.min == nil {
+			c.min = value
+		}
+
+		if c.max == nil {
+			c.max = value
+		}
+
 		if *value < *c.min {
 			c.min = value
 		} else if *value > *c.max {
@@ -62,43 +83,43 @@ func (c *counter[T]) Read(value *T) {
 }
 
 // CountEmpty implements Stateless.
-func (c *counter[T]) CountEmpty() uint {
+func (c *Counter[T]) CountEmpty() uint {
 	return c.countEmpty
 }
 
 // CountNulls implements Stateless.
-func (c *counter[T]) CountNulls() uint {
+func (c *Counter[T]) CountNulls() uint {
 	return c.countNulls
 }
 
 // CountTotal implements Stateless.
-func (c *counter[T]) CountTotal() uint {
+func (c *Counter[T]) CountTotal() uint {
 	return c.countTotal
 }
 
 // Samples implements Stateless.
-func (c *counter[T]) Samples() []T {
+func (c *Counter[T]) Samples() []T {
 	return c.samples.Data()
 }
 
 // Min implements Stateless.
-func (c *counter[T]) Min() *T {
+func (c *Counter[T]) Min() *T {
 	return c.min
 }
 
 // Max implements Stateless.
-func (c *counter[T]) Max() *T {
+func (c *Counter[T]) Max() *T {
 	return c.max
 }
 
-type uniquecounter[T constraints.Ordered] struct {
-	counter[T]
+type Distinctcounter[T constraints.Ordered] struct {
+	Counter[T]
 	values map[T]int
 }
 
 func NewDistinctCounter[T constraints.Ordered](samplerSize uint) Statefull[T] {
-	return &uniquecounter[T]{
-		counter: counter[T]{
+	return &Distinctcounter[T]{
+		Counter: Counter[T]{
 			countTotal: 0,
 			countNulls: 0,
 			countEmpty: 0,
@@ -110,8 +131,8 @@ func NewDistinctCounter[T constraints.Ordered](samplerSize uint) Statefull[T] {
 }
 
 // Read implements Statefull.
-func (c *uniquecounter[T]) Read(value *T) {
-	c.counter.Read(value)
+func (c *Distinctcounter[T]) Read(value *T) {
+	c.Counter.Read(value)
 
 	if value != nil {
 		c.values[*value] = 0
@@ -119,6 +140,6 @@ func (c *uniquecounter[T]) Read(value *T) {
 }
 
 // CountDistinct implements Statefull.
-func (c *uniquecounter[T]) CountDistinct() uint {
+func (c *Distinctcounter[T]) CountDistinct() uint {
 	return uint(len(c.values))
 }

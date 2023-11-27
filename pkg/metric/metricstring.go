@@ -138,3 +138,70 @@ func uniqueLengthSorted(lenCounter map[int]int) []int {
 
 	return uniqueLengthSorted
 }
+
+type String struct {
+	sampleSize uint
+	main       Stateless[string]
+	byLen      map[int]Stateless[string]
+}
+
+func NewString(sampleSize uint) *String {
+	return &String{
+		sampleSize: sampleSize,
+		main:       NewCounter[string](sampleSize),
+		byLen:      map[int]Stateless[string]{},
+	}
+}
+
+func (s *String) Read(value *string) {
+	s.main.Read(value)
+
+	if value != nil {
+		length := len(*value)
+
+		analyser, exists := s.byLen[length]
+		if !exists {
+			analyser = NewCounter[string](s.sampleSize)
+		}
+
+		analyser.Read(value)
+
+		s.byLen[length] = analyser
+	}
+}
+
+func (s *String) Build() model.Col[string] {
+	result := model.Col[string]{}
+
+	result.MainMetric.Count = s.main.CountTotal()
+	result.MainMetric.Empty = s.main.CountEmpty()
+	result.MainMetric.Null = s.main.CountNulls()
+	result.MainMetric.Max = s.main.Max()
+	result.MainMetric.Min = s.main.Min()
+	result.MainMetric.Samples = s.main.Samples()
+
+	lengths := make([]int, 0, len(s.byLen))
+	for len := range s.byLen {
+		lengths = append(lengths, len)
+	}
+
+	sort.Ints(lengths)
+
+	result.StringMetric.CountLen = len(lengths)
+	result.StringMetric.MaxLen = lengths[0]
+	result.StringMetric.MaxLen = lengths[len(lengths)-1]
+
+	for _, length := range lengths {
+		len := model.StringLen{}
+		len.Length = length
+		len.Metrics.Count = s.byLen[length].CountTotal()
+		len.Metrics.Empty = s.byLen[length].CountEmpty()
+		len.Metrics.Null = s.byLen[length].CountNulls()
+		len.Metrics.Max = s.byLen[length].Max()
+		len.Metrics.Min = s.byLen[length].Min()
+		len.Metrics.Samples = s.byLen[length].Samples()
+		result.StringMetric.Lengths = append(result.StringMetric.Lengths, len)
+	}
+
+	return result
+}

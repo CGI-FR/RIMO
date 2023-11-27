@@ -18,6 +18,8 @@
 package metric_test
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/cgi-fr/rimo/pkg/metric"
@@ -57,4 +59,23 @@ func TestStringMetric(t *testing.T) {
 		assert.Equal(t, expectedMetric.LeastFreqLen[i].Freq, actualMetric.LeastFreqLen[i].Freq)
 		assert.ElementsMatch(t, expectedMetric.LeastFreqLen[i].Sample, actualMetric.LeastFreqLen[i].Sample)
 	}
+}
+
+func TestStringMetricV2(t *testing.T) {
+	analyser := metric.NewString(5)
+
+	strings := []string{"1", "1", "1", "1", "22", "22", "22", "331", "332", "4441", ""}
+
+	for _, s := range strings {
+		s := s
+		analyser.Read(&s)
+	}
+
+	analyser.Read(nil)
+
+	bytes, err := json.Marshal(analyser.Build())
+
+	assert.NoError(t, err)
+
+	fmt.Printf("%s\n", string(bytes))
 }
