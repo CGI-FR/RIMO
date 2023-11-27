@@ -194,6 +194,7 @@ func (s *String) Build() model.Col[string] {
 	for _, length := range lengths {
 		len := model.StringLen{}
 		len.Length = length
+		len.Freq = float64(s.byLen[length].CountTotal()) / float64(s.main.CountTotal())
 		len.Metrics.Count = s.byLen[length].CountTotal()
 		len.Metrics.Empty = s.byLen[length].CountEmpty()
 		len.Metrics.Null = s.byLen[length].CountNulls()
