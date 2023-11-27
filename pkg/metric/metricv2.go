@@ -2,18 +2,6 @@ package metric
 
 import "golang.org/x/exp/constraints"
 
-type Factory[T constraints.Ordered] interface {
-	Create() Analyser[T]
-}
-
-type DefaultFactory[T constraints.Ordered] struct {
-	SampleSize uint
-}
-
-func (f DefaultFactory[T]) Create() Analyser[T] {
-	return NewCounter[T](f.SampleSize)
-}
-
 type Analyser[T constraints.Ordered] interface {
 	Read(*T)
 }
