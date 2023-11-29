@@ -38,6 +38,9 @@ func (s *Sampler[T]) Read(value *T) {
 	}
 }
 
-func (s *Sampler[T]) Build(metric *modelv2.Column[T]) {
-	metric.MainMetric.Samples = s.samples
+func (s *Sampler[T]) Build(metric *modelv2.Column) {
+	metric.MainMetric.Samples = make([]any, len(s.samples))
+	for i, s := range s.samples {
+		metric.MainMetric.Samples[i] = s
+	}
 }

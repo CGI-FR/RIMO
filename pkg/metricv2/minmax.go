@@ -35,7 +35,7 @@ func (a *MinMax[T]) Read(value *T) {
 	}
 }
 
-func (a *MinMax[T]) Build(metric *modelv2.Column[T]) {
+func (a *MinMax[T]) Build(metric *modelv2.Column) {
 	metric.MainMetric.Min = a.min
 	metric.MainMetric.Max = a.max
 }

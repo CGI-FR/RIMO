@@ -17,17 +17,17 @@ func TestStringMetric(t *testing.T) { //nolint:funlen
 	min := ""
 	max := "4441"
 
-	expectedMetric := modelv2.Column[string]{
-		MainMetric: modelv2.Generic[string]{
+	expectedMetric := modelv2.Column{
+		MainMetric: modelv2.Generic{
 			Count:    12,
 			Empty:    1,
 			Null:     1,
 			Distinct: 6,
-			Samples:  []string{"22"},
+			Samples:  []any{"22"},
 			Min:      &min,
 			Max:      &max,
 		},
-		StringMetric: modelv2.String{
+		StringMetric: &modelv2.String{
 			MinLen:   0,
 			MaxLen:   4,
 			CountLen: 5,
@@ -35,21 +35,21 @@ func TestStringMetric(t *testing.T) { //nolint:funlen
 				{
 					Length: 1,
 					Freq:   0.3333333333333333,
-					Metrics: modelv2.Generic[string]{
+					Metrics: modelv2.Generic{
 						Count:    4,
 						Empty:    0,
 						Null:     0,
 						Distinct: 1,
 						Min:      &text[0],
 						Max:      &text[0],
-						Samples:  []string{"1", "1", "1", "1"},
+						Samples:  []any{"1", "1", "1", "1"},
 					},
 				},
 			},
 		},
 	}
 
-	actualMetric := modelv2.Column[string]{}
+	actualMetric := modelv2.Column{}
 
 	analyser := metricv2.NewString(5, true)
 	for index := range text {

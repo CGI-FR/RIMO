@@ -61,10 +61,10 @@ func (a *String) Read(value *string) {
 	}
 }
 
-func (a *String) Build(metric *modelv2.Column[string]) {
+func (a *String) Build(metric *modelv2.Column) {
 	a.main.Build(metric)
 
-	metric.StringMetric = modelv2.String{
+	metric.StringMetric = &modelv2.String{
 		MinLen:   slices.Min(maps.Keys(a.byLen)),
 		MaxLen:   slices.Max(maps.Keys(a.byLen)),
 		CountLen: len(a.byLen),
@@ -72,13 +72,13 @@ func (a *String) Build(metric *modelv2.Column[string]) {
 	}
 
 	for length, analyser := range a.byLen {
-		lenMetric := modelv2.Column[string]{}
+		lenMetric := modelv2.Column{}
 		analyser.Build(&lenMetric)
 
 		strlen := modelv2.StringLen{
 			Length:  length,
 			Freq:    float64(lenMetric.MainMetric.Count) / float64(metric.MainMetric.Count),
-			Metrics: modelv2.Generic[string]{},
+			Metrics: modelv2.Generic{},
 		}
 		strlen.Metrics.Count = lenMetric.MainMetric.Count
 		strlen.Metrics.Empty = lenMetric.MainMetric.Empty

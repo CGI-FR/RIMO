@@ -32,7 +32,7 @@ func (c *Counter[T]) Read(value *T) {
 	}
 }
 
-func (c *Counter[T]) Build(metric *modelv2.Column[T]) {
+func (c *Counter[T]) Build(metric *modelv2.Column) {
 	metric.MainMetric.Count = c.countTotal
 	metric.MainMetric.Null = c.countNulls
 	metric.MainMetric.Empty = c.countEmpty
