@@ -7,7 +7,7 @@ import (
 
 type Analyser[T constraints.Ordered] interface {
 	Read(*T)
-	Build(*modelv2.Generic[T])
+	Build(*modelv2.Column[T])
 }
 
 type Multi[T constraints.Ordered] struct {
@@ -20,7 +20,7 @@ func (m Multi[T]) Read(value *T) {
 	}
 }
 
-func (m Multi[T]) Build(metric *modelv2.Generic[T]) {
+func (m Multi[T]) Build(metric *modelv2.Column[T]) {
 	for _, a := range m.analyser {
 		a.Build(metric)
 	}

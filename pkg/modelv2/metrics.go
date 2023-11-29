@@ -3,14 +3,13 @@ package modelv2
 import "golang.org/x/exp/constraints"
 
 type Generic[T constraints.Ordered] struct {
-	Count    uint    `json:"count"              yaml:"count"              jsonschema:"required"`
-	Empty    uint    `json:"empty,omitempty"    yaml:"empty,omitempty"`
-	Null     uint    `json:"nulls,omitempty"    yaml:"nulls,omitempty"`
-	Distinct uint    `json:"distinct,omitempty" yaml:"distinct,omitempty"`
-	Min      *T      `json:"min,omitempty"      yaml:"min,omitempty"`
-	Max      *T      `json:"max,omitempty"      yaml:"max,omitempty"`
-	Samples  []T     `json:"samples"            yaml:"samples"            jsonschema:"required"`
-	String   *String `json:"string,omitempty"   yaml:"string,omitempty"`
+	Count    uint `json:"count"              yaml:"count"              jsonschema:"required"`
+	Empty    uint `json:"empty,omitempty"    yaml:"empty,omitempty"`
+	Null     uint `json:"nulls,omitempty"    yaml:"nulls,omitempty"`
+	Distinct uint `json:"distinct,omitempty" yaml:"distinct,omitempty"`
+	Min      *T   `json:"min,omitempty"      yaml:"min,omitempty"`
+	Max      *T   `json:"max,omitempty"      yaml:"max,omitempty"`
+	Samples  []T  `json:"samples"            yaml:"samples"            jsonschema:"required"`
 }
 
 type String struct {
@@ -25,3 +24,7 @@ type StringLen struct {
 	Freq    float64         `json:"freq"    yaml:"freq"    jsonschema:"required"`
 	Metrics Generic[string] `json:"metrics" yaml:"metrics" jsonschema:"required"`
 }
+
+type Numeric struct{}
+
+type Bool struct{}

@@ -61,10 +61,10 @@ func (a *String) Read(value *string) {
 	}
 }
 
-func (a *String) Build(metric *modelv2.Generic[string]) {
+func (a *String) Build(metric *modelv2.Column[string]) {
 	a.main.Build(metric)
 
-	metric.String = &modelv2.String{
+	metric.StringMetric = modelv2.String{
 		MinLen:   slices.Min(maps.Keys(a.byLen)),
 		MaxLen:   slices.Max(maps.Keys(a.byLen)),
 		CountLen: len(a.byLen),
@@ -72,25 +72,25 @@ func (a *String) Build(metric *modelv2.Generic[string]) {
 	}
 
 	for length, analyser := range a.byLen {
-		lenMetric := modelv2.Generic[string]{}
+		lenMetric := modelv2.Column[string]{}
 		analyser.Build(&lenMetric)
 
 		strlen := modelv2.StringLen{
 			Length:  length,
-			Freq:    float64(lenMetric.Count) / float64(metric.Count),
+			Freq:    float64(lenMetric.MainMetric.Count) / float64(metric.MainMetric.Count),
 			Metrics: modelv2.Generic[string]{},
 		}
-		strlen.Metrics.Count = lenMetric.Count
-		strlen.Metrics.Empty = lenMetric.Empty
-		strlen.Metrics.Null = lenMetric.Null
-		strlen.Metrics.Distinct = lenMetric.Distinct
-		strlen.Metrics.Max = lenMetric.Max
-		strlen.Metrics.Min = lenMetric.Min
-		strlen.Metrics.Samples = lenMetric.Samples
-		metric.String.Lengths = append(metric.String.Lengths, strlen)
+		strlen.Metrics.Count = lenMetric.MainMetric.Count
+		strlen.Metrics.Empty = lenMetric.MainMetric.Empty
+		strlen.Metrics.Null = lenMetric.MainMetric.Null
+		strlen.Metrics.Distinct = lenMetric.MainMetric.Distinct
+		strlen.Metrics.Max = lenMetric.MainMetric.Max
+		strlen.Metrics.Min = lenMetric.MainMetric.Min
+		strlen.Metrics.Samples = lenMetric.MainMetric.Samples
+		metric.StringMetric.Lengths = append(metric.StringMetric.Lengths, strlen)
 	}
 
-	sort.Slice(metric.String.Lengths, func(i, j int) bool {
-		return metric.String.Lengths[i].Freq > metric.String.Lengths[j].Freq
+	sort.Slice(metric.StringMetric.Lengths, func(i, j int) bool {
+		return metric.StringMetric.Lengths[i].Freq > metric.StringMetric.Lengths[j].Freq
 	})
 }

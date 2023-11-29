@@ -21,6 +21,6 @@ func (a *Distinct[T]) Read(value *T) {
 	}
 }
 
-func (a *Distinct[T]) Build(metric *modelv2.Generic[T]) {
-	metric.Distinct = uint(len(a.values))
+func (a *Distinct[T]) Build(metric *modelv2.Column[T]) {
+	metric.MainMetric.Distinct = uint(len(a.values))
 }

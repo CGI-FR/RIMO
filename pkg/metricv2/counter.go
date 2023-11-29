@@ -32,8 +32,8 @@ func (c *Counter[T]) Read(value *T) {
 	}
 }
 
-func (c *Counter[T]) Build(metric *modelv2.Generic[T]) {
-	metric.Count = c.countTotal
-	metric.Null = c.countNulls
-	metric.Empty = c.countEmpty
+func (c *Counter[T]) Build(metric *modelv2.Column[T]) {
+	metric.MainMetric.Count = c.countTotal
+	metric.MainMetric.Null = c.countNulls
+	metric.MainMetric.Empty = c.countEmpty
 }
