@@ -36,7 +36,7 @@ func TestPipeline(t *testing.T) {
 
 	inputPath := filepath.Join(testdataDir, "data1/data_input.jsonl")
 
-	reader, err := infra.FilesReaderFactory([]string{inputPath})
+	reader, err := infra.NewJSONLFileReader("base", inputPath)
 	require.NoError(t, err)
 
 	writer := infra.StdoutWriterFactory()

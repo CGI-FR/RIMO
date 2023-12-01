@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/cgi-fr/rimo/pkg/model"
+	"github.com/cgi-fr/rimo/pkg/modelv2"
 	"gopkg.in/yaml.v3"
 )
 
@@ -35,7 +36,7 @@ func StdoutWriterFactory() *StdoutWriter {
 	return &writer
 }
 
-func (w *StdoutWriter) Export(base *model.Base) error {
+func (w *StdoutWriter) Export(base *modelv2.Base) error {
 	fmt.Printf("%v\n", base)
 
 	return nil
