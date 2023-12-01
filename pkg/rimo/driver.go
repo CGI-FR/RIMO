@@ -67,6 +67,8 @@ func AnalyseBase(reader Reader, writer Writer) error {
 				table.Columns = append(table.Columns, col)
 
 				base.Tables[valreader.TableName()] = table
+			case nil:
+				nilcount++
 			}
 		}
 	}
