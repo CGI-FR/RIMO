@@ -41,7 +41,7 @@ func NewJSONLFolderReader(folderpath string) (*JSONLFolderReader, error) {
 	return &JSONLFolderReader{
 		basename: basename,
 		readers:  readers,
-		current:  -1,
+		current:  0,
 	}, nil
 }
 
