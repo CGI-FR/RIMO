@@ -3,6 +3,7 @@ module github.com/cgi-fr/rimo
 go 1.20
 
 require (
+	github.com/goccy/go-json v0.10.2
 	github.com/hexops/valast v1.4.4
 	github.com/rs/zerolog v1.30.0
 	github.com/spf13/cobra v1.7.0
@@ -11,10 +12,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require (
-	github.com/goccy/go-json v0.10.2 // indirect
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
-)
+require gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/cgi-fr/rimo/pkg/rimo"
@@ -12,6 +13,55 @@ import (
 )
 
 var ErrReadFile = errors.New("error while reading file")
+
+type JSONLFolderReader struct {
+	basename string
+	readers  []*JSONLFileReader
+	current  int
+}
+
+func NewJSONLFolderReader(folderpath string) (*JSONLFolderReader, error) {
+	basename := path.Base(folderpath)
+
+	pattern := filepath.Join(folderpath, "*.jsonl")
+
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, fmt.Errorf("error listing files: %w", err)
+	}
+
+	readers := make([]*JSONLFileReader, len(files))
+	for index, filepath := range files {
+		readers[index], err = NewJSONLFileReader(basename, filepath)
+		if err != nil {
+			return nil, fmt.Errorf("error opening files: %w", err)
+		}
+	}
+
+	return &JSONLFolderReader{
+		basename: basename,
+		readers:  readers,
+		current:  -1,
+	}, nil
+}
+
+func (r *JSONLFolderReader) BaseName() string {
+	return r.basename
+}
+
+func (r *JSONLFolderReader) Next() bool {
+	if r.current < len(r.readers) && !r.readers[r.current].Next() {
+		r.current++
+
+		return r.Next()
+	}
+
+	return r.current < len(r.readers)
+}
+
+func (r *JSONLFolderReader) Col() (rimo.ColReader, error) { //nolint:ireturn
+	return r.readers[r.current].Col()
+}
 
 type JSONLFileReader struct {
 	tablename string

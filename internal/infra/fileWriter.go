@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/cgi-fr/rimo/pkg/modelv2"
 	"gopkg.in/yaml.v3"
 )
@@ -62,7 +61,7 @@ func YAMLWriterFactory(filepath string) (*YAMLWriter, error) {
 }
 
 // Write a YAML file from RIMO base at outputPath.
-func (w *YAMLWriter) Export(base *model.Base) error {
+func (w *YAMLWriter) Export(base *modelv2.Base) error {
 	outputFile, err := os.Create(w.outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to create output file: %w", err)

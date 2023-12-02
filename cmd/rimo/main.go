@@ -77,25 +77,12 @@ func main() { //nolint:funlen
 			outputDir := args[1]
 
 			// Reader
-
-			inputList, err := BuildFilepathList(inputDir, ".jsonl")
-			if err != nil {
-				log.Fatal().Msgf("error listing files: %v", err)
-			}
-
-			reader, err := infra.FilesReaderFactory(inputList)
+			reader, err := infra.NewJSONLFolderReader(inputDir)
 			if err != nil {
 				log.Fatal().Msgf("error creating reader: %v", err)
 			}
 
-			// Writer
-			// (could be relocated to infra.FilesReader)
-			baseName, _, err := infra.ExtractName(inputList[0])
-			if err != nil {
-				log.Fatal().Msgf("error extracting base name: %v", err)
-			}
-
-			outputPath := filepath.Join(outputDir, fmt.Sprintf("%s.yaml", baseName))
+			outputPath := filepath.Join(outputDir, fmt.Sprintf("%s.yaml", reader.BaseName()))
 
 			writer, err := infra.YAMLWriterFactory(outputPath)
 			if err != nil {
