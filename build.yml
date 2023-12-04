@@ -255,6 +255,12 @@ targets:
       - ldflags = ldflags + " -s -w" # Omit the DWARF symbol table. Omit the symbol table and debug information.
       - call: compile
 
+  test-int-debug:
+    doc: "Run all integration tests"
+    depends: ["info"]
+    steps:
+      - $: venom run test/suites/*
+
   test-int:
     doc: "Run all integration tests"
     depends: ["info", "refresh", "lint", "test", "benchmark", "release"]
