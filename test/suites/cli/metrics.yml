@@ -1,0 +1,8 @@
+name: test metrics
+testcases:
+  - name: main metric
+    steps:
+      - script: |-
+          rimo analyse ../testdata/data1/ ../testdata/data1/output/
+        assertions:
+          - result.code ShouldEqual 0

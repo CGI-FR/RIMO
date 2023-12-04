@@ -21,10 +21,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/cgi-fr/rimo/internal/infra"
 	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -32,21 +35,25 @@ import (
 
 const DefaultSampleSize = uint(5)
 
-// Provisioned by ldflags.
+//nolint:gochecknoglobals
 var (
-	name      string //nolint: gochecknoglobals
-	version   string //nolint: gochecknoglobals
-	commit    string //nolint: gochecknoglobals
-	buildDate string //nolint: gochecknoglobals
-	builtBy   string //nolint: gochecknoglobals
+	name      string // provisioned by ldflags
+	version   string // provisioned by ldflags
+	commit    string // provisioned by ldflags
+	buildDate string // provisioned by ldflags
+	builtBy   string // provisioned by ldflags
 
-	sampleSize uint //nolint: gochecknoglobals
+	verbosity string
+	jsonlog   bool
+	debug     bool
+	colormode string
+
+	sampleSize uint
 	distinct   bool //nolint: gochecknoglobals
 )
 
 func main() { //nolint:funlen
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) //nolint: exhaustruct
-
+	cobra.OnInitialize(initLog)
 	log.Info().Msgf("%v %v (commit=%v date=%v by=%v)", name, version, commit, buildDate, builtBy)
 
 	rootCmd := &cobra.Command{ //nolint:exhaustruct
@@ -58,6 +65,12 @@ func main() { //nolint:funlen
 		This is free software: you are free to change and redistribute it.
 		There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDate, builtBy),
 	}
+
+	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "warn",
+		"set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "add debug information to logs (very slow)")
+	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
+	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
 
 	rimoSchemaCmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "jsonschema",
@@ -114,5 +127,47 @@ func main() { //nolint:funlen
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
 		os.Exit(1)
+	}
+}
+
+func initLog() {
+	color := false
+
+	switch strings.ToLower(colormode) {
+	case "auto":
+		if isatty.IsTerminal(os.Stdout.Fd()) && runtime.GOOS != "windows" {
+			color = true
+		}
+	case "yes", "true", "1", "on", "enable":
+		color = true
+	}
+
+	if jsonlog {
+		log.Logger = zerolog.New(os.Stderr)
+	} else {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: !color}) //nolint:exhaustruct
+	}
+
+	if debug {
+		log.Logger = log.Logger.With().Caller().Logger()
+	}
+
+	setVerbosity()
+}
+
+func setVerbosity() {
+	switch verbosity {
+	case "trace", "5":
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
+	case "debug", "4":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case "info", "3":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case "warn", "2":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	case "error", "1":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	default:
+		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
 }

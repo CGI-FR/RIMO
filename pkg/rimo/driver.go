@@ -161,6 +161,8 @@ func (d Driver) AnalyseString(nilcount int, firstValue string, reader ColReader)
 		switch valtyped := val.(type) {
 		case string:
 			analyser.Read(&valtyped)
+		case nil:
+			analyser.Read(nil)
 		default:
 			return column, fmt.Errorf("invalue value type : %w", err)
 		}
@@ -242,6 +244,8 @@ func (d Driver) AnalyseBool(nilcount int, firstValue bool, reader ColReader) (mo
 		switch valtyped := val.(type) {
 		case bool:
 			analyser.Read(&valtyped)
+		case nil:
+			analyser.Read(nil)
 		default:
 			return column, fmt.Errorf("invalue value type : %w", err)
 		}
@@ -281,6 +285,8 @@ func GetFloat64(value any) (*float64, error) {
 		converted = float64(valtyped)
 	case uint64:
 		converted = float64(valtyped)
+	case nil:
+		return nil, nil //nolint:nilnil
 	default:
 		return nil, fmt.Errorf("%w : %T", ErrInvalidValueType, value)
 	}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/goccy/go-json"
+	"github.com/rs/zerolog/log"
 )
 
 var ErrReadFile = errors.New("error while reading file")
@@ -21,6 +22,8 @@ type JSONLFolderReader struct {
 }
 
 func NewJSONLFolderReader(folderpath string) (*JSONLFolderReader, error) {
+	log.Trace().Str("path", folderpath).Msg("reading folder")
+
 	basename := path.Base(folderpath)
 
 	pattern := filepath.Join(folderpath, "*.jsonl")
@@ -31,7 +34,10 @@ func NewJSONLFolderReader(folderpath string) (*JSONLFolderReader, error) {
 	}
 
 	readers := make([]*JSONLFileReader, len(files))
+
 	for index, filepath := range files {
+		log.Trace().Str("path", filepath).Msg("scanning file")
+
 		readers[index], err = NewJSONLFileReader(basename, filepath)
 		if err != nil {
 			return nil, fmt.Errorf("error opening files: %w", err)
@@ -73,6 +79,8 @@ type JSONLFileReader struct {
 }
 
 func NewJSONLFileReader(basename string, filepath string) (*JSONLFileReader, error) {
+	log.Trace().Str("path", filepath).Msg("opening file")
+
 	source, err := os.Open(filepath)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
@@ -80,17 +88,24 @@ func NewJSONLFileReader(basename string, filepath string) (*JSONLFileReader, err
 
 	template := map[string]any{}
 
+	log.Trace().Str("path", filepath).Msg("decoding line template")
+
 	decoder := json.NewDecoder(source)
 	if err := decoder.Decode(&template); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrReadFile, err)
 	}
+
+	log.Trace().Str("path", filepath).Any("template", template).Msg("decoded line template")
 
 	if _, err := source.Seek(0, 0); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrReadFile, err)
 	}
 
 	columns := make([]string, 0, len(template))
+
 	for column := range template {
+		log.Trace().Str("path", filepath).Any("column", column).Msg("registering column")
+
 		columns = append(columns, column)
 	}
 
@@ -116,6 +131,8 @@ func (fr *JSONLFileReader) Next() bool {
 	}
 
 	fr.decoder = json.NewDecoder(fr.source)
+
+	log.Trace().Str("base", fr.basename).Any("index", fr.current).Msg("successful jump to next column")
 
 	return fr.current < len(fr.columns)
 }
@@ -156,6 +173,8 @@ func (cr *JSONLColReader) Value() (any, error) {
 	if err := cr.decoder.Decode(&row); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrReadFile, err)
 	}
+
+	log.Trace().Str("table", cr.table).Str("column", cr.column).Any("value", row[cr.column]).Msg("read value")
 
 	return row[cr.column], nil
 }
