@@ -23,6 +23,8 @@ type StringLen struct {
 	Metrics Generic `json:"metrics" yaml:"metrics" jsonschema:"required"`
 }
 
-type Numeric struct{}
+type Numeric struct {
+	Mean float64 `json:"mean"  yaml:"mean" jsonschema:"required"`
+}
 
 type Bool struct{}

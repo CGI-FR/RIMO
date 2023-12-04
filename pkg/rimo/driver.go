@@ -30,11 +30,9 @@ type Driver struct {
 	SampleSize uint
 }
 
+//nolint:funlen,cyclop
 func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
-	// log.Logger = zerolog.New(os.Stdout).Level(zerolog.DebugLevel)
 	baseName := reader.BaseName()
-
-	// log.Debug().Msgf("Processing [%s base]", baseName)
 
 	base := modelv2.NewBase(baseName)
 
@@ -71,17 +69,27 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 				table.Columns = append(table.Columns, col)
 
 				base.Tables[valreader.TableName()] = table
+			case float64:
+				col, err := d.AnalyseNumeric(nilcount, valtyped, valreader)
+				if err != nil {
+					return fmt.Errorf("failed to analyse column : %w", err)
+				}
+
+				table, exists := base.Tables[valreader.TableName()]
+				if !exists {
+					table = modelv2.Table{
+						Columns: []modelv2.Column{},
+					}
+				}
+
+				table.Columns = append(table.Columns, col)
+
+				base.Tables[valreader.TableName()] = table
 			case nil:
 				nilcount++
 			}
 		}
 	}
-
-	// base.SortBase()
-
-	// log.Debug().Msg("---------- Finish processing base :")
-	// log.Debug().Msg(valast.String(*base))
-	// log.Debug().Msg("----------")
 
 	err := writer.Export(base)
 	if err != nil {
@@ -127,4 +135,78 @@ func (d Driver) AnalyseString(nilcount int, firstValue string, reader ColReader)
 	analyser.Build(&column)
 
 	return column, nil
+}
+
+func (d Driver) AnalyseNumeric(nilcount int, firstValue float64, reader ColReader) (modelv2.Column, error) {
+	column := modelv2.Column{
+		Name:          reader.ColName(),
+		Type:          "string",
+		Config:        modelv2.Config{},  //nolint:exhaustruct
+		MainMetric:    modelv2.Generic{}, //nolint:exhaustruct
+		StringMetric:  nil,
+		NumericMetric: &modelv2.Numeric{}, //nolint:exhaustruct
+		BoolMetric:    nil,
+	}
+
+	analyser := metricv2.NewNumeric(d.SampleSize, true)
+
+	for i := 0; i < nilcount; i++ {
+		analyser.Read(nil)
+	}
+
+	analyser.Read(&firstValue)
+
+	for reader.Next() {
+		val, err := reader.Value()
+		if err != nil {
+			return column, fmt.Errorf("failed to read value : %w", err)
+		}
+
+		valtyped, err := GetFloat64(val)
+		if err != nil {
+			return column, fmt.Errorf("failed to read value : %w", err)
+		}
+
+		analyser.Read(valtyped)
+	}
+
+	analyser.Build(&column)
+
+	return column, nil
+}
+
+//nolint:cyclop
+func GetFloat64(value any) (*float64, error) {
+	var converted float64
+
+	switch valtyped := value.(type) {
+	case float64:
+		converted = valtyped
+	case float32:
+		converted = float64(valtyped)
+	case int:
+		converted = float64(valtyped)
+	case int8:
+		converted = float64(valtyped)
+	case int16:
+		converted = float64(valtyped)
+	case int32:
+		converted = float64(valtyped)
+	case int64:
+		converted = float64(valtyped)
+	case uint:
+		converted = float64(valtyped)
+	case uint8:
+		converted = float64(valtyped)
+	case uint16:
+		converted = float64(valtyped)
+	case uint32:
+		converted = float64(valtyped)
+	case uint64:
+		converted = float64(valtyped)
+	default:
+		return nil, fmt.Errorf("%w : %T", ErrInvalidValueType, value)
+	}
+
+	return &converted, nil
 }
