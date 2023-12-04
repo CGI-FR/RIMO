@@ -2,8 +2,8 @@ package model
 
 type Generic struct {
 	Count    uint  `json:"count"              yaml:"count"              jsonschema:"required"`
-	Empty    uint  `json:"empty,omitempty"    yaml:"empty,omitempty"`
-	Null     uint  `json:"nulls,omitempty"    yaml:"nulls,omitempty"`
+	Empty    uint  `json:"empty"              yaml:"empty"              jsonschema:"required"`
+	Null     uint  `json:"nulls"              yaml:"nulls"              jsonschema:"required"`
 	Distinct uint  `json:"distinct,omitempty" yaml:"distinct,omitempty"`
 	Min      any   `json:"min,omitempty"      yaml:"min,omitempty"`
 	Max      any   `json:"max,omitempty"      yaml:"max,omitempty"`

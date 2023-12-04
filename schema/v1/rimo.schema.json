@@ -103,6 +103,8 @@
       "type": "object",
       "required": [
         "count",
+        "empty",
+        "nulls",
         "samples"
       ]
     },

@@ -6,8 +6,9 @@ type Bool struct {
 
 func NewBool(sampleSize uint, countDistinct bool) *Bool {
 	mainAnalyser := []Analyser[bool]{
-		NewCounter[bool](), // count total, count null
-		NewTrueRatio(),     // calculate true ratio
+		NewCounter[bool](),           // count total, count null, count empty
+		NewSampler[bool](sampleSize), // store few samples
+		NewTrueRatio(),               // calculate true ratio
 	}
 
 	if countDistinct {
