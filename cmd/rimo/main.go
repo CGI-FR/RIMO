@@ -41,6 +41,7 @@ var (
 	builtBy   string //nolint: gochecknoglobals
 
 	sampleSize uint //nolint: gochecknoglobals
+	distinct   bool //nolint: gochecknoglobals
 )
 
 func main() { //nolint:funlen
@@ -93,7 +94,7 @@ func main() { //nolint:funlen
 				log.Fatal().Msgf("error creating writer: %v", err)
 			}
 
-			driver := rimo.Driver{SampleSize: sampleSize}
+			driver := rimo.Driver{SampleSize: sampleSize, Distinct: distinct}
 
 			err = driver.AnalyseBase(reader, writer)
 			if err != nil {
@@ -105,6 +106,7 @@ func main() { //nolint:funlen
 	}
 
 	rimoAnalyseCmd.Flags().UintVar(&sampleSize, "sample-size", DefaultSampleSize, "number of sample value to collect")
+	rimoAnalyseCmd.Flags().BoolVarP(&distinct, "distinct", "d", false, "count distinct values")
 
 	rootCmd.AddCommand(rimoAnalyseCmd)
 	rootCmd.AddCommand(rimoSchemaCmd)
@@ -113,56 +115,4 @@ func main() { //nolint:funlen
 		log.Err(err).Msg("Error when executing command")
 		os.Exit(1)
 	}
-}
-
-func FilesList(path string, extension string) ([]string, error) {
-	pattern := filepath.Join(path, "*"+extension)
-
-	files, err := filepath.Glob(pattern)
-	if err != nil {
-		return nil, fmt.Errorf("error listing files: %w", err)
-	}
-
-	return files, nil
-}
-
-var ErrNoFile = fmt.Errorf("no file found")
-
-func BuildFilepathList(path string, extension string) ([]string, error) {
-	err := ValidateDirPath(path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to validate input directory: %w", err)
-	}
-
-	pattern := filepath.Join(path, "*"+extension)
-
-	files, err := filepath.Glob(pattern)
-	if err != nil {
-		return nil, fmt.Errorf("error listing files: %w", err)
-	}
-
-	if len(files) == 0 {
-		return nil, fmt.Errorf("%w : no %s files found in %s", ErrNoFile, extension, path)
-	}
-
-	return files, nil
-}
-
-func ValidateDirPath(path string) error {
-	fileInfo, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", infra.ErrDirDoesNotExist, path)
-	} else if err != nil {
-		return fmt.Errorf("failed to get directory info: %w", err)
-	}
-
-	if !fileInfo.IsDir() {
-		return fmt.Errorf("%w: %s", infra.ErrPathIsNotDir, path)
-	}
-
-	if fileInfo.Mode().Perm()&infra.WriteDirPerm != infra.WriteDirPerm {
-		return fmt.Errorf("%w: %s", infra.ErrWriteDirPermission, path)
-	}
-
-	return nil
 }

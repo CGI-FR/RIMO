@@ -29,6 +29,7 @@ import (
 
 type Driver struct {
 	SampleSize uint
+	Distinct   bool
 }
 
 //nolint:funlen,cyclop,gocognit
@@ -143,7 +144,7 @@ func (d Driver) AnalyseString(nilcount int, firstValue string, reader ColReader)
 		BoolMetric:    nil,
 	}
 
-	analyser := metric.NewString(d.SampleSize, true)
+	analyser := metric.NewString(d.SampleSize, d.Distinct)
 
 	for i := 0; i < nilcount; i++ {
 		analyser.Read(nil)
@@ -181,7 +182,7 @@ func (d Driver) AnalyseNumeric(nilcount int, firstValue any, reader ColReader) (
 		BoolMetric:    nil,
 	}
 
-	analyser := metric.NewNumeric(d.SampleSize, true)
+	analyser := metric.NewNumeric(d.SampleSize, d.Distinct)
 
 	for i := 0; i < nilcount; i++ {
 		analyser.Read(nil)
@@ -224,7 +225,7 @@ func (d Driver) AnalyseBool(nilcount int, firstValue bool, reader ColReader) (mo
 		BoolMetric:    &model.Bool{}, //nolint:exhaustruct
 	}
 
-	analyser := metric.NewBool(d.SampleSize, true)
+	analyser := metric.NewBool(d.SampleSize, d.Distinct)
 
 	for i := 0; i < nilcount; i++ {
 		analyser.Read(nil)
