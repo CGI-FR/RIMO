@@ -17,7 +17,7 @@
 
 package rimo
 
-import "github.com/cgi-fr/rimo/pkg/modelv2"
+import "github.com/cgi-fr/rimo/pkg/model"
 
 type ColReader interface {
 	ColName() string
@@ -33,5 +33,5 @@ type Reader interface {
 }
 
 type Writer interface {
-	Export(base *modelv2.Base) error
+	Export(base *model.Base) error
 }

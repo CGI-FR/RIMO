@@ -1,4 +1,4 @@
-package modelv2
+package model
 
 type Column struct {
 	Name string `json:"name" yaml:"name" jsonschema:"required"`

@@ -1,6 +1,6 @@
-package metricv2
+package metric
 
-import "github.com/cgi-fr/rimo/pkg/modelv2"
+import "github.com/cgi-fr/rimo/pkg/model"
 
 type Mean struct {
 	count uint
@@ -24,8 +24,8 @@ func (a *Mean) Read(value *float64) {
 	a.mean += (*value - a.mean) / float64(a.count)
 }
 
-func (a *Mean) Build(metric *modelv2.Column) {
-	metric.NumericMetric = &modelv2.Numeric{
+func (a *Mean) Build(metric *model.Column) {
+	metric.NumericMetric = &model.Numeric{
 		Mean: a.mean,
 	}
 }

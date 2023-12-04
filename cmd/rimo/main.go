@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 
 	"github.com/cgi-fr/rimo/internal/infra"
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/cgi-fr/rimo/pkg/rimo"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -63,7 +63,7 @@ func main() { //nolint:funlen
 		Short: "Return rimo jsonschema",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			jsonschema, err := modelv2.GetJSONSchema()
+			jsonschema, err := model.GetJSONSchema()
 			if err != nil {
 				os.Exit(1)
 			}

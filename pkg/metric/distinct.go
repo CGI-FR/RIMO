@@ -1,7 +1,7 @@
-package metricv2
+package metric
 
 import (
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 type Distinct[T Accepted] struct {
@@ -20,6 +20,6 @@ func (a *Distinct[T]) Read(value *T) {
 	}
 }
 
-func (a *Distinct[T]) Build(metric *modelv2.Column) {
+func (a *Distinct[T]) Build(metric *model.Column) {
 	metric.MainMetric.Distinct = uint(len(a.values))
 }

@@ -1,6 +1,6 @@
-package metricv2
+package metric
 
-import "github.com/cgi-fr/rimo/pkg/modelv2"
+import "github.com/cgi-fr/rimo/pkg/model"
 
 type TrueRatio struct {
 	countTrue uint
@@ -26,8 +26,8 @@ func (a *TrueRatio) Read(value *bool) {
 	}
 }
 
-func (a *TrueRatio) Build(metric *modelv2.Column) {
-	metric.BoolMetric = &modelv2.Bool{
+func (a *TrueRatio) Build(metric *model.Column) {
+	metric.BoolMetric = &model.Bool{
 		TrueRatio: float64(a.countTrue) / float64(a.count),
 	}
 }

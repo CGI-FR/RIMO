@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/cgi-fr/rimo/pkg/metricv2"
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/metric"
+	"github.com/cgi-fr/rimo/pkg/model"
 
 	"github.com/rs/zerolog/log"
 )
@@ -35,8 +35,8 @@ type Driver struct {
 func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 	baseName := reader.BaseName()
 
-	base := modelv2.NewBase(baseName)
-	tables := map[string]modelv2.Table{}
+	base := model.NewBase(baseName)
+	tables := map[string]model.Table{}
 
 	for reader.Next() { // itère colonne par colonne
 		valreader, err := reader.Col()
@@ -63,9 +63,9 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 
 				table, exists := tables[valreader.TableName()]
 				if !exists {
-					table = modelv2.Table{
+					table = model.Table{
 						Name:    valreader.TableName(),
-						Columns: []modelv2.Column{},
+						Columns: []model.Column{},
 					}
 				}
 
@@ -80,9 +80,9 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 
 				table, exists := tables[valreader.TableName()]
 				if !exists {
-					table = modelv2.Table{
+					table = model.Table{
 						Name:    valreader.TableName(),
-						Columns: []modelv2.Column{},
+						Columns: []model.Column{},
 					}
 				}
 
@@ -97,9 +97,9 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 
 				table, exists := tables[valreader.TableName()]
 				if !exists {
-					table = modelv2.Table{
+					table = model.Table{
 						Name:    valreader.TableName(),
-						Columns: []modelv2.Column{},
+						Columns: []model.Column{},
 					}
 				}
 
@@ -132,18 +132,18 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 	return nil
 }
 
-func (d Driver) AnalyseString(nilcount int, firstValue string, reader ColReader) (modelv2.Column, error) {
-	column := modelv2.Column{
+func (d Driver) AnalyseString(nilcount int, firstValue string, reader ColReader) (model.Column, error) {
+	column := model.Column{
 		Name:          reader.ColName(),
 		Type:          "string",
-		Config:        modelv2.Config{},  //nolint:exhaustruct
-		MainMetric:    modelv2.Generic{}, //nolint:exhaustruct
-		StringMetric:  &modelv2.String{}, //nolint:exhaustruct
+		Config:        model.Config{},  //nolint:exhaustruct
+		MainMetric:    model.Generic{}, //nolint:exhaustruct
+		StringMetric:  &model.String{}, //nolint:exhaustruct
 		NumericMetric: nil,
 		BoolMetric:    nil,
 	}
 
-	analyser := metricv2.NewString(d.SampleSize, true)
+	analyser := metric.NewString(d.SampleSize, true)
 
 	for i := 0; i < nilcount; i++ {
 		analyser.Read(nil)
@@ -170,18 +170,18 @@ func (d Driver) AnalyseString(nilcount int, firstValue string, reader ColReader)
 	return column, nil
 }
 
-func (d Driver) AnalyseNumeric(nilcount int, firstValue any, reader ColReader) (modelv2.Column, error) {
-	column := modelv2.Column{
+func (d Driver) AnalyseNumeric(nilcount int, firstValue any, reader ColReader) (model.Column, error) {
+	column := model.Column{
 		Name:          reader.ColName(),
 		Type:          "numeric",
-		Config:        modelv2.Config{},  //nolint:exhaustruct
-		MainMetric:    modelv2.Generic{}, //nolint:exhaustruct
+		Config:        model.Config{},  //nolint:exhaustruct
+		MainMetric:    model.Generic{}, //nolint:exhaustruct
 		StringMetric:  nil,
-		NumericMetric: &modelv2.Numeric{}, //nolint:exhaustruct
+		NumericMetric: &model.Numeric{}, //nolint:exhaustruct
 		BoolMetric:    nil,
 	}
 
-	analyser := metricv2.NewNumeric(d.SampleSize, true)
+	analyser := metric.NewNumeric(d.SampleSize, true)
 
 	for i := 0; i < nilcount; i++ {
 		analyser.Read(nil)
@@ -213,18 +213,18 @@ func (d Driver) AnalyseNumeric(nilcount int, firstValue any, reader ColReader) (
 	return column, nil
 }
 
-func (d Driver) AnalyseBool(nilcount int, firstValue bool, reader ColReader) (modelv2.Column, error) {
-	column := modelv2.Column{
+func (d Driver) AnalyseBool(nilcount int, firstValue bool, reader ColReader) (model.Column, error) {
+	column := model.Column{
 		Name:          reader.ColName(),
 		Type:          "bool",
-		Config:        modelv2.Config{},  //nolint:exhaustruct
-		MainMetric:    modelv2.Generic{}, //nolint:exhaustruct
+		Config:        model.Config{},  //nolint:exhaustruct
+		MainMetric:    model.Generic{}, //nolint:exhaustruct
 		StringMetric:  nil,
 		NumericMetric: nil,
-		BoolMetric:    &modelv2.Bool{}, //nolint:exhaustruct
+		BoolMetric:    &model.Bool{}, //nolint:exhaustruct
 	}
 
-	analyser := metricv2.NewBool(d.SampleSize, true)
+	analyser := metric.NewBool(d.SampleSize, true)
 
 	for i := 0; i < nilcount; i++ {
 		analyser.Read(nil)

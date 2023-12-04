@@ -1,4 +1,4 @@
-package modelv2
+package model
 
 type Generic struct {
 	Count    uint  `json:"count"              yaml:"count"              jsonschema:"required"`

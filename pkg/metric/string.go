@@ -1,9 +1,9 @@
-package metricv2
+package metric
 
 import (
 	"sort"
 
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/model"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
@@ -61,24 +61,24 @@ func (a *String) Read(value *string) {
 	}
 }
 
-func (a *String) Build(metric *modelv2.Column) {
+func (a *String) Build(metric *model.Column) {
 	a.main.Build(metric)
 
-	metric.StringMetric = &modelv2.String{
+	metric.StringMetric = &model.String{
 		MinLen:   slices.Min(maps.Keys(a.byLen)),
 		MaxLen:   slices.Max(maps.Keys(a.byLen)),
 		CountLen: len(a.byLen),
-		Lengths:  make([]modelv2.StringLen, 0, len(a.byLen)),
+		Lengths:  make([]model.StringLen, 0, len(a.byLen)),
 	}
 
 	for length, analyser := range a.byLen {
-		lenMetric := modelv2.Column{} //nolint:exhaustruct
+		lenMetric := model.Column{} //nolint:exhaustruct
 		analyser.Build(&lenMetric)
 
-		strlen := modelv2.StringLen{
+		strlen := model.StringLen{
 			Length:  length,
 			Freq:    float64(lenMetric.MainMetric.Count) / float64(metric.MainMetric.Count),
-			Metrics: modelv2.Generic{}, //nolint:exhaustruct
+			Metrics: model.Generic{}, //nolint:exhaustruct
 		}
 		strlen.Metrics.Count = lenMetric.MainMetric.Count
 		strlen.Metrics.Empty = lenMetric.MainMetric.Empty

@@ -1,7 +1,7 @@
-package metricv2
+package metric
 
 import (
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/model"
 	"golang.org/x/exp/constraints"
 )
 
@@ -35,7 +35,7 @@ func (a *MinMax[T]) Read(value *T) {
 	}
 }
 
-func (a *MinMax[T]) Build(metric *modelv2.Column) {
+func (a *MinMax[T]) Build(metric *model.Column) {
 	metric.MainMetric.Min = a.min
 	metric.MainMetric.Max = a.max
 }

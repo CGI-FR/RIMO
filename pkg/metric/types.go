@@ -1,4 +1,4 @@
-package metricv2
+package metric
 
 import "golang.org/x/exp/constraints"
 

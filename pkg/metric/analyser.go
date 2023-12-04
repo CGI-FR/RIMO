@@ -1,12 +1,12 @@
-package metricv2
+package metric
 
 import (
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 type Analyser[T Accepted] interface {
 	Read(*T)
-	Build(*modelv2.Column)
+	Build(*model.Column)
 }
 
 type Multi[T Accepted] struct {
@@ -19,7 +19,7 @@ func (m Multi[T]) Read(value *T) {
 	}
 }
 
-func (m Multi[T]) Build(metric *modelv2.Column) {
+func (m Multi[T]) Build(metric *model.Column) {
 	for _, a := range m.analyser {
 		a.Build(metric)
 	}

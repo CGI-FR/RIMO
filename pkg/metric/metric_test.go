@@ -1,10 +1,10 @@
-package metricv2_test
+package metric_test
 
 import (
 	"testing"
 
-	"github.com/cgi-fr/rimo/pkg/metricv2"
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/metric"
+	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,8 +17,8 @@ func TestStringMetric(t *testing.T) { //nolint:funlen
 	min := ""
 	max := "4441"
 
-	expectedMetric := modelv2.Column{ //nolint:exhaustruct
-		MainMetric: modelv2.Generic{
+	expectedMetric := model.Column{ //nolint:exhaustruct
+		MainMetric: model.Generic{
 			Count:    12,
 			Empty:    1,
 			Null:     1,
@@ -27,15 +27,15 @@ func TestStringMetric(t *testing.T) { //nolint:funlen
 			Min:      &min,
 			Max:      &max,
 		},
-		StringMetric: &modelv2.String{
+		StringMetric: &model.String{
 			MinLen:   0,
 			MaxLen:   4,
 			CountLen: 5,
-			Lengths: []modelv2.StringLen{
+			Lengths: []model.StringLen{
 				{
 					Length: 1,
 					Freq:   0.3333333333333333,
-					Metrics: modelv2.Generic{
+					Metrics: model.Generic{
 						Count:    4,
 						Empty:    0,
 						Null:     0,
@@ -49,9 +49,9 @@ func TestStringMetric(t *testing.T) { //nolint:funlen
 		},
 	}
 
-	actualMetric := modelv2.Column{} //nolint:exhaustruct
+	actualMetric := model.Column{} //nolint:exhaustruct
 
-	analyser := metricv2.NewString(5, true)
+	analyser := metric.NewString(5, true)
 	for index := range text {
 		analyser.Read(&text[index])
 	}

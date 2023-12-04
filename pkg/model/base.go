@@ -1,4 +1,4 @@
-package modelv2
+package model
 
 const DefaultTableSize = 10
 

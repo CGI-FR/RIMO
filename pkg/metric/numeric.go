@@ -1,4 +1,4 @@
-package metricv2
+package metric
 
 type Numeric struct {
 	Multi[float64]

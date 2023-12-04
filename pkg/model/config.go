@@ -1,4 +1,4 @@
-package modelv2
+package model
 
 type Config struct {
 	Concept      string   `json:"concept"      yaml:"concept"      jsonschema:"required"`

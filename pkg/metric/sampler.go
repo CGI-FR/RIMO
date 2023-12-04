@@ -1,9 +1,9 @@
-package metricv2
+package metric
 
 import (
 	"math/rand"
 
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 type Sampler[T Accepted] struct {
@@ -37,7 +37,7 @@ func (s *Sampler[T]) Read(value *T) {
 	}
 }
 
-func (s *Sampler[T]) Build(metric *modelv2.Column) {
+func (s *Sampler[T]) Build(metric *model.Column) {
 	metric.MainMetric.Samples = make([]any, len(s.samples))
 	for i, s := range s.samples {
 		metric.MainMetric.Samples[i] = s

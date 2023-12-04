@@ -1,7 +1,7 @@
-package metricv2
+package metric
 
 import (
-	"github.com/cgi-fr/rimo/pkg/modelv2"
+	"github.com/cgi-fr/rimo/pkg/model"
 )
 
 type Counter[T Accepted] struct {
@@ -31,7 +31,7 @@ func (c *Counter[T]) Read(value *T) {
 	}
 }
 
-func (c *Counter[T]) Build(metric *modelv2.Column) {
+func (c *Counter[T]) Build(metric *model.Column) {
 	metric.MainMetric.Count = c.countTotal
 	metric.MainMetric.Null = c.countNulls
 	metric.MainMetric.Empty = c.countEmpty
