@@ -19,6 +19,7 @@ package rimo
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/cgi-fr/rimo/pkg/metricv2"
 	"github.com/cgi-fr/rimo/pkg/modelv2"
@@ -35,6 +36,7 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 	baseName := reader.BaseName()
 
 	base := modelv2.NewBase(baseName)
+	tables := map[string]modelv2.Table{}
 
 	for reader.Next() { // itère colonne par colonne
 		valreader, err := reader.Col()
@@ -59,37 +61,51 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 					return fmt.Errorf("failed to analyse column : %w", err)
 				}
 
-				table, exists := base.Tables[valreader.TableName()]
+				table, exists := tables[valreader.TableName()]
 				if !exists {
 					table = modelv2.Table{
+						Name:    valreader.TableName(),
 						Columns: []modelv2.Column{},
 					}
 				}
 
 				table.Columns = append(table.Columns, col)
 
-				base.Tables[valreader.TableName()] = table
+				tables[valreader.TableName()] = table
 			case float64:
 				col, err := d.AnalyseNumeric(nilcount, valtyped, valreader)
 				if err != nil {
 					return fmt.Errorf("failed to analyse column : %w", err)
 				}
 
-				table, exists := base.Tables[valreader.TableName()]
+				table, exists := tables[valreader.TableName()]
 				if !exists {
 					table = modelv2.Table{
+						Name:    valreader.TableName(),
 						Columns: []modelv2.Column{},
 					}
 				}
 
 				table.Columns = append(table.Columns, col)
 
-				base.Tables[valreader.TableName()] = table
+				tables[valreader.TableName()] = table
 			case nil:
 				nilcount++
 			}
 		}
 	}
+
+	for _, table := range tables {
+		sort.SliceStable(table.Columns, func(i, j int) bool {
+			return table.Columns[i].Name < table.Columns[j].Name
+		})
+
+		base.Tables = append(base.Tables, table)
+	}
+
+	sort.SliceStable(base.Tables, func(i, j int) bool {
+		return base.Tables[i].Name < base.Tables[j].Name
+	})
 
 	err := writer.Export(base)
 	if err != nil {
