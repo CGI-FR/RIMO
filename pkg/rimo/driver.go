@@ -26,7 +26,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func AnalyseBase(reader Reader, writer Writer) error {
+type Driver struct {
+	SampleSize uint
+}
+
+func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 	// log.Logger = zerolog.New(os.Stdout).Level(zerolog.DebugLevel)
 	baseName := reader.BaseName()
 
@@ -52,7 +56,7 @@ func AnalyseBase(reader Reader, writer Writer) error {
 
 			switch valtyped := val.(type) {
 			case string:
-				col, err := AnalyseString(nilcount, valtyped, valreader)
+				col, err := d.AnalyseString(nilcount, valtyped, valreader)
 				if err != nil {
 					return fmt.Errorf("failed to analyse column : %w", err)
 				}
@@ -87,7 +91,7 @@ func AnalyseBase(reader Reader, writer Writer) error {
 	return nil
 }
 
-func AnalyseString(nilcount int, firstValue string, reader ColReader) (modelv2.Column, error) {
+func (d Driver) AnalyseString(nilcount int, firstValue string, reader ColReader) (modelv2.Column, error) {
 	column := modelv2.Column{
 		Name:          reader.ColName(),
 		Type:          "string",
@@ -98,7 +102,7 @@ func AnalyseString(nilcount int, firstValue string, reader ColReader) (modelv2.C
 		BoolMetric:    nil,
 	}
 
-	analyser := metricv2.NewString(5, true)
+	analyser := metricv2.NewString(d.SampleSize, true)
 
 	for i := 0; i < nilcount; i++ {
 		analyser.Read(nil)

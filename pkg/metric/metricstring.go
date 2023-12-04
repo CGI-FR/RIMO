@@ -197,16 +197,16 @@ func (s *String) Build() model.Col[string] {
 	result.StringMetric.MaxLen = lengths[len(lengths)-1]
 
 	for _, length := range lengths {
-		len := model.StringLen{}
-		len.Length = length
-		len.Freq = float64(s.byLen[length].CountTotal()) / float64(s.main.CountTotal())
-		len.Metrics.Count = s.byLen[length].CountTotal()
-		len.Metrics.Empty = s.byLen[length].CountEmpty()
-		len.Metrics.Null = s.byLen[length].CountNulls()
-		len.Metrics.Max = s.byLen[length].Max()
-		len.Metrics.Min = s.byLen[length].Min()
-		len.Metrics.Samples = s.byLen[length].Samples()
-		result.StringMetric.Lengths = append(result.StringMetric.Lengths, len)
+		strlen := model.StringLen{} //nolint:exhaustruct
+		strlen.Length = length
+		strlen.Freq = float64(s.byLen[length].CountTotal()) / float64(s.main.CountTotal())
+		strlen.Metrics.Count = s.byLen[length].CountTotal()
+		strlen.Metrics.Empty = s.byLen[length].CountEmpty()
+		strlen.Metrics.Null = s.byLen[length].CountNulls()
+		strlen.Metrics.Max = s.byLen[length].Max()
+		strlen.Metrics.Min = s.byLen[length].Min()
+		strlen.Metrics.Samples = s.byLen[length].Samples()
+		result.StringMetric.Lengths = append(result.StringMetric.Lengths, strlen)
 	}
 
 	return result

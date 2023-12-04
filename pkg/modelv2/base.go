@@ -1,5 +1,7 @@
 package modelv2
 
+const DefaultTableSize = 10
+
 type Base struct {
 	Name   string           `json:"database" yaml:"database" jsonschema:"required"`
 	Tables map[string]Table `json:"tables"   yaml:"tables"   jsonschema:"required"`
@@ -12,6 +14,6 @@ type Table struct {
 func NewBase(name string) *Base {
 	return &Base{
 		Name:   name,
-		Tables: make(map[string]Table, 10),
+		Tables: make(map[string]Table, DefaultTableSize),
 	}
 }

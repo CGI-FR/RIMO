@@ -85,7 +85,9 @@ func NewJSONLFileReader(basename string, filepath string) (*JSONLFileReader, err
 		return nil, fmt.Errorf("%w: %w", ErrReadFile, err)
 	}
 
-	source.Seek(0, 0)
+	if _, err := source.Seek(0, 0); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrReadFile, err)
+	}
 
 	columns := make([]string, 0, len(template))
 	for column := range template {
@@ -109,7 +111,10 @@ func (fr *JSONLFileReader) BaseName() string {
 func (fr *JSONLFileReader) Next() bool {
 	fr.current++
 
-	fr.source.Seek(0, 0)
+	if _, err := fr.source.Seek(0, 0); err != nil {
+		panic(err)
+	}
+
 	fr.decoder = json.NewDecoder(fr.source)
 
 	return fr.current < len(fr.columns)

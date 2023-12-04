@@ -72,13 +72,13 @@ func (a *String) Build(metric *modelv2.Column) {
 	}
 
 	for length, analyser := range a.byLen {
-		lenMetric := modelv2.Column{}
+		lenMetric := modelv2.Column{} //nolint:exhaustruct
 		analyser.Build(&lenMetric)
 
 		strlen := modelv2.StringLen{
 			Length:  length,
 			Freq:    float64(lenMetric.MainMetric.Count) / float64(metric.MainMetric.Count),
-			Metrics: modelv2.Generic{},
+			Metrics: modelv2.Generic{}, //nolint:exhaustruct
 		}
 		strlen.Metrics.Count = lenMetric.MainMetric.Count
 		strlen.Metrics.Empty = lenMetric.MainMetric.Empty

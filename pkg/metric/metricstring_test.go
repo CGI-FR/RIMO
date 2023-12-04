@@ -62,6 +62,8 @@ func TestStringMetric(t *testing.T) {
 }
 
 func TestStringMetricV2(t *testing.T) {
+	t.Parallel()
+
 	analyser := metric.NewString(5)
 
 	strings := []string{"1", "1", "1", "1", "22", "22", "22", "331", "332", "4441", ""}

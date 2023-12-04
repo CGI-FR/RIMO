@@ -17,7 +17,7 @@ func TestStringMetric(t *testing.T) { //nolint:funlen
 	min := ""
 	max := "4441"
 
-	expectedMetric := modelv2.Column{
+	expectedMetric := modelv2.Column{ //nolint:exhaustruct
 		MainMetric: modelv2.Generic{
 			Count:    12,
 			Empty:    1,
@@ -49,7 +49,7 @@ func TestStringMetric(t *testing.T) { //nolint:funlen
 		},
 	}
 
-	actualMetric := modelv2.Column{}
+	actualMetric := modelv2.Column{} //nolint:exhaustruct
 
 	analyser := metricv2.NewString(5, true)
 	for index := range text {
@@ -77,6 +77,6 @@ func TestStringMetric(t *testing.T) { //nolint:funlen
 	for i := 0; i < len(expectedMetric.StringMetric.Lengths); i++ {
 		assert.Equal(t, expectedMetric.StringMetric.Lengths[i].Length, actualMetric.StringMetric.Lengths[i].Length)
 		assert.Equal(t, expectedMetric.StringMetric.Lengths[i].Freq, actualMetric.StringMetric.Lengths[i].Freq)
-		assert.Equal(t, expectedMetric.StringMetric.Lengths[i].Metrics.Samples, actualMetric.StringMetric.Lengths[i].Metrics.Samples)
+		assert.Equal(t, expectedMetric.StringMetric.Lengths[i].Metrics.Samples, actualMetric.StringMetric.Lengths[i].Metrics.Samples) //nolint:lll
 	}
 }

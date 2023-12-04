@@ -30,6 +30,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const DefaultSampleSize = uint(5)
+
 // Provisioned by ldflags.
 var (
 	name      string //nolint: gochecknoglobals
@@ -37,6 +39,8 @@ var (
 	commit    string //nolint: gochecknoglobals
 	buildDate string //nolint: gochecknoglobals
 	builtBy   string //nolint: gochecknoglobals
+
+	sampleSize uint //nolint: gochecknoglobals
 )
 
 func main() { //nolint:funlen
@@ -89,7 +93,9 @@ func main() { //nolint:funlen
 				log.Fatal().Msgf("error creating writer: %v", err)
 			}
 
-			err = rimo.AnalyseBase(reader, writer)
+			driver := rimo.Driver{SampleSize: sampleSize}
+
+			err = driver.AnalyseBase(reader, writer)
 			if err != nil {
 				log.Fatal().Msgf("error generating rimo.yaml: %v", err)
 			}
@@ -97,6 +103,8 @@ func main() { //nolint:funlen
 			log.Info().Msgf("Successfully generated rimo.yaml in %s", outputDir)
 		},
 	}
+
+	rimoAnalyseCmd.Flags().UintVar(&sampleSize, "sample-size", DefaultSampleSize, "number of sample value to collect")
 
 	rootCmd.AddCommand(rimoAnalyseCmd)
 	rootCmd.AddCommand(rimoSchemaCmd)
