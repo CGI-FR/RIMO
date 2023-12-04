@@ -31,7 +31,7 @@ type Driver struct {
 	SampleSize uint
 }
 
-//nolint:funlen,cyclop
+//nolint:funlen,cyclop,gocognit
 func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 	baseName := reader.BaseName()
 
@@ -72,8 +72,25 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 				table.Columns = append(table.Columns, col)
 
 				tables[valreader.TableName()] = table
-			case float64:
+			case float64, float32, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 				col, err := d.AnalyseNumeric(nilcount, valtyped, valreader)
+				if err != nil {
+					return fmt.Errorf("failed to analyse column : %w", err)
+				}
+
+				table, exists := tables[valreader.TableName()]
+				if !exists {
+					table = modelv2.Table{
+						Name:    valreader.TableName(),
+						Columns: []modelv2.Column{},
+					}
+				}
+
+				table.Columns = append(table.Columns, col)
+
+				tables[valreader.TableName()] = table
+			case bool:
+				col, err := d.AnalyseBool(nilcount, valtyped, valreader)
 				if err != nil {
 					return fmt.Errorf("failed to analyse column : %w", err)
 				}
@@ -153,10 +170,10 @@ func (d Driver) AnalyseString(nilcount int, firstValue string, reader ColReader)
 	return column, nil
 }
 
-func (d Driver) AnalyseNumeric(nilcount int, firstValue float64, reader ColReader) (modelv2.Column, error) {
+func (d Driver) AnalyseNumeric(nilcount int, firstValue any, reader ColReader) (modelv2.Column, error) {
 	column := modelv2.Column{
 		Name:          reader.ColName(),
-		Type:          "string",
+		Type:          "numeric",
 		Config:        modelv2.Config{},  //nolint:exhaustruct
 		MainMetric:    modelv2.Generic{}, //nolint:exhaustruct
 		StringMetric:  nil,
@@ -170,7 +187,12 @@ func (d Driver) AnalyseNumeric(nilcount int, firstValue float64, reader ColReade
 		analyser.Read(nil)
 	}
 
-	analyser.Read(&firstValue)
+	valtyped, err := GetFloat64(firstValue)
+	if err != nil {
+		return column, fmt.Errorf("failed to read value : %w", err)
+	}
+
+	analyser.Read(valtyped)
 
 	for reader.Next() {
 		val, err := reader.Value()
@@ -184,6 +206,44 @@ func (d Driver) AnalyseNumeric(nilcount int, firstValue float64, reader ColReade
 		}
 
 		analyser.Read(valtyped)
+	}
+
+	analyser.Build(&column)
+
+	return column, nil
+}
+
+func (d Driver) AnalyseBool(nilcount int, firstValue bool, reader ColReader) (modelv2.Column, error) {
+	column := modelv2.Column{
+		Name:          reader.ColName(),
+		Type:          "bool",
+		Config:        modelv2.Config{},  //nolint:exhaustruct
+		MainMetric:    modelv2.Generic{}, //nolint:exhaustruct
+		StringMetric:  nil,
+		NumericMetric: nil,
+		BoolMetric:    &modelv2.Bool{}, //nolint:exhaustruct
+	}
+
+	analyser := metricv2.NewBool(d.SampleSize, true)
+
+	for i := 0; i < nilcount; i++ {
+		analyser.Read(nil)
+	}
+
+	analyser.Read(&firstValue)
+
+	for reader.Next() {
+		val, err := reader.Value()
+		if err != nil {
+			return column, fmt.Errorf("failed to read value : %w", err)
+		}
+
+		switch valtyped := val.(type) {
+		case bool:
+			analyser.Read(&valtyped)
+		default:
+			return column, fmt.Errorf("invalue value type : %w", err)
+		}
 	}
 
 	analyser.Build(&column)

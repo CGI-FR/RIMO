@@ -2,14 +2,13 @@ package metricv2
 
 import (
 	"github.com/cgi-fr/rimo/pkg/modelv2"
-	"golang.org/x/exp/constraints"
 )
 
-type Distinct[T constraints.Ordered] struct {
+type Distinct[T Accepted] struct {
 	values map[T]int
 }
 
-func NewDistinct[T constraints.Ordered]() *Distinct[T] {
+func NewDistinct[T Accepted]() *Distinct[T] {
 	return &Distinct[T]{
 		values: make(map[T]int, 1024), //nolint:gomnd
 	}

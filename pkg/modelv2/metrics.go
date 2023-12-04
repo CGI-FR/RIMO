@@ -27,4 +27,6 @@ type Numeric struct {
 	Mean float64 `json:"mean"  yaml:"mean" jsonschema:"required"`
 }
 
-type Bool struct{}
+type Bool struct {
+	TrueRatio float64 `json:"trueRatio" yaml:"trueRatio" jsonschema:"required"`
+}

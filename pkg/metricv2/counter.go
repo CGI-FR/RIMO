@@ -2,17 +2,16 @@ package metricv2
 
 import (
 	"github.com/cgi-fr/rimo/pkg/modelv2"
-	"golang.org/x/exp/constraints"
 )
 
-type Counter[T constraints.Ordered] struct {
+type Counter[T Accepted] struct {
 	countTotal uint
 	countNulls uint
 	countEmpty uint
 	zero       T
 }
 
-func NewCounter[T constraints.Ordered]() *Counter[T] {
+func NewCounter[T Accepted]() *Counter[T] {
 	return &Counter[T]{
 		countTotal: 0,
 		countNulls: 0,

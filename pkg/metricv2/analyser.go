@@ -2,15 +2,14 @@ package metricv2
 
 import (
 	"github.com/cgi-fr/rimo/pkg/modelv2"
-	"golang.org/x/exp/constraints"
 )
 
-type Analyser[T constraints.Ordered] interface {
+type Analyser[T Accepted] interface {
 	Read(*T)
 	Build(*modelv2.Column)
 }
 
-type Multi[T constraints.Ordered] struct {
+type Multi[T Accepted] struct {
 	analyser []Analyser[T]
 }
 

@@ -4,16 +4,15 @@ import (
 	"math/rand"
 
 	"github.com/cgi-fr/rimo/pkg/modelv2"
-	"golang.org/x/exp/constraints"
 )
 
-type Sampler[T constraints.Ordered] struct {
+type Sampler[T Accepted] struct {
 	size    uint
 	count   int
 	samples []T
 }
 
-func NewSampler[T constraints.Ordered](size uint) *Sampler[T] {
+func NewSampler[T Accepted](size uint) *Sampler[T] {
 	return &Sampler[T]{
 		size:    size,
 		count:   0,
