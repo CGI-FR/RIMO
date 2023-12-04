@@ -20,7 +20,7 @@ const (
 
 // Benchmark (same as previous analyse_test.go benchmark).
 func BenchmarkAnalyseInterface(b *testing.B) {
-	for _, numLines := range []int{100, 1000, 10000, 100000} {
+	for _, numLines := range []int{100, 1000, 10000} {
 		inputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%d", numLines))
 		outputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%dinterface_output.yaml", numLines))
 
