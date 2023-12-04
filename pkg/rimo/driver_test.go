@@ -8,6 +8,7 @@ import (
 
 	"github.com/cgi-fr/rimo/internal/infra"
 	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,6 +21,8 @@ const (
 
 // Benchmark (same as previous analyse_test.go benchmark).
 func BenchmarkAnalyseInterface(b *testing.B) {
+	zerolog.SetGlobalLevel(zerolog.WarnLevel)
+
 	for _, numLines := range []int{100, 1000, 10000} {
 		inputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%d", numLines))
 		outputPath := filepath.Join(dataDir, fmt.Sprintf("benchmark/mixed/%dinterface_output.yaml", numLines))
