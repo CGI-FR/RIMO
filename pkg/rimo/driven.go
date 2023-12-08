@@ -17,14 +17,19 @@
 
 package rimo
 
-import (
-	"github.com/cgi-fr/rimo/pkg/model"
-)
+import "github.com/cgi-fr/rimo/pkg/model"
+
+type ColReader interface {
+	ColName() string
+	TableName() string
+	Next() bool
+	Value() (any, error)
+}
 
 type Reader interface {
 	BaseName() string
-	Next() bool                                    // itère sur les colonnes.
-	Value() ([]interface{}, string, string, error) // colValues, colName, tableName
+	Next() bool
+	Col() (ColReader, error)
 }
 
 type Writer interface {

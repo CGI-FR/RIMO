@@ -1,0 +1,10 @@
+{"string":"","bool":true,"numeric":0}
+{"string":" ","bool":false,"numeric":1}
+{"string":"_","bool":true,"numeric":3.1415}
+{"string":"new\nline    ","bool":false,"numeric":1.0E+2}
+{"string":"hello world ","bool":true,"numeric":21.2e-7}
+{"string":"tabs\t       ","bool":false,"numeric":-235}
+{"string":"教育漢字","bool":true,"numeric":-0}
+{"string":"\\","bool":false,"numeric":0.0}
+{"string":"\u20ac         ","bool":true,"numeric":9.0}
+{"string":null,"bool":null,"numeric":null}

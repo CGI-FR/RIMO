@@ -21,27 +21,39 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/cgi-fr/rimo/internal/infra"
 	"github.com/cgi-fr/rimo/pkg/model"
 	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
-// Provisioned by ldflags.
+const DefaultSampleSize = uint(5)
+
+//nolint:gochecknoglobals
 var (
-	name      string //nolint: gochecknoglobals
-	version   string //nolint: gochecknoglobals
-	commit    string //nolint: gochecknoglobals
-	buildDate string //nolint: gochecknoglobals
-	builtBy   string //nolint: gochecknoglobals
+	name      string // provisioned by ldflags
+	version   string // provisioned by ldflags
+	commit    string // provisioned by ldflags
+	buildDate string // provisioned by ldflags
+	builtBy   string // provisioned by ldflags
+
+	verbosity string
+	jsonlog   bool
+	debug     bool
+	colormode string
+
+	sampleSize uint
+	distinct   bool //nolint: gochecknoglobals
 )
 
 func main() { //nolint:funlen
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) //nolint: exhaustruct
-
+	cobra.OnInitialize(initLog)
 	log.Info().Msgf("%v %v (commit=%v date=%v by=%v)", name, version, commit, buildDate, builtBy)
 
 	rootCmd := &cobra.Command{ //nolint:exhaustruct
@@ -53,6 +65,12 @@ func main() { //nolint:funlen
 		This is free software: you are free to change and redistribute it.
 		There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDate, builtBy),
 	}
+
+	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "warn",
+		"set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "add debug information to logs (very slow)")
+	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
+	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
 
 	rimoSchemaCmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "jsonschema",
@@ -77,32 +95,21 @@ func main() { //nolint:funlen
 			outputDir := args[1]
 
 			// Reader
-
-			inputList, err := BuildFilepathList(inputDir, ".jsonl")
-			if err != nil {
-				log.Fatal().Msgf("error listing files: %v", err)
-			}
-
-			reader, err := infra.FilesReaderFactory(inputList)
+			reader, err := infra.NewJSONLFolderReader(inputDir)
 			if err != nil {
 				log.Fatal().Msgf("error creating reader: %v", err)
 			}
 
-			// Writer
-			// (could be relocated to infra.FilesReader)
-			baseName, _, err := infra.ExtractName(inputList[0])
-			if err != nil {
-				log.Fatal().Msgf("error extracting base name: %v", err)
-			}
-
-			outputPath := filepath.Join(outputDir, fmt.Sprintf("%s.yaml", baseName))
+			outputPath := filepath.Join(outputDir, fmt.Sprintf("%s.yaml", reader.BaseName()))
 
 			writer, err := infra.YAMLWriterFactory(outputPath)
 			if err != nil {
 				log.Fatal().Msgf("error creating writer: %v", err)
 			}
 
-			err = rimo.AnalyseBase(reader, writer)
+			driver := rimo.Driver{SampleSize: sampleSize, Distinct: distinct}
+
+			err = driver.AnalyseBase(reader, writer)
 			if err != nil {
 				log.Fatal().Msgf("error generating rimo.yaml: %v", err)
 			}
@@ -110,6 +117,9 @@ func main() { //nolint:funlen
 			log.Info().Msgf("Successfully generated rimo.yaml in %s", outputDir)
 		},
 	}
+
+	rimoAnalyseCmd.Flags().UintVar(&sampleSize, "sample-size", DefaultSampleSize, "number of sample value to collect")
+	rimoAnalyseCmd.Flags().BoolVarP(&distinct, "distinct", "d", false, "count distinct values")
 
 	rootCmd.AddCommand(rimoAnalyseCmd)
 	rootCmd.AddCommand(rimoSchemaCmd)
@@ -120,54 +130,44 @@ func main() { //nolint:funlen
 	}
 }
 
-func FilesList(path string, extension string) ([]string, error) {
-	pattern := filepath.Join(path, "*"+extension)
+func initLog() {
+	color := false
 
-	files, err := filepath.Glob(pattern)
-	if err != nil {
-		return nil, fmt.Errorf("error listing files: %w", err)
+	switch strings.ToLower(colormode) {
+	case "auto":
+		if isatty.IsTerminal(os.Stdout.Fd()) && runtime.GOOS != "windows" {
+			color = true
+		}
+	case "yes", "true", "1", "on", "enable":
+		color = true
 	}
 
-	return files, nil
+	if jsonlog {
+		log.Logger = zerolog.New(os.Stderr)
+	} else {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: !color}) //nolint:exhaustruct
+	}
+
+	if debug {
+		log.Logger = log.Logger.With().Caller().Logger()
+	}
+
+	setVerbosity()
 }
 
-var ErrNoFile = fmt.Errorf("no file found")
-
-func BuildFilepathList(path string, extension string) ([]string, error) {
-	err := ValidateDirPath(path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to validate input directory: %w", err)
+func setVerbosity() {
+	switch verbosity {
+	case "trace", "5":
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
+	case "debug", "4":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case "info", "3":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case "warn", "2":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	case "error", "1":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	default:
+		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
-
-	pattern := filepath.Join(path, "*"+extension)
-
-	files, err := filepath.Glob(pattern)
-	if err != nil {
-		return nil, fmt.Errorf("error listing files: %w", err)
-	}
-
-	if len(files) == 0 {
-		return nil, fmt.Errorf("%w : no %s files found in %s", ErrNoFile, extension, path)
-	}
-
-	return files, nil
-}
-
-func ValidateDirPath(path string) error {
-	fileInfo, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", infra.ErrDirDoesNotExist, path)
-	} else if err != nil {
-		return fmt.Errorf("failed to get directory info: %w", err)
-	}
-
-	if !fileInfo.IsDir() {
-		return fmt.Errorf("%w: %s", infra.ErrPathIsNotDir, path)
-	}
-
-	if fileInfo.Mode().Perm()&infra.WriteDirPerm != infra.WriteDirPerm {
-		return fmt.Errorf("%w: %s", infra.ErrWriteDirPermission, path)
-	}
-
-	return nil
 }

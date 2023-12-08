@@ -1,173 +1,180 @@
-// Copyright (C) 2023 CGI France
-//
-// This file is part of RIMO.
-//
-// RIMO is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// RIMO is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with RIMO.  If not, see <http://www.gnu.org/licenses/>.
-
 package infra
 
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+	"strings"
+
+	"github.com/cgi-fr/rimo/pkg/rimo"
+	"github.com/goccy/go-json"
+	"github.com/rs/zerolog/log"
 )
 
-// Errors declaration.
-var (
-	ErrInvalidFilePath = errors.New("failed to validate path")
-	ErrNoFilePath      = errors.New("no file path provided")
-	ErrNonUniqueBase   = errors.New("base name is not unique")
-)
+var ErrReadFile = errors.New("error while reading file")
 
-// FilesReader can read multiple type of file and feed data to rimo.
-// FilesReader is responsible of :
-// - BaseName() return the name of the base
-// - Next() return true if there is a next value to read
-// - Value() return the value of the current column, the name of the column and the name of the table
-// Interface itself with a Loader interface. Which currently only supports YAML files.
-// Loader and FilesReader can be initialized with LoaderFactory and FilesReaderFactory.
-type FilesReader struct {
-	filepathList []string
-	loader       JSONLinesLoader // responsible of loading a file format
-	baseName     string
-	// variable for looping over columns
-	fileIndex       int
-	colNameMapIndex map[int]string // map of column name by index
-	colIndex        int            // value of current column index
-	// given by Value()
-	dataMap   map[string][]interface{}
-	tableName string // filled by FilesReader
+type JSONLFolderReader struct {
+	basename string
+	readers  []*JSONLFileReader
+	current  int
 }
 
-// Constructor for FilesReader.
-func FilesReaderFactory(filepathList []string) (*FilesReader, error) {
-	var err error
+func NewJSONLFolderReader(folderpath string) (*JSONLFolderReader, error) {
+	log.Trace().Str("path", folderpath).Msg("reading folder")
 
-	// Process inputDirList
-	if len(filepathList) == 0 {
-		return nil, ErrNoFilePath
-	}
+	basename := path.Base(folderpath)
 
-	for _, path := range filepathList {
-		err := ValidateFilePath(path)
-		if err != nil {
-			return nil, ErrInvalidFilePath
-		}
-	}
+	pattern := filepath.Join(folderpath, "*.jsonl")
 
-	// Initialize FilesReader
-	var filesReader FilesReader
-	filesReader.filepathList = filepathList
-	filesReader.fileIndex = -1
-
-	filesReader.baseName, err = filesReader.isBaseUnique()
+	files, err := filepath.Glob(pattern)
 	if err != nil {
-		return nil, fmt.Errorf("base is not unique: %w", err)
+		return nil, fmt.Errorf("error listing files: %w", err)
 	}
 
-	// Use of JSONLinesLoader
-	filesReader.loader = JSONLinesLoader{}
+	readers := make([]*JSONLFileReader, len(files))
 
-	return &filesReader, nil
-}
+	for index, filepath := range files {
+		log.Trace().Str("path", filepath).Msg("scanning file")
 
-// Reader interface implementation
-
-func (r *FilesReader) BaseName() string {
-	return r.baseName
-}
-
-func (r *FilesReader) Next() bool {
-	// First call to Next()
-	if r.fileIndex == -1 {
-		r.fileIndex = 0
-		r.colIndex = 0
-
-		return true
-	}
-
-	// Current file contain column left to process.
-	if r.colIndex < len(r.dataMap) {
-		r.colIndex++
-	}
-
-	// Current file contain no columns left to process.
-	if r.colIndex == len(r.dataMap) {
-		// Current file is last file.
-		if r.fileIndex == len(r.filepathList)-1 {
-			return false
-		}
-		// There is a next file.
-		r.fileIndex++
-		r.colIndex = 0
-	}
-
-	return true
-}
-
-// Charger les fichiers un à un dans une dataMap.
-// Retourne les valeurs d'une colonne, son nom et le nom de table.
-func (r *FilesReader) Value() ([]interface{}, string, string, error) {
-	var err error
-
-	// colIndex = 0 : new file to load
-	if r.colIndex == 0 {
-		filepath := r.filepathList[r.fileIndex]
-
-		// Extract table name from file name
-		_, r.tableName, err = ExtractName(filepath)
+		readers[index], err = NewJSONLFileReader(basename, filepath)
 		if err != nil {
-			return nil, "", "", fmt.Errorf("failed to extract table name: %w", err)
-		}
-
-		// Load file in dataMap
-		r.dataMap, err = r.loader.Load(r.filepathList[r.fileIndex])
-		if err != nil {
-			panic(err)
-		}
-
-		// Create a map of column name by index
-		r.colNameMapIndex = make(map[int]string, 0)
-		i := 0
-
-		for k := range r.dataMap {
-			r.colNameMapIndex[i] = k
-			i++
+			return nil, fmt.Errorf("error opening files: %w", err)
 		}
 	}
 
-	// colIndex = n : current file have been partially processed
-	currentColName := r.colNameMapIndex[r.colIndex]
-	// return values, colName, tableName
-	return r.dataMap[currentColName], currentColName, r.tableName, nil
+	return &JSONLFolderReader{
+		basename: basename,
+		readers:  readers,
+		current:  0,
+	}, nil
 }
 
-func (r *FilesReader) isBaseUnique() (string, error) {
-	baseName, _, err := ExtractName(r.filepathList[0])
+func (r *JSONLFolderReader) BaseName() string {
+	return r.basename
+}
+
+func (r *JSONLFolderReader) Next() bool {
+	if r.current < len(r.readers) && !r.readers[r.current].Next() {
+		r.current++
+
+		return r.Next()
+	}
+
+	return r.current < len(r.readers)
+}
+
+func (r *JSONLFolderReader) Col() (rimo.ColReader, error) { //nolint:ireturn
+	return r.readers[r.current].Col()
+}
+
+type JSONLFileReader struct {
+	tablename string
+	source    *os.File
+	columns   []string
+	current   int
+	decoder   *json.Decoder
+	basename  string
+}
+
+func NewJSONLFileReader(basename string, filepath string) (*JSONLFileReader, error) {
+	log.Trace().Str("path", filepath).Msg("opening file")
+
+	source, err := os.Open(filepath)
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("%w", err)
 	}
 
-	for _, path := range r.filepathList {
-		baseNameI, _, err := ExtractName(path)
-		if err != nil {
-			return "", err
-		}
+	template := map[string]any{}
 
-		if baseName != baseNameI {
-			return "", fmt.Errorf("%w : %s and %s", ErrNonUniqueBase, baseName, baseNameI)
-		}
+	log.Trace().Str("path", filepath).Msg("decoding line template")
+
+	decoder := json.NewDecoder(source)
+	if err := decoder.Decode(&template); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrReadFile, err)
 	}
 
-	return baseName, nil
+	log.Trace().Str("path", filepath).Any("template", template).Msg("decoded line template")
+
+	if _, err := source.Seek(0, 0); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrReadFile, err)
+	}
+
+	columns := make([]string, 0, len(template))
+
+	for column := range template {
+		log.Trace().Str("path", filepath).Any("column", column).Msg("registering column")
+
+		columns = append(columns, column)
+	}
+
+	return &JSONLFileReader{
+		tablename: strings.TrimSuffix(path.Base(filepath), path.Ext(filepath)),
+		source:    source,
+		columns:   columns,
+		current:   -1,
+		decoder:   json.NewDecoder(source),
+		basename:  basename,
+	}, nil
+}
+
+func (fr *JSONLFileReader) BaseName() string {
+	return fr.basename
+}
+
+func (fr *JSONLFileReader) Next() bool {
+	fr.current++
+
+	if _, err := fr.source.Seek(0, 0); err != nil {
+		panic(err)
+	}
+
+	fr.decoder = json.NewDecoder(fr.source)
+
+	log.Trace().Str("base", fr.basename).Any("index", fr.current).Msg("successful jump to next column")
+
+	return fr.current < len(fr.columns)
+}
+
+func (fr *JSONLFileReader) Col() (rimo.ColReader, error) { //nolint:ireturn
+	return NewJSONLColReader(fr.tablename, fr.columns[fr.current], fr.decoder), nil
+}
+
+type JSONLColReader struct {
+	table   string
+	column  string
+	decoder *json.Decoder
+}
+
+func NewJSONLColReader(table, column string, decoder *json.Decoder) *JSONLColReader {
+	return &JSONLColReader{
+		table:   table,
+		column:  column,
+		decoder: decoder,
+	}
+}
+
+func (cr *JSONLColReader) ColName() string {
+	return cr.column
+}
+
+func (cr *JSONLColReader) TableName() string {
+	return cr.table
+}
+
+func (cr *JSONLColReader) Next() bool {
+	return cr.decoder.More()
+}
+
+func (cr *JSONLColReader) Value() (any, error) {
+	row := map[string]any{}
+
+	if err := cr.decoder.Decode(&row); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrReadFile, err)
+	}
+
+	log.Trace().Str("table", cr.table).Str("column", cr.column).Any("value", row[cr.column]).Msg("read value")
+
+	return row[cr.column], nil
 }

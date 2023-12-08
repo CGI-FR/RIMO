@@ -22,7 +22,7 @@
         "tables"
       ]
     },
-    "BoolMetric": {
+    "Bool": {
       "properties": {
         "trueRatio": {
           "type": "number"
@@ -55,16 +55,16 @@
           "type": "boolean"
         },
         "mainMetric": {
-          "$ref": "#/$defs/GenericMetric"
+          "$ref": "#/$defs/Generic"
         },
         "stringMetric": {
-          "$ref": "#/$defs/StringMetric"
+          "$ref": "#/$defs/String"
         },
         "numericMetric": {
-          "$ref": "#/$defs/NumericMetric"
+          "$ref": "#/$defs/Numeric"
         },
         "boolMetric": {
-          "$ref": "#/$defs/BoolMetric"
+          "$ref": "#/$defs/Bool"
         }
       },
       "additionalProperties": false,
@@ -78,7 +78,7 @@
         "mainMetric"
       ]
     },
-    "GenericMetric": {
+    "Generic": {
       "properties": {
         "count": {
           "type": "integer"
@@ -86,10 +86,15 @@
         "empty": {
           "type": "integer"
         },
-        "unique": {
+        "nulls": {
           "type": "integer"
         },
-        "sample": {
+        "distinct": {
+          "type": "integer"
+        },
+        "min": true,
+        "max": true,
+        "samples": {
           "items": true,
           "type": "array"
         }
@@ -99,41 +104,12 @@
       "required": [
         "count",
         "empty",
-        "unique",
-        "sample"
+        "nulls",
+        "samples"
       ]
     },
-    "LenFreq": {
+    "Numeric": {
       "properties": {
-        "length": {
-          "type": "integer"
-        },
-        "freq": {
-          "type": "number"
-        },
-        "sample": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "length",
-        "freq",
-        "sample"
-      ]
-    },
-    "NumericMetric": {
-      "properties": {
-        "min": {
-          "type": "number"
-        },
-        "max": {
-          "type": "number"
-        },
         "mean": {
           "type": "number"
         }
@@ -141,12 +117,10 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "min",
-        "max",
         "mean"
       ]
     },
-    "StringMetric": {
+    "String": {
       "properties": {
         "minLen": {
           "type": "integer"
@@ -154,15 +128,12 @@
         "maxLen": {
           "type": "integer"
         },
-        "mostFrequentLen": {
-          "items": {
-            "$ref": "#/$defs/LenFreq"
-          },
-          "type": "array"
+        "countLen": {
+          "type": "integer"
         },
-        "leastFrequentLen": {
+        "lengths": {
           "items": {
-            "$ref": "#/$defs/LenFreq"
+            "$ref": "#/$defs/StringLen"
           },
           "type": "array"
         }
@@ -171,9 +142,27 @@
       "type": "object",
       "required": [
         "minLen",
-        "maxLen",
-        "mostFrequentLen",
-        "leastFrequentLen"
+        "maxLen"
+      ]
+    },
+    "StringLen": {
+      "properties": {
+        "length": {
+          "type": "integer"
+        },
+        "freq": {
+          "type": "number"
+        },
+        "metrics": {
+          "$ref": "#/$defs/Generic"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "length",
+        "freq",
+        "metrics"
       ]
     },
     "Table": {

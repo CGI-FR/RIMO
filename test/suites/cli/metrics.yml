@@ -1,0 +1,244 @@
+name: test metrics
+testcases:
+  - name: main metric
+    steps:
+      - script: rimo analyse -d ../testdata/main ../testdata/main/output
+        assertions:
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].name' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "data"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[0].name' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "bool"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[0].type' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "bool"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[0].mainMetric.count' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "10"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[0].mainMetric.empty' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "4"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[0].mainMetric.nulls' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[0].mainMetric.distinct' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "2"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[0].mainMetric.samples|length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "5"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[0].boolMetric.trueRatio' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0.5555555555555556"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].name' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "numeric"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].type' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "numeric"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].mainMetric.count' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "10"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].mainMetric.empty' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "3"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].mainMetric.nulls' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].mainMetric.distinct' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "7"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].mainMetric.min' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "-235"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].mainMetric.max' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "100"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].mainMetric.samples|length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "5"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[1].numericMetric.mean' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "-13.539833097777777"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].name' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "string"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].type' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "string"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].mainMetric.count' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "10"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].mainMetric.empty' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].mainMetric.nulls' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].mainMetric.distinct' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "9"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].mainMetric.min' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual ""
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].mainMetric.max' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "教育漢字"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].mainMetric.samples|length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "5"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.minLen' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.maxLen' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "12"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.countLen' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "3"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths|length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "3"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[0].length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "12"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[0].freq' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0.5"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[0].metrics.count' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "5"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[0].metrics.empty' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[0].metrics.nulls' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[0].metrics.distinct' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "5"
+          - result.code ShouldEqual 0
+      - script: yq -o json '.tables[0].columns[2].stringMetric.lengths[0].metrics.min' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual '"hello world "'
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[0].metrics.max' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "教育漢字"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[0].metrics.samples|length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "5"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[1].length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[1].freq' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0.3"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[1].metrics.count' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "3"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[1].metrics.empty' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[1].metrics.nulls' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[1].metrics.distinct' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "3"
+          - result.code ShouldEqual 0
+      - script: yq -o json '.tables[0].columns[2].stringMetric.lengths[1].metrics.min' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual '" "'
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[1].metrics.max' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "_"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[1].metrics.samples|length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "3"
+          - result.code ShouldEqual 0
+
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[2].length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[2].freq' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0.1"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[2].metrics.count' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[2].metrics.empty' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[2].metrics.nulls' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "0"
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[2].metrics.distinct' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
+      - script: yq -o json '.tables[0].columns[2].stringMetric.lengths[2].metrics.min' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual '""'
+          - result.code ShouldEqual 0
+      - script: yq -o json '.tables[0].columns[2].stringMetric.lengths[2].metrics.max' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual '""'
+          - result.code ShouldEqual 0
+      - script: yq '.tables[0].columns[2].stringMetric.lengths[2].metrics.samples|length' ../testdata/main/output/main.yaml
+        assertions:
+          - result.systemout ShouldEqual "1"
+          - result.code ShouldEqual 0
