@@ -14,6 +14,13 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.3.0]
+
+- `Added` moved `min` and `max` to the main metric.
+- `Added` `countNulls` to the main metric.
+- `Added` all main metrics to the lengths section in string metrics.
+- `Removed` `leastFrequentLen` and `mostFrequentLen` all lengths are listed with the most frequent length in first position
+
 ## [0.2.0]
 
 - `Added` new string metrics `minLen` and `maxLen`
