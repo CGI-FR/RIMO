@@ -19,7 +19,13 @@ package rimo
 
 import "github.com/cgi-fr/rimo/pkg/model"
 
+type Resource interface {
+	Open() error
+	Close() error
+}
+
 type ColReader interface {
+	Resource
 	ColName() string
 	TableName() string
 	Next() bool
@@ -27,6 +33,7 @@ type ColReader interface {
 }
 
 type Reader interface {
+	Resource
 	BaseName() string
 	Next() bool
 	Col() (ColReader, error)

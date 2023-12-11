@@ -51,6 +51,9 @@ func NewJSONLFolderReader(folderpath string) (*JSONLFolderReader, error) {
 	}, nil
 }
 
+func (r *JSONLFolderReader) Open() error  { return nil }
+func (r *JSONLFolderReader) Close() error { return nil }
+
 func (r *JSONLFolderReader) BaseName() string {
 	return r.basename
 }
@@ -154,6 +157,9 @@ func NewJSONLColReader(table, column string, decoder *json.Decoder) *JSONLColRea
 		decoder: decoder,
 	}
 }
+
+func (cr *JSONLColReader) Open() error  { return nil }
+func (cr *JSONLColReader) Close() error { return nil }
 
 func (cr *JSONLColReader) ColName() string {
 	return cr.column

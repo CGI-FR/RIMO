@@ -32,84 +32,25 @@ type Driver struct {
 	Distinct   bool
 }
 
-//nolint:funlen,cyclop,gocognit
-func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
+func (d Driver) AnalyseBase(reader Reader, writer Writer) (err error) {
+	if err := reader.Open(); err != nil {
+		return fmt.Errorf("failed to open column reader : %w", err)
+	}
+
+	defer func() {
+		if localerr := reader.Close(); err != nil {
+			err = localerr
+		}
+	}()
+
 	baseName := reader.BaseName()
 
 	base := model.NewBase(baseName)
 	tables := map[string]model.Table{}
 
 	for reader.Next() { // itère colonne par colonne
-		valreader, err := reader.Col()
-		if err != nil {
-			return fmt.Errorf("failed to get column reader : %w", err)
-		}
-
-		nilcount := 0
-
-		for valreader.Next() {
-			val, err := valreader.Value()
-			if err != nil {
-				return fmt.Errorf("failed to read value : %w", err)
-			}
-
-			log.Debug().Msgf("Processing [%s base][%s table][%s column]", baseName, valreader.TableName(), valreader.ColName())
-
-			switch valtyped := val.(type) {
-			case string:
-				col, err := d.AnalyseString(nilcount, valtyped, valreader)
-				if err != nil {
-					return fmt.Errorf("failed to analyse column : %w", err)
-				}
-
-				table, exists := tables[valreader.TableName()]
-				if !exists {
-					table = model.Table{
-						Name:    valreader.TableName(),
-						Columns: []model.Column{},
-					}
-				}
-
-				table.Columns = append(table.Columns, col)
-
-				tables[valreader.TableName()] = table
-			case float64, float32, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-				col, err := d.AnalyseNumeric(nilcount, valtyped, valreader)
-				if err != nil {
-					return fmt.Errorf("failed to analyse column : %w", err)
-				}
-
-				table, exists := tables[valreader.TableName()]
-				if !exists {
-					table = model.Table{
-						Name:    valreader.TableName(),
-						Columns: []model.Column{},
-					}
-				}
-
-				table.Columns = append(table.Columns, col)
-
-				tables[valreader.TableName()] = table
-			case bool:
-				col, err := d.AnalyseBool(nilcount, valtyped, valreader)
-				if err != nil {
-					return fmt.Errorf("failed to analyse column : %w", err)
-				}
-
-				table, exists := tables[valreader.TableName()]
-				if !exists {
-					table = model.Table{
-						Name:    valreader.TableName(),
-						Columns: []model.Column{},
-					}
-				}
-
-				table.Columns = append(table.Columns, col)
-
-				tables[valreader.TableName()] = table
-			case nil:
-				nilcount++
-			}
+		if err := d.analyse(reader, tables); err != nil {
+			return err
 		}
 	}
 
@@ -125,9 +66,96 @@ func (d Driver) AnalyseBase(reader Reader, writer Writer) error {
 		return base.Tables[i].Name < base.Tables[j].Name
 	})
 
-	err := writer.Export(base)
+	err = writer.Export(base)
 	if err != nil {
 		return fmt.Errorf("failed to export base : %w", err)
+	}
+
+	return nil
+}
+
+//nolint:funlen,cyclop
+func (d Driver) analyse(reader Reader, tables map[string]model.Table) (err error) {
+	valreader, err := reader.Col()
+	if err != nil {
+		return fmt.Errorf("failed to get column reader : %w", err)
+	}
+
+	if err := valreader.Open(); err != nil {
+		return fmt.Errorf("failed to open value reader : %w", err)
+	}
+
+	defer func() {
+		if localerr := reader.Close(); err != nil {
+			err = localerr
+		}
+	}()
+
+	nilcount := 0
+
+	for valreader.Next() {
+		val, err := valreader.Value()
+		if err != nil {
+			return fmt.Errorf("failed to read value : %w", err)
+		}
+
+		log.Debug().Msgf("Processing [%s][%s][%s]", reader.BaseName(), valreader.TableName(), valreader.ColName())
+
+		switch valtyped := val.(type) {
+		case string:
+			col, err := d.AnalyseString(nilcount, valtyped, valreader)
+			if err != nil {
+				return fmt.Errorf("failed to analyse column : %w", err)
+			}
+
+			table, exists := tables[valreader.TableName()]
+			if !exists {
+				table = model.Table{
+					Name:    valreader.TableName(),
+					Columns: []model.Column{},
+				}
+			}
+
+			table.Columns = append(table.Columns, col)
+
+			tables[valreader.TableName()] = table
+		case float64, float32, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+			col, err := d.AnalyseNumeric(nilcount, valtyped, valreader)
+			if err != nil {
+				return fmt.Errorf("failed to analyse column : %w", err)
+			}
+
+			table, exists := tables[valreader.TableName()]
+			if !exists {
+				table = model.Table{
+					Name:    valreader.TableName(),
+					Columns: []model.Column{},
+				}
+			}
+
+			table.Columns = append(table.Columns, col)
+
+			tables[valreader.TableName()] = table
+		case bool:
+			col, err := d.AnalyseBool(nilcount, valtyped, valreader)
+			if err != nil {
+				return fmt.Errorf("failed to analyse column : %w", err)
+			}
+
+			table, exists := tables[valreader.TableName()]
+			if !exists {
+				table = model.Table{
+					Name:    valreader.TableName(),
+					Columns: []model.Column{},
+				}
+			}
+
+			table.Columns = append(table.Columns, col)
+
+			tables[valreader.TableName()] = table
+		case nil:
+			nilcount++
+		}
 	}
 
 	return nil
