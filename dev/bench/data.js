@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1702049787330,
+  "lastUpdate": 1702312909678,
   "repoUrl": "https://github.com/CGI-FR/RIMO",
   "entries": {
     "Benchmark": [
@@ -574,6 +574,102 @@ window.BENCHMARK_DATA = {
           {
             "name": "BenchmarkAnalyseInterface/numLines=10000 - allocs/op",
             "value": 26826212,
+            "unit": "allocs/op",
+            "extra": "1 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8efe9d90e204ecd79f0b970a296b848810dd80fa",
+          "message": "chore: fix release action",
+          "timestamp": "2023-12-11T17:39:24+01:00",
+          "tree_id": "f49304dca13442c0113a3e50f38e9b23dba3a9d0",
+          "url": "https://github.com/CGI-FR/RIMO/commit/8efe9d90e204ecd79f0b970a296b848810dd80fa"
+        },
+        "date": 1702312908936,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100 - ns/op",
+            "value": 155571,
+            "unit": "ns/op",
+            "extra": "7546 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100 - lines/s",
+            "value": 642723,
+            "unit": "lines/s",
+            "extra": "7546 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100 - B/op",
+            "value": 10399,
+            "unit": "B/op",
+            "extra": "7546 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=100 - allocs/op",
+            "value": 65,
+            "unit": "allocs/op",
+            "extra": "7546 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=1000 - ns/op",
+            "value": 203223,
+            "unit": "ns/op",
+            "extra": "5545 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=1000 - lines/s",
+            "value": 4920069,
+            "unit": "lines/s",
+            "extra": "5545 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=1000 - B/op",
+            "value": 41465,
+            "unit": "B/op",
+            "extra": "5545 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=1000 - allocs/op",
+            "value": 514,
+            "unit": "allocs/op",
+            "extra": "5545 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=10000 - ns/op",
+            "value": 2921840524,
+            "unit": "ns/op",
+            "extra": "1 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=10000 - lines/s",
+            "value": 3422,
+            "unit": "lines/s",
+            "extra": "1 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=10000 - B/op",
+            "value": 1876858544,
+            "unit": "B/op",
+            "extra": "1 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAnalyseInterface/numLines=10000 - allocs/op",
+            "value": 26827288,
             "unit": "allocs/op",
             "extra": "1 times\n4 procs"
           }
