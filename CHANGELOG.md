@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.4.0]
+
+- `Added` `Open` and `Close` methods to column/value reader inferfaces.
+
 ## [0.3.0]
 
 - `Added` moved `min` and `max` to the main metric.
